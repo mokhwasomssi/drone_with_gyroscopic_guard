@@ -1,5 +1,7 @@
 # STM32 quadcopter firmware using STM32CubeIDE
 
+My goal is writing all code needed for flight.
+
 _working...working...working..._
 
 ## To-do list  
