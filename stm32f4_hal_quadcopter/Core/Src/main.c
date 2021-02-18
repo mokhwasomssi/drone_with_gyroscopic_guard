@@ -50,18 +50,15 @@
 
 /* USER CODE BEGIN PV */
 
+
+// sensor struct
 ICM20948_DATA MYDATA;
-uint8_t whoami_icm;
-uint8_t whoami_mag;
 
-dshot_frame motor1[DSHOT_FRAME_SIZE];
-dshot_frame motor2[DSHOT_FRAME_SIZE];
-dshot_frame motor3[DSHOT_FRAME_SIZE];
-dshot_frame motor4[DSHOT_FRAME_SIZE];
+// motor struct and array
+motors_s mymotors;
+throttle_value myvalue[4] = {0};				// throttle of entire motors
 
-throttle_value value = 0;					// need to keep value = 0 for a while after power on
 
-uint8_t hal_state[4];
 
 /* USER CODE END PV */
 
@@ -78,27 +75,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if (htim == &htim11)
   {
-	  // when using different channel in same timer to generate dshot signal(PWM), only first command works
-	  // because timer state indicate HAL_BUSY at second command, so use "__HAL_TIM_RESET_HANDLE_STATE" macro to clear
-
-	  // motor1 : O
-	  dshot600_single(motor1, value);
-	  hal_state[0] = HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_3, motor1, DSHOT_FRAME_SIZE);
-
-	  // motor2 : O
-	  dshot600_single(motor2, value);
-	  hal_state[1] = HAL_TIM_PWM_Start_DMA(&htim5, TIM_CHANNEL_4, motor2, DSHOT_FRAME_SIZE);
-
-	  __HAL_TIM_RESET_HANDLE_STATE(&htim5);
-	  // motor3 : O
-	  dshot600_single(motor3, value);
-	  hal_state[2] = HAL_TIM_PWM_Start_DMA(&htim5, TIM_CHANNEL_2, motor3, DSHOT_FRAME_SIZE);
-
-	  __HAL_TIM_RESET_HANDLE_STATE(&htim2);
-	  // motor4 : O
-	  dshot600_single(motor4, value);
-	  hal_state[3] = HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, motor4, DSHOT_FRAME_SIZE);
-
+	  run_dshot600(&mymotors, myvalue);
   }
 }
 

@@ -1,1 +1,2 @@
-dshot.c:13:6:dshot600_single	40	static
+dshot.c:14:6:make_dshot600_frame	40	static
+dshot.c:42:6:run_dshot600	16	static
