@@ -60,6 +60,14 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define DEBUG_LED_Pin GPIO_PIN_13
 #define DEBUG_LED_GPIO_Port GPIOC
+#define MOTOR_4_Pin GPIO_PIN_0
+#define MOTOR_4_GPIO_Port GPIOA
+#define MOTOR_3_Pin GPIO_PIN_1
+#define MOTOR_3_GPIO_Port GPIOA
+#define MOTOR_1_Pin GPIO_PIN_2
+#define MOTOR_1_GPIO_Port GPIOA
+#define MOTOR_2_Pin GPIO_PIN_3
+#define MOTOR_2_GPIO_Port GPIOA
 #define SPI_ICM20948_CS_Pin GPIO_PIN_4
 #define SPI_ICM20948_CS_GPIO_Port GPIOA
 #define SPI_ICM20948_SCK_Pin GPIO_PIN_5

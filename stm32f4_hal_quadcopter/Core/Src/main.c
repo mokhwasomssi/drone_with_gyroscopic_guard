@@ -19,13 +19,16 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dma.h"
 #include "spi.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
 #include "icm_20948.h"
+#include "dshot.h"
 
 /* USER CODE END Includes */
 
@@ -51,6 +54,15 @@ ICM20948_DATA MYDATA;
 uint8_t whoami_icm;
 uint8_t whoami_mag;
 
+dshot_frame motor1[DSHOT_FRAME_SIZE];
+dshot_frame motor2[DSHOT_FRAME_SIZE];
+dshot_frame motor3[DSHOT_FRAME_SIZE];
+dshot_frame motor4[DSHOT_FRAME_SIZE];
+
+throttle_value value = 0;					// need to keep value = 0 for a while after power on
+
+uint8_t hal_state[4];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -61,6 +73,34 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  if (htim == &htim11)
+  {
+	  // when using different channel in same timer to generate dshot signal(PWM), only first command works
+	  // because timer state indicate HAL_BUSY at second command, so use "__HAL_TIM_RESET_HANDLE_STATE" macro to clear
+
+	  // motor1 : O
+	  dshot600_single(motor1, value);
+	  hal_state[0] = HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_3, motor1, DSHOT_FRAME_SIZE);
+
+	  // motor2 : O
+	  dshot600_single(motor2, value);
+	  hal_state[1] = HAL_TIM_PWM_Start_DMA(&htim5, TIM_CHANNEL_4, motor2, DSHOT_FRAME_SIZE);
+
+	  __HAL_TIM_RESET_HANDLE_STATE(&htim5);
+	  // motor3 : O
+	  dshot600_single(motor3, value);
+	  hal_state[2] = HAL_TIM_PWM_Start_DMA(&htim5, TIM_CHANNEL_2, motor3, DSHOT_FRAME_SIZE);
+
+	  __HAL_TIM_RESET_HANDLE_STATE(&htim2);
+	  // motor4 : O
+	  dshot600_single(motor4, value);
+	  hal_state[3] = HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, motor4, DSHOT_FRAME_SIZE);
+
+  }
+}
 
 /* USER CODE END 0 */
 
@@ -93,15 +133,24 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_SPI1_Init();
+  MX_TIM2_Init();
+  MX_TIM5_Init();
+  MX_TIM11_Init();
   /* USER CODE BEGIN 2 */
 
+  /*
   INIT_ICM20948();
   INIT_AK09916();
 
 
   if(WHOAMI_AK09916() == DEVICE_ID_AK09916)
   	  HAL_GPIO_WritePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin, RESET);	// Debug LED
+  	  */
+
+
+  HAL_TIM_Base_Start_IT(&htim11); // timer interrupt 1kHz
 
   /* USER CODE END 2 */
 
@@ -110,15 +159,23 @@ int main(void)
   while (1)
   {
 
-      READ_GYRO(&MYDATA);
-	  READ_ACCEL(&MYDATA);
-	  READ_MAG(&MYDATA);
+      //READ_GYRO(&MYDATA);
+	  //READ_ACCEL(&MYDATA);
+	  //READ_MAG(&MYDATA);
 
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 
+	  /*
+	  // motor2 : O
+	  dshot600_single(motor2, value);
+	  hal_state[1] = HAL_TIM_PWM_Start_DMA(&htim5, TIM_CHANNEL_4, motor2, DSHOT_FRAME_SIZE);
 
+	  // motor3 : O
+	  dshot600_single(motor3, value);
+	  hal_state[2] = HAL_TIM_PWM_Start_DMA(&htim5, TIM_CHANNEL_2, motor3, DSHOT_FRAME_SIZE);
+	  */
 
   }
   /* USER CODE END 3 */
