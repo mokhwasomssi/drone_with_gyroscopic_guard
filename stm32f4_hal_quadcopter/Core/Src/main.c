@@ -22,6 +22,7 @@
 #include "dma.h"
 #include "spi.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -29,6 +30,7 @@
 
 #include "icm_20948.h"
 #include "dshot.h"
+#include "flysky_ibus.h"
 
 /* USER CODE END Includes */
 
@@ -51,13 +53,15 @@
 /* USER CODE BEGIN PV */
 
 
-// sensor struct
+// sensor variable
 ICM20948_DATA MYDATA;
 
-// motor struct and array
+// motor variable
 motors_s mymotors;
-throttle_value myvalue[4] = {0};				// throttle of entire motors
+throttle_value myvalue[4] = {0};	// throttle of entire motors
 
+// rc controller variable
+channel_data mychannel[IBUS_USER_CHANNELS] = {0};
 
 
 /* USER CODE END PV */
@@ -71,13 +75,22 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)	// timer interrupt 1kHz
 {
   if (htim == &htim11)
   {
 	  run_dshot600(&mymotors, myvalue);
   }
 }
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(huart->Instance == IBUS_UART_INSTANCE)
+	{
+		ibus_read_channel(mychannel);
+	}
+}
+
 
 /* USER CODE END 0 */
 
@@ -115,6 +128,7 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM5_Init();
   MX_TIM11_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /*
@@ -128,6 +142,8 @@ int main(void)
 
 
   HAL_TIM_Base_Start_IT(&htim11); // timer interrupt 1kHz
+
+  ibus_init();
 
   /* USER CODE END 2 */
 

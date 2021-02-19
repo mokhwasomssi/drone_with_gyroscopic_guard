@@ -9,7 +9,11 @@
 
 #include "dshot.h"
 
-
+void reset_dshot()
+{
+  // it have to send 0 value of dshot frame for a while to reset
+  // regardless of RC receiver value
+}
 
 void make_dshot600_frame(dshot_frame *motor_x, throttle_value value)
 {
