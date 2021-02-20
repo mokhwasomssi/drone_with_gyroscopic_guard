@@ -20,7 +20,7 @@ void ibus_init()
 }
 
 
-void ibus_read_channel(channel_data *channel)
+void ibus_read_channel(channel *channel)
 {
 	//uint8_t ibus_buffer[32] = {0};
 	//HAL_UART_Receive_IT(IBUS_UART, ibus_buffer, 32);

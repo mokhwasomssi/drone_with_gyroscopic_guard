@@ -54,7 +54,7 @@ typedef struct _motors
 
 } motors_s;
 
-
+void dshot_init();
 void make_dshot600_frame(dshot_frame *motor_x, throttle_value value);
 void run_dshot600(motors_s *motors, throttle_value value[]);
 

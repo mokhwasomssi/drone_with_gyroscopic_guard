@@ -9,7 +9,7 @@
 
 #include "dshot.h"
 
-void reset_dshot()
+void dshot_init()
 {
   // it have to send 0 value of dshot frame for a while to reset
   // regardless of RC receiver value

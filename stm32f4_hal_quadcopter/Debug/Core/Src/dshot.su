@@ -1,3 +1,3 @@
-dshot.c:12:6:reset_dshot	4	static
+dshot.c:12:6:dshot_init	4	static
 dshot.c:18:6:make_dshot600_frame	40	static
 dshot.c:46:6:run_dshot600	16	static

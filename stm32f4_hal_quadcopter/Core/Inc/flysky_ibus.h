@@ -24,10 +24,10 @@
 #define IBUS_COMMAND40			0x40	// Command to set servo or motor speed is always 0x40
 #define IBUS_MAX_CHANNLES		14
 
-typedef uint16_t channel_data;
+typedef uint16_t channel;
 
 void ibus_init();
-void ibus_read_channel(channel_data *channel);
+void ibus_read_channel(channel *channel);
 
 
 #endif /* _FLYSKY_IBUS_H_ */

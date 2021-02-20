@@ -54,14 +54,15 @@
 
 
 // sensor variable
-ICM20948_DATA MYDATA;
+icm20948_s mysensor;
 
 // motor variable
-motors_s mymotors;
+motors_s mymotors;					// dshot data frame structure
 throttle_value myvalue[4] = {0};	// throttle of entire motors
 
 // rc controller variable
-channel_data mychannel[IBUS_USER_CHANNELS] = {0};
+channel mychannel[IBUS_USER_CHANNELS] = {0};
+
 
 
 /* USER CODE END PV */
@@ -69,6 +70,8 @@ channel_data mychannel[IBUS_USER_CHANNELS] = {0};
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+
+
 
 /* USER CODE END PFP */
 
@@ -131,26 +134,58 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  /*
-  INIT_ICM20948();
-  INIT_AK09916();
 
 
-  if(WHOAMI_AK09916() == DEVICE_ID_AK09916)
+
+  if(whoami_ak09916() == DEVICE_ID_AK09916)
   	  HAL_GPIO_WritePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin, RESET);	// Debug LED
-  	  */
 
 
-  HAL_TIM_Base_Start_IT(&htim11); // timer interrupt 1kHz
-
+  HAL_TIM_Base_Start_IT(&htim11); // timer interrupt 1kHz : dshot period
   ibus_init();
+
+
+  icm20948_init();
+  ak09916_init();
+
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+
   while (1)
   {
+
+	  read_gyro(&mysensor);
+	  read_accel(&mysensor);
+	  read_mag(&mysensor);
+
+
+	  /*
+	  if(mychannel[4] == 2000) // arming
+	  {
+		  if(mychannel[2] > 1011) // 69
+		  {
+			  for(int i = 0; i < 4; i++)
+				  myvalue[i] = (mychannel[2] - 1000) * 2 + 47;
+		  }
+
+		  else
+		  {
+			  for(int i = 0; i < 4; i++)
+				  myvalue[i] = 69; // minimum value to spin smoothly
+		  }
+	  }
+	  else	// disarming
+	  {
+		  for(int i = 0; i < 4; i++)
+			  myvalue[i] = 0;
+	  }
+
+	  */
+
 
       //READ_GYRO(&MYDATA);
 	  //READ_ACCEL(&MYDATA);

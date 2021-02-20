@@ -27,7 +27,7 @@
 
 
 /* ICM20948 Data Structure */
-typedef struct _ICM20948_DATA
+typedef struct _icm20948
 {
 	int16_t Accel_X_Data;		// Acceleromoter Output Data
 	int16_t Accel_Y_Data;
@@ -40,19 +40,46 @@ typedef struct _ICM20948_DATA
 	int16_t Mag_X_Data;			// Magnetometor Output Data
 	int16_t Mag_Y_Data;
 	int16_t Mag_Z_Data;
-} ICM20948_DATA;
+} icm20948_s;
 /* ICM20948 Data Structure */
 
 
 /* UserBank */
-typedef enum _UserBank
+typedef enum _userbank
 {
-	UserBank_0		= 0 << 4,
-	UserBank_1		= 1 << 4,
-	UserBank_2		= 2 << 4,
-	UserBank_3		= 3 << 4
-} UserBank;
-/* UserBank */
+	userbank_0		= 0 << 4,
+	userbank_1		= 1 << 4,
+	userbank_2		= 2 << 4,
+	userbank_3		= 3 << 4
+} userbank_e;
+/* userbank */
+
+/* functions */
+void cs_high();
+void cs_low();
+
+void select_user_bank(userbank_e ub);
+
+// spi
+void icm20948_read(uint8_t regaddr, uint8_t len);
+void icm20948_write(uint8_t regaddr, uint8_t data);
+
+void ak09916_read(uint8_t regaddr, uint8_t len);
+void ak09916_wrtie(uint8_t regaddr, uint8_t data);
+
+uint8_t whoami_icm20948();
+uint8_t whoami_ak09916();
+
+void icm20948_init();
+void ak09916_init();
+
+void read_gyro(icm20948_s* mydata);
+void read_accel(icm20948_s* mydata);
+void read_mag(icm20948_s* mydata);
+/* functions */
+
+
+
 
 typedef enum _USER_CTRL
 {
@@ -159,27 +186,7 @@ typedef enum _CNTL2
 } CNTL2;
 
 
-/* functions */
-void CS_HIGH();
-void CS_LOW();
 
-void SELECT_USER_BANK(UserBank UB);
-
-void ICM20948_READ(uint8_t regaddr, uint8_t len);
-void ICM20948_WRITE(uint8_t regaddr, uint8_t data);
-
-void AK09916_READ(uint8_t regaddr, uint8_t len);
-void AK09916_WRTIE(uint8_t regaddr, uint8_t data);
-
-uint8_t WHOAMI_ICM20948();
-uint8_t WHOAMI_AK09916();
-
-void INIT_ICM20948();
-void INIT_AK09916();
-
-void READ_GYRO(ICM20948_DATA* myData);
-void READ_ACCEL(ICM20948_DATA* myData);
-void READ_MAG(ICM20948_DATA* myData);
 
 #endif	/* _ICM_20948_H_ */
 
