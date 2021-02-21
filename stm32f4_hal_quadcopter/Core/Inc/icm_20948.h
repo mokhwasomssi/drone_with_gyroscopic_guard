@@ -26,23 +26,39 @@
 /* User Configuration */
 
 
-/* ICM20948 Data Structure */
-typedef struct _icm20948
+/* icm20948 data structure */
+typedef struct icm20948_s
 {
-	int16_t Accel_X_Data;		// Acceleromoter Output Data
-	int16_t Accel_Y_Data;
-	int16_t Accel_Z_Data;
+	int16_t gyro_x;		// gyroscope output data
+	int16_t gyro_y;
+	int16_t gyro_z;
 
-	int16_t Gyro_X_Data;		// Gyroscope Output Data
-	int16_t Gyro_Y_Data;
-	int16_t Gyro_Z_Data;
+	int16_t accel_x;		// acceleromoter output data
+	int16_t accel_y;
+	int16_t accel_z;
 
-	int16_t Mag_X_Data;			// Magnetometor Output Data
-	int16_t Mag_Y_Data;
-	int16_t Mag_Z_Data;
-} icm20948_s;
-/* ICM20948 Data Structure */
+	int16_t mag_x;			// magnetometor output data
+	int16_t mag_y;
+	int16_t mag_z;
 
+} icm20948_t;
+
+typedef struct gyro_offset_s
+{
+	int16_t x;
+	int16_t y;
+	int16_t z;
+
+} gyro_offset_t;
+
+typedef struct gyro_adj_s
+{
+	int16_t x;
+	int16_t y;
+	int16_t z;
+
+} gyro_adj_t;
+/* icm20948 data structure */
 
 /* UserBank */
 typedef enum _userbank
@@ -54,28 +70,43 @@ typedef enum _userbank
 } userbank_e;
 /* userbank */
 
+
 /* functions */
+
+// cs state
 void cs_high();
 void cs_low();
 
+// user bank
 void select_user_bank(userbank_e ub);
 
 // spi
 void icm20948_read(uint8_t regaddr, uint8_t len);
 void icm20948_write(uint8_t regaddr, uint8_t data);
 
+// auxiliary i2c
 void ak09916_read(uint8_t regaddr, uint8_t len);
 void ak09916_wrtie(uint8_t regaddr, uint8_t data);
 
-uint8_t whoami_icm20948();
-uint8_t whoami_ak09916();
+// check sensor id
+uint8_t whoami_icm20948();	// return : 0xEA
+uint8_t whoami_ak09916();	// return : 0x09
 
+// initialize
 void icm20948_init();
 void ak09916_init();
 
-void read_gyro(icm20948_s* mydata);
-void read_accel(icm20948_s* mydata);
-void read_mag(icm20948_s* mydata);
+// read raw sensor data
+void read_raw_gyro(icm20948_t* data);
+void read_raw_accel(icm20948_t* data);
+void read_raw_mag(icm20948_t* data);
+
+// calculate offset
+void cal_offset_gyro(icm20948_t *icm20948, gyro_offset_t *gyro_offset, uint16_t samples);
+
+// adjust gyro data : raw gyro data - offset gyro data
+void adj_gyro(icm20948_t* icm20948, gyro_offset_t *gyro_offset, gyro_adj_t* gyro_adj);
+
 /* functions */
 
 

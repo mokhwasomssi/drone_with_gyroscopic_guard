@@ -156,27 +156,27 @@ void ak09916_init()
 
 
 /* Read Sensor Data */
-void read_gyro(icm20948_s* data)
+void read_raw_gyro(icm20948_t* icm20948)
 {
 	select_user_bank(userbank_0);
 	icm20948_read(B0_GYRO_XOUT_H, 6);
 
-	data->Gyro_X_Data = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]);
-	data->Gyro_Y_Data = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]);
-	data->Gyro_Z_Data = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]);
+	icm20948->gyro_x = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]);
+	icm20948->gyro_y = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]);
+	icm20948->gyro_z = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]);
 }
 
-void read_accel(icm20948_s* data)
+void read_raw_accel(icm20948_t* icm20948)
 {
 	select_user_bank(userbank_0);
 	icm20948_read(B0_ACCEL_XOUT_H, 6);
 
-	data->Accel_X_Data = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]);
-	data->Accel_Y_Data = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]);
-	data->Accel_Z_Data = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]);
+	icm20948->accel_x = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]);
+	icm20948->accel_y = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]);
+	icm20948->accel_z = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]);
 }
 
-void read_mag(icm20948_s* data)
+void read_raw_mag(icm20948_t* icm20948)
 {
 	int16_t data_buffer[3] = {0};
 
@@ -198,9 +198,45 @@ void read_mag(icm20948_s* data)
 
 		if((rx_buffer[0] & 0x08) == 0x00) // not overflow
 		{
-			data->Mag_X_Data = data_buffer[0];
-			data->Mag_Y_Data = data_buffer[1];
-			data->Mag_Z_Data = data_buffer[2];
+			icm20948->mag_x = data_buffer[0];
+			icm20948->mag_y = data_buffer[1];
+			icm20948->mag_z = data_buffer[2];
 		}
 	}
+}
+
+
+//int32_t sum_gyro_x, sum_gyro_y, sum_gyro_z = 0;
+
+// calculate offset
+void cal_offset_gyro(icm20948_t *icm20948, gyro_offset_t *gyro_offset, uint16_t samples)
+{
+	int32_t sum_gyro_x = 0;
+	int32_t sum_gyro_y = 0;
+	int32_t sum_gyro_z = 0;
+	
+	for(int i = 0; i < samples; i++)
+	{
+		read_raw_gyro(icm20948);
+
+		sum_gyro_x += icm20948->gyro_x;
+		sum_gyro_y += icm20948->gyro_y;
+		sum_gyro_z += icm20948->gyro_z;
+
+		//HAL_Delay(1);
+	}
+
+	gyro_offset->x = (sum_gyro_x / samples);
+	gyro_offset->y = (sum_gyro_y / samples);
+	gyro_offset->z = (sum_gyro_z / samples);
+}
+
+// adjust gyro : raw gyro data - offset gyro data
+void adj_gyro(icm20948_t* icm20948, gyro_offset_t *gyro_offset, gyro_adj_t* gyro_adj)
+{
+	read_raw_gyro(icm20948);
+
+	gyro_adj->x = icm20948->gyro_x - gyro_offset->x;
+	gyro_adj->y = icm20948->gyro_y - gyro_offset->y;
+	gyro_adj->z = icm20948->gyro_z - gyro_offset->z;
 }

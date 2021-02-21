@@ -9,6 +9,8 @@ icm_20948.c:93:9:whoami_icm20948	8	static
 icm_20948.c:101:9:whoami_ak09916	8	static
 icm_20948.c:110:6:icm20948_init	8	static
 icm_20948.c:136:6:ak09916_init	8	static
-icm_20948.c:159:6:read_gyro	16	static
-icm_20948.c:169:6:read_accel	16	static
-icm_20948.c:179:6:read_mag	24	static
+icm_20948.c:159:6:read_raw_gyro	16	static
+icm_20948.c:169:6:read_raw_accel	16	static
+icm_20948.c:179:6:read_raw_mag	24	static
+icm_20948.c:212:6:cal_offset_gyro	40	static
+icm_20948.c:235:6:adj_gyro	24	static

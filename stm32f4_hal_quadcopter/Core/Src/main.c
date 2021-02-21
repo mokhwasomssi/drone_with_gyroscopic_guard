@@ -54,14 +54,21 @@
 
 
 // sensor variable
-icm20948_s mysensor;
+uint8_t 		id_icm20948 = 0;	// 0xEA
+uint8_t 		id_ak09916 = 0;		// 0x09
+
+icm20948_t 		my_icm20948;
+gyro_offset_t 	my_gyro_offset;
+gyro_adj_t 		my_gyro_adj;
+
 
 // motor variable
-motors_s mymotors;					// dshot data frame structure
-throttle_value myvalue[4] = {0};	// throttle of entire motors
+motors_s 		my_motors;			// dshot data frame structure
+throttle_value 	my_value[4] = {0};	// throttle of entire motors
+
 
 // rc controller variable
-channel mychannel[IBUS_USER_CHANNELS] = {0};
+channel 		my_channel[IBUS_USER_CHANNELS] = {0};
 
 
 
@@ -71,7 +78,25 @@ channel mychannel[IBUS_USER_CHANNELS] = {0};
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
+/*
+void cal(icm20948_t *icm20948, gyro_offset_t *gyro_offset)
+{
+	  for(int i = 0; i < 100; i++)
+	  {
+		  read_raw_gyro(icm20948);
 
+		  sum_gyro_x += icm20948->gyro_x;
+		  sum_gyro_y += icm20948->gyro_y;
+		  sum_gyro_z += icm20948->gyro_z;
+
+	  }
+
+	  gyro_offset->x = sum_gyro_x / 100;
+	  gyro_offset->y = sum_gyro_y / 100;
+	  gyro_offset->z = sum_gyro_z / 100;
+
+}
+*/
 
 /* USER CODE END PFP */
 
@@ -82,7 +107,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)	// timer interrupt 1
 {
   if (htim == &htim11)
   {
-	  run_dshot600(&mymotors, myvalue);
+	  run_dshot600(&my_motors, my_value);
   }
 }
 
@@ -90,7 +115,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if(huart->Instance == IBUS_UART_INSTANCE)
 	{
-		ibus_read_channel(mychannel);
+		ibus_read_channel(my_channel);
 	}
 }
 
@@ -134,19 +159,22 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  // send dshot 1Khz
+  HAL_TIM_Base_Start_IT(&htim11);
 
-
-
-  if(whoami_ak09916() == DEVICE_ID_AK09916)
-  	  HAL_GPIO_WritePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin, RESET);	// Debug LED
-
-
-  HAL_TIM_Base_Start_IT(&htim11); // timer interrupt 1kHz : dshot period
+  // init rc controller
   ibus_init();
 
+  // check sensor id
+  id_icm20948 = whoami_icm20948();
+  id_ak09916 = whoami_ak09916();
 
+  // init sensor
   icm20948_init();
   ak09916_init();
+
+  // calculate offset
+  cal_offset_gyro(&my_icm20948, &my_gyro_offset, 1000);
 
 
   /* USER CODE END 2 */
@@ -158,52 +186,15 @@ int main(void)
   while (1)
   {
 
-	  read_gyro(&mysensor);
-	  read_accel(&mysensor);
-	  read_mag(&mysensor);
-
-
 	  /*
-	  if(mychannel[4] == 2000) // arming
-	  {
-		  if(mychannel[2] > 1011) // 69
-		  {
-			  for(int i = 0; i < 4; i++)
-				  myvalue[i] = (mychannel[2] - 1000) * 2 + 47;
-		  }
+	  read_raw_gyro(&my_icm20948);
+	  read_raw_accel(&my_icm20948);
+	  read_raw_mag(&my_icm20948);
+	*/
 
-		  else
-		  {
-			  for(int i = 0; i < 4; i++)
-				  myvalue[i] = 69; // minimum value to spin smoothly
-		  }
-	  }
-	  else	// disarming
-	  {
-		  for(int i = 0; i < 4; i++)
-			  myvalue[i] = 0;
-	  }
-
-	  */
+	  adj_gyro(&my_icm20948, &my_gyro_offset, &my_gyro_adj);
 
 
-      //READ_GYRO(&MYDATA);
-	  //READ_ACCEL(&MYDATA);
-	  //READ_MAG(&MYDATA);
-
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-
-	  /*
-	  // motor2 : O
-	  dshot600_single(motor2, value);
-	  hal_state[1] = HAL_TIM_PWM_Start_DMA(&htim5, TIM_CHANNEL_4, motor2, DSHOT_FRAME_SIZE);
-
-	  // motor3 : O
-	  dshot600_single(motor3, value);
-	  hal_state[2] = HAL_TIM_PWM_Start_DMA(&htim5, TIM_CHANNEL_2, motor3, DSHOT_FRAME_SIZE);
-	  */
 
   }
   /* USER CODE END 3 */
