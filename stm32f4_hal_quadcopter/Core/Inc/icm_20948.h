@@ -1,19 +1,20 @@
 /*
 *
-* icm_20948.h
+* 	icm_20948.h
 *
- *  Created on: Dec 26, 2020
- *      Author: mokhwasomssi
- *
-*   Chip : ICM-20948
-*   Breakout Board : SparkFun 9Dof IMU Breakout - ICM-20948 (Qwiic)
+*  	Created on: Dec 26, 2020
+*      Author: mokhwasomssi
+*
+*   gyro and accel 		: icm-20948
+*	magnatometer 		: ak09916
+*   Breakout Board		: SparkFun 9Dof IMU Breakout - ICM-20948 (Qwiic)
 *
 */
 
 #ifndef _ICM_20948_H_
 #define	_ICM_20948_H_
 
-#include "icm_20948_register.h"			// Define Register List of ICM-20948
+#include "icm_20948_register.h"
 #include "stm32f4xx_hal.h"
 #include "main.h"
 #include "spi.h"
@@ -26,52 +27,50 @@
 /* User Configuration */
 
 
-/* icm20948 data structure */
+// icm20948 data structure 
 typedef struct icm20948_s
 {
-	int16_t gyro_x;		// gyroscope output data
-	int16_t gyro_y;
-	int16_t gyro_z;
+	// unit lsb
+	int16_t gyro_lsb_x;		// gyroscope output data
+	int16_t gyro_lsb_y;
+	int16_t gyro_lsb_z;
 
-	int16_t accel_x;		// acceleromoter output data
-	int16_t accel_y;
-	int16_t accel_z;
+	// unit dps
+	double gyro_dps_x;		
+	double gyro_dps_y;
+	double gyro_dps_z;
 
-	int16_t mag_x;			// magnetometor output data
-	int16_t mag_y;
-	int16_t mag_z;
+	// unit lsb
+	int16_t accel_lsb_x;	// acceleromoter output data
+	int16_t accel_lsb_y;
+	int16_t accel_lsb_z;
+
+	// unit g
+	double accel_g_x;		
+	double accel_g_y;
+	double accel_g_z;
 
 } icm20948_t;
 
-typedef struct gyro_offset_s
+// ak09916 data structure
+typedef struct ak09916_s
 {
-	int16_t x;
-	int16_t y;
-	int16_t z;
+	// unit lsb
+	int16_t mag_x;
+	int16_t mag_y;
+	int16_t mag_z;
 
-} gyro_offset_t;
+} ak09916_t;
 
-typedef struct gyro_adj_s
-{
-	int16_t x;
-	int16_t y;
-	int16_t z;
-
-} gyro_adj_t;
-/* icm20948 data structure */
-
-/* UserBank */
-typedef enum _userbank
+// user bank
+typedef enum userbank_e
 {
 	userbank_0		= 0 << 4,
 	userbank_1		= 1 << 4,
 	userbank_2		= 2 << 4,
 	userbank_3		= 3 << 4
 } userbank_e;
-/* userbank */
 
-
-/* functions */
 
 // cs state
 void cs_high();
@@ -96,22 +95,22 @@ uint8_t whoami_ak09916();	// return : 0x09
 void icm20948_init();
 void ak09916_init();
 
-// read raw sensor data
-void read_raw_gyro(icm20948_t* data);
-void read_raw_accel(icm20948_t* data);
-void read_raw_mag(icm20948_t* data);
+// read gyro
+void read_gyro_lsb(icm20948_t* icm20948);
+void read_gyro_dps(icm20948_t* icm20948);
 
-// calculate offset
-void cal_offset_gyro(icm20948_t *icm20948, gyro_offset_t *gyro_offset, uint16_t samples);
+// read aceel
+void read_accel_lsb(icm20948_t* icm20948);
+void read_accel_g(icm20948_t* icm20948);
 
-// adjust gyro data : raw gyro data - offset gyro data
-void adj_gyro(icm20948_t* icm20948, gyro_offset_t *gyro_offset, gyro_adj_t* gyro_adj);
+// read mag
+void read_mag_lsb(ak09916_t* ak09916);
 
-/* functions */
+// calibrate gyro and accel
+void calibrate_icm20948(icm20948_t* icm20948, uint16_t samples);
 
 
-
-
+// registers
 typedef enum _USER_CTRL
 {
 	DMP_EN 			= 1 << 7,		// Enables DMP features
@@ -144,10 +143,10 @@ typedef enum _GYRO_SMPLRT_DIV
 typedef enum _GYRO_CONFIG_1			// Reset Value : 0x01
 {
 	GYRO_DLPFCFG = 0,				// Gyro low pass filter configuration (Table 16)
-	GYRO_FS_SEL_250dps = 1,			// Gyro Full Scale Select
-	GYRO_FS_SEL_500dps = 3,
-	GYRO_FS_SEL_1000dps = 5,
-	GYRO_FS_SEL_2000dps = 7,
+	GYRO_FS_SEL_250dps = 0,			// Gyro Full Scale Select
+	GYRO_FS_SEL_500dps = 2,
+	GYRO_FS_SEL_1000dps = 4,
+	GYRO_FS_SEL_2000dps = 6,
 	GYRO_FCHOICE = 1				// Enable gyro DLPF
 } GYRO_CONFIG_1;
 

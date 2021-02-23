@@ -58,9 +58,6 @@ uint8_t 		id_icm20948 = 0;	// 0xEA
 uint8_t 		id_ak09916 = 0;		// 0x09
 
 icm20948_t 		my_icm20948;
-gyro_offset_t 	my_gyro_offset;
-gyro_adj_t 		my_gyro_adj;
-
 
 // motor variable
 motors_s 		my_motors;			// dshot data frame structure
@@ -78,25 +75,6 @@ channel 		my_channel[IBUS_USER_CHANNELS] = {0};
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-/*
-void cal(icm20948_t *icm20948, gyro_offset_t *gyro_offset)
-{
-	  for(int i = 0; i < 100; i++)
-	  {
-		  read_raw_gyro(icm20948);
-
-		  sum_gyro_x += icm20948->gyro_x;
-		  sum_gyro_y += icm20948->gyro_y;
-		  sum_gyro_z += icm20948->gyro_z;
-
-	  }
-
-	  gyro_offset->x = sum_gyro_x / 100;
-	  gyro_offset->y = sum_gyro_y / 100;
-	  gyro_offset->z = sum_gyro_z / 100;
-
-}
-*/
 
 /* USER CODE END PFP */
 
@@ -159,6 +137,7 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
+
   // send dshot 1Khz
   HAL_TIM_Base_Start_IT(&htim11);
 
@@ -174,7 +153,9 @@ int main(void)
   ak09916_init();
 
   // calculate offset
-  cal_offset_gyro(&my_icm20948, &my_gyro_offset, 1000);
+  calibrate_icm20948(&my_icm20948, 100);
+
+  HAL_Delay(10);
 
 
   /* USER CODE END 2 */
@@ -185,17 +166,8 @@ int main(void)
 
   while (1)
   {
-
-	  /*
-	  read_raw_gyro(&my_icm20948);
-	  read_raw_accel(&my_icm20948);
-	  read_raw_mag(&my_icm20948);
-	*/
-
-	  adj_gyro(&my_icm20948, &my_gyro_offset, &my_gyro_adj);
-
-
-
+	  read_gyro_lsb(&my_icm20948);
+	  read_accel_lsb(&my_icm20948);
   }
   /* USER CODE END 3 */
 }
