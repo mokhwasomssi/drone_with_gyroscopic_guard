@@ -52,7 +52,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(SPI_ICM20948_CS_GPIO_Port, SPI_ICM20948_CS_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(SPI_ICM20948_CS_GPIO_Port, SPI_ICM20948_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = DEBUG_LED_Pin;

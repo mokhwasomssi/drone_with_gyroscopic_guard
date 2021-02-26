@@ -54,14 +54,20 @@
 
 
 // sensor variable
-uint8_t 		id_icm20948 = 0;	// 0xEA
-uint8_t 		id_ak09916 = 0;		// 0x09
+uint8_t 		id_icm20948 	= 0;	// 0xEA
+uint8_t 		id_ak09916 		= 0;	// 0x09
 
-icm20948_t 		my_icm20948;
+icm20948_t 		my_icm20948 	= {0, };
+angle_t 		my_angle 		= {0, };
+
+uint8_t 		my_dt			= 0;
+
+uint32_t		period_us		= 0;
+
 
 // motor variable
 motors_s 		my_motors;			// dshot data frame structure
-throttle_value 	my_value[4] = {0};	// throttle of entire motors
+throttle_value 	my_value[4] 	= {0};	// throttle of entire motors
 
 
 // rc controller variable
@@ -85,7 +91,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)	// timer interrupt 1
 {
   if (htim == &htim11)
   {
-	  run_dshot600(&my_motors, my_value);
+	  //run_dshot600(&my_motors, my_value);
+	  //__HAL_TIM_SET_COUNTER(&htim10, 0);
+	  complementary_filter(&my_icm20948, &my_angle);
+	  period_us = __HAL_TIM_GET_COUNTER(&htim11);
+
+
   }
 }
 
@@ -135,6 +146,7 @@ int main(void)
   MX_TIM5_Init();
   MX_TIM11_Init();
   MX_USART1_UART_Init();
+  MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
 
 
@@ -152,22 +164,24 @@ int main(void)
   icm20948_init();
   ak09916_init();
 
-  // calculate offset
+  // calibrate sensor
   calibrate_icm20948(&my_icm20948, 100);
-
-  HAL_Delay(10);
 
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
-
   while (1)
   {
-	  read_gyro_lsb(&my_icm20948);
-	  read_accel_lsb(&my_icm20948);
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+
+	  //__HAL_TIM_SET_COUNTER(&htim10, 0);
+	  //complementary_filter(&my_icm20948, &my_angle);
+	  //period_us = __HAL_TIM_GET_COUNTER(&htim11);
+
   }
   /* USER CODE END 3 */
 }

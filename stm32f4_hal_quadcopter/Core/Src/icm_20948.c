@@ -23,7 +23,7 @@ uint8_t rx_buffer[6] = {0};
 // cs state
 void cs_high()
 {
-	HAL_GPIO_WritePin(CS_PIN_PORT, CS_PIN_NUMBER, SET);
+	HAL_GPIO_WritePin(CS_PIN_PORT, CS_PIN_NUMBER, SET);	
 }
 
 void cs_low()
@@ -45,8 +45,6 @@ void icm20948_read(uint8_t regaddr, uint8_t len)
 	HAL_SPI_Transmit(SPI_ICM20948, tx_buffer, 1, 10);
 	HAL_SPI_Receive(SPI_ICM20948, rx_buffer, len, 10);
 	cs_high();
-
-	HAL_Delay(1);
 }
 
 void icm20948_write(uint8_t regaddr, uint8_t data)
@@ -57,6 +55,7 @@ void icm20948_write(uint8_t regaddr, uint8_t data)
 	HAL_SPI_Transmit(SPI_ICM20948, tx_buffer, 2, 10);
 	cs_high();
 
+	// necessary
 	HAL_Delay(1);
 }
 
@@ -149,10 +148,11 @@ void ak09916_init()
 	ak09916_wrtie(MAG_CNTL2, Continuous_measurement_mode_4);
 }
 
+
+
 // read gyro
-void read_gyro_lsb(icm20948_t* icm20948)
+void read_gyro_lsb(icm20948_t* icm20948)	// 22us
 {
-	select_user_bank(userbank_0);
 	icm20948_read(B0_GYRO_XOUT_H, 6);
 
 	icm20948->gyro_lsb_x = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]);
@@ -160,28 +160,21 @@ void read_gyro_lsb(icm20948_t* icm20948)
 	icm20948->gyro_lsb_z = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]);
 }
 
-void read_gyro_dps(icm20948_t* icm20948)
+void read_gyro_dps(icm20948_t* icm20948)	
 {
-	// temporary array 
-	int16_t raw_gyro[3] = {0, 0, 0};
+	// get lsb data
+	read_gyro_lsb(icm20948);
 
-	select_user_bank(userbank_0);
-	icm20948_read(B0_GYRO_XOUT_H, 6);
-
-	raw_gyro[0] = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]);
-	raw_gyro[1] = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]);
-	raw_gyro[2] = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]);
-
-	icm20948->gyro_dps_x = raw_gyro[0] / 131.0;
-	icm20948->gyro_dps_y = raw_gyro[1] / 131.0;
-	icm20948->gyro_dps_z = raw_gyro[2] / 131.0;
+	// divide by 131(lsb/dps)
+	icm20948->gyro_dps_x = icm20948->gyro_lsb_x / 131.0;
+	icm20948->gyro_dps_y = icm20948->gyro_lsb_y / 131.0;
+	icm20948->gyro_dps_z = icm20948->gyro_lsb_z / 131.0;  
 }
 
 
 // read aceel
-void read_accel_lsb(icm20948_t* icm20948)
+void read_accel_lsb(icm20948_t* icm20948)	// 22us
 {
-	select_user_bank(userbank_0);
 	icm20948_read(B0_ACCEL_XOUT_H, 6);
 
 	icm20948->accel_lsb_x = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]);
@@ -191,19 +184,11 @@ void read_accel_lsb(icm20948_t* icm20948)
 
 void read_accel_g(icm20948_t* icm20948)
 {
-	// temporary array 
-	int16_t raw_accel[3] = {0, 0, 0};
+	read_accel_lsb(icm20948);
 
-	select_user_bank(userbank_0);
-	icm20948_read(B0_ACCEL_XOUT_H, 6);
-
-	raw_accel[0] = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]);
-	raw_accel[1] = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]);
-	raw_accel[2] = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]);
-
-	icm20948->accel_g_x = raw_accel[0] / 16384.0;
-	icm20948->accel_g_y = raw_accel[1] / 16384.0;
-	icm20948->accel_g_z = raw_accel[2] / 16384.0;
+	icm20948->accel_g_x = icm20948->accel_lsb_x / 16384.0;
+	icm20948->accel_g_y = icm20948->accel_lsb_y / 16384.0;
+	icm20948->accel_g_z = (icm20948->accel_lsb_z / 16384.0) + 1;
 }
 
 
@@ -248,11 +233,14 @@ void calibrate_icm20948(icm20948_t* icm20948, uint16_t samples)
 	int32_t accel_bias[3] = {0, 0, 0};
 	uint8_t accel_offset[6] = {0, 0, 0, 0, 0, 0};
 
+	// for read function
+	select_user_bank(userbank_0);
+
 	// average
 	for(int i = 0; i < samples; i++)
 	{
-		read_gyro_lsb(icm20948);
 		read_accel_lsb(icm20948);
+		read_gyro_lsb(icm20948);
 
 		gyro_bias[0] += icm20948->gyro_lsb_x;
 		gyro_bias[1] += icm20948->gyro_lsb_y;
@@ -322,4 +310,30 @@ void calibrate_icm20948(icm20948_t* icm20948, uint16_t samples)
 	icm20948_write(B1_YA_OFFS_L, accel_offset[3]);
 	icm20948_write(B1_ZA_OFFS_H, accel_offset[4]);
 	icm20948_write(B1_ZA_OFFS_L, accel_offset[5]);
+
+	// for read function
+	select_user_bank(userbank_0);
+}
+
+
+void complementary_filter(icm20948_t *icm20948, angle_t *angle)
+{
+	read_gyro_dps(icm20948);
+	read_accel_g(icm20948);
+
+	// angle from gyro
+	// dt : 1ms
+	angle->gyro_angle_x += icm20948->gyro_dps_x * (0.001);
+	angle->gyro_angle_y += icm20948->gyro_dps_y * (0.001);
+	angle->gyro_angle_z += icm20948->gyro_dps_z * (0.001);
+
+	// angle from accel
+	angle->accel_angle_x = atan(icm20948->accel_g_y / sqrt( pow(icm20948->accel_g_x, 2) + pow(icm20948->accel_g_z, 2) ) ) * 57.3;
+	angle->accel_angle_y = atan(icm20948->accel_g_x / sqrt( pow(icm20948->accel_g_y, 2) + pow(icm20948->accel_g_z, 2) ) ) * 57.3;
+	angle->accel_angle_z = 0;
+
+	// angle from complementary filter
+	angle->angle_x = ALPHA * angle->gyro_angle_x + (1 - ALPHA) * angle->accel_angle_x;
+	angle->angle_y = ALPHA * angle->gyro_angle_y + (1 - ALPHA) * angle->accel_angle_y;
+	angle->angle_z = angle->gyro_angle_z;
 }

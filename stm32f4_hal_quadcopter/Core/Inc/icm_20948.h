@@ -19,6 +19,9 @@
 #include "main.h"
 #include "spi.h"
 
+#include <math.h>
+
+#define ALPHA				0.96
 
 /* User Configuration */
 #define SPI_ICM20948 		(&hspi1)			// SPI Number
@@ -51,6 +54,25 @@ typedef struct icm20948_s
 	double accel_g_z;
 
 } icm20948_t;
+
+typedef struct angle
+{
+	// from gyro
+	double gyro_angle_x;
+	double gyro_angle_y;
+	double gyro_angle_z;
+
+	// from accel
+	double accel_angle_x;
+	double accel_angle_y;
+	double accel_angle_z;
+
+	// from complementary filter
+	double angle_x;
+	double angle_y;
+	double angle_z;
+
+} angle_t;
 
 // ak09916 data structure
 typedef struct ak09916_s
@@ -108,6 +130,9 @@ void read_mag_lsb(ak09916_t* ak09916);
 
 // calibrate gyro and accel
 void calibrate_icm20948(icm20948_t* icm20948, uint16_t samples);
+
+// complementary filter
+void complementary_filter(icm20948_t *icm20948, angle_t *angle);
 
 
 // registers
