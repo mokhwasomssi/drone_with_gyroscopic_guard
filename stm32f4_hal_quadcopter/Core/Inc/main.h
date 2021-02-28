@@ -76,6 +76,10 @@ void Error_Handler(void);
 #define SPI_ICM20948_MISO_GPIO_Port GPIOA
 #define SPI_ICM20948_MOSI_Pin GPIO_PIN_7
 #define SPI_ICM20948_MOSI_GPIO_Port GPIOA
+#define IBUS_TX_Pin GPIO_PIN_9
+#define IBUS_TX_GPIO_Port GPIOA
+#define IBUS_RX_Pin GPIO_PIN_10
+#define IBUS_RX_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

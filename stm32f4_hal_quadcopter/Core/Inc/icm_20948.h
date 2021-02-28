@@ -19,11 +19,15 @@
 #include "main.h"
 #include "spi.h"
 
+#include "flysky_ibus.h"
 #include <math.h>
+#include <stdbool.h>
 
-#define ALPHA				0.96
 
 /* User Configuration */
+#define ALPHA				0.96
+#define dt					0.001125 				// 1.125khz
+
 #define SPI_ICM20948 		(&hspi1)			// SPI Number
 #define CS_PIN_PORT			GPIOA				// CS Pin
 #define CS_PIN_NUMBER		GPIO_PIN_4
@@ -54,6 +58,20 @@ typedef struct icm20948_s
 	double accel_g_z;
 
 } icm20948_t;
+
+typedef struct offset
+{
+	bool offsetting;
+
+	int32_t gyro_x;
+	int32_t gyro_y;
+	int32_t gyro_z;
+
+	int32_t accel_x;
+	int32_t accel_y;
+	int32_t accel_z;
+
+} offset_t;
 
 typedef struct angle
 {
@@ -160,7 +178,7 @@ typedef enum _PWR_MGNT_1			// Reset Value : 0x41
 
 typedef enum _GYRO_SMPLRT_DIV
 {
-	Gyro_ODR_1100Hz = 0,			// Output Data Rate = 1.1kHz / (1 + GYRO_SMPLRT_DIV)
+	Gyro_ODR_1125Hz = 0,			// Output Data Rate = 1.1kHz / (1 + GYRO_SMPLRT_DIV)
 	Gyro_ODR_100Hz = 10,
 	Gyro_ODR_10Hz = 109
 } GYRO_SMPLRT_DIV;
@@ -175,9 +193,16 @@ typedef enum _GYRO_CONFIG_1			// Reset Value : 0x01
 	GYRO_FCHOICE = 1				// Enable gyro DLPF
 } GYRO_CONFIG_1;
 
+typedef enum _ODR_ALING_EN
+{
+	ODR_START_TIME_ALIGNMENT_DISABLE = 0,
+	ODR_START_TIME_ALIGNMENT_ENABLE = 1
+
+} ODR_ALING_EN;
+
 typedef enum _ACCEL_SMPLRT_DIV_2
 {
-	Accel_ODR_1100Hz = 0,			// Output Data Rate = 1.1kHz / (1 + ACCEL_SMPLRT_DIV)
+	Accel_ODR_1125Hz = 0,			// Output Data Rate = 1.1kHz / (1 + ACCEL_SMPLRT_DIV)
 	Accel_ODR_100Hz = 10,
 	Accel_ODR_10Hz = 109
 } ACCEL_SMPLRT_DIV_2;

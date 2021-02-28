@@ -26,8 +26,8 @@
 
 typedef uint16_t channel;
 
+
 void ibus_init();
 void ibus_read_channel(channel *channel);
-
 
 #endif /* _FLYSKY_IBUS_H_ */

@@ -172,9 +172,9 @@
 #define B2_ZG_OFFS_USRH					0x07
 #define B2_ZG_OFFS_USRL					0x08
 
-/*
+
 #define B2_ODR_ALIGN_EN					0x09		// ODR Start-Time Alignment
-*/
+
 
 #define B2_ACCEL_SMPLRT_DIV_1			0x10		// ACCEL Sample Rate Divider
 #define B2_ACCEL_SMPLRT_DIV_2			0x11		

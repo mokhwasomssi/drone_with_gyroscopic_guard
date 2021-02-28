@@ -57,6 +57,7 @@ void ibus_read_channel(channel *channel)
 		}
 	}
 
-	HAL_UART_Receive_IT(IBUS_UART, ibus_buffer, 32);
+	// if you use HAL_UART_RxCpltCallback() function
+	//HAL_UART_Receive_IT(IBUS_UART, ibus_buffer, 32);
 }
 

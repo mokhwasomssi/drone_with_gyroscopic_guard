@@ -31,6 +31,7 @@
 #include "icm_20948.h"
 #include "dshot.h"
 #include "flysky_ibus.h"
+#include "pid.h"
 
 /* USER CODE END Includes */
 
@@ -54,25 +55,35 @@
 
 
 // sensor variable
-uint8_t 		id_icm20948 	= 0;	// 0xEA
-uint8_t 		id_ak09916 		= 0;	// 0x09
+extern uint8_t rx_buffer[6];
 
-icm20948_t 		my_icm20948 	= {0, };
-angle_t 		my_angle 		= {0, };
+uint8_t 			id_icm20948 	= 0;	// 0xEA
+uint8_t 			id_ak09916 		= 0;	// 0x09
 
-uint8_t 		my_dt			= 0;
+icm20948_t 			my_icm20948 	= {0, };
+angle_t 			my_angle 		= {0, };
 
-uint32_t		period_us		= 0;
+uint8_t 			my_dt			= 0;
+
+uint32_t			period_us		= 0;
 
 
 // motor variable
-motors_s 		my_motors;			// dshot data frame structure
-throttle_value 	my_value[4] 	= {0};	// throttle of entire motors
+motors_s 			my_motors;				// dshot data frame structure
+throttle_value 		my_value[4]		= {0};	// throttle of entire motors
 
 
 // rc controller variable
-channel 		my_channel[IBUS_USER_CHANNELS] = {0};
+channel 			my_channel[IBUS_USER_CHANNELS] = {0};
+uint8_t 			ibus_flag = 0;
+extern uint8_t ibus_buffer[32];
 
+
+// pid variable
+target_angle_t 		my_target_angle		 = {0, };	// 0
+balancing_force_t 	my_balancing_force	 = {0, };	// output of pid
+
+motor_speed_t		my_motor_speed		 = {0, };	// output of motor mixing algorithm
 
 
 /* USER CODE END PV */
@@ -91,22 +102,32 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)	// timer interrupt 1
 {
   if (htim == &htim11)
   {
-	  //run_dshot600(&my_motors, my_value);
-	  //__HAL_TIM_SET_COUNTER(&htim10, 0);
+
+
 	  complementary_filter(&my_icm20948, &my_angle);
+	  p_control(&my_balancing_force, &my_target_angle, &my_angle);
+	  distribute(&my_motor_speed, &my_balancing_force);
+
+	  run_dshot600(&my_motors, my_value);
+
+
+	  ibus_read_channel(my_channel);
 	  period_us = __HAL_TIM_GET_COUNTER(&htim11);
 
 
   }
 }
 
+// ibus protocol receive interrupt
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
+	// 7ms period
 	if(huart->Instance == IBUS_UART_INSTANCE)
 	{
-		ibus_read_channel(my_channel);
+		HAL_UART_Receive_IT(IBUS_UART, ibus_buffer, 32);
 	}
 }
+
 
 
 /* USER CODE END 0 */
@@ -146,12 +167,9 @@ int main(void)
   MX_TIM5_Init();
   MX_TIM11_Init();
   MX_USART1_UART_Init();
-  MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
 
 
-  // send dshot 1Khz
-  HAL_TIM_Base_Start_IT(&htim11);
 
   // init rc controller
   ibus_init();
@@ -165,8 +183,15 @@ int main(void)
   ak09916_init();
 
   // calibrate sensor
+  HAL_Delay(100);
+
   calibrate_icm20948(&my_icm20948, 100);
 
+  // 1khz loop
+  HAL_TIM_Base_Start_IT(&htim11);
+
+
+  // after init, debug led on
 
   /* USER CODE END 2 */
 
@@ -178,9 +203,34 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
+
+
 	  //__HAL_TIM_SET_COUNTER(&htim10, 0);
 	  //complementary_filter(&my_icm20948, &my_angle);
 	  //period_us = __HAL_TIM_GET_COUNTER(&htim11);
+
+	  /*
+	  if(my_channel[4] == 2000) // arming
+	  {
+		  if(my_channel[2] > 1011) // 69
+		  {
+			  for(int i = 0; i < 4; i++)
+				  my_value[i] = (my_channel[2] - 1000) * 2 + 47;
+		  }
+
+		  else
+		  {
+			  for(int i = 0; i < 4; i++)
+				  my_value[i] = 69; // minimum value to spin smoothly
+		  }
+	  }
+
+	  else	// disarming
+	  {
+		  for(int i = 0; i < 4; i++)
+			  my_value[i] = 0;
+	  }
+	  */
 
   }
   /* USER CODE END 3 */

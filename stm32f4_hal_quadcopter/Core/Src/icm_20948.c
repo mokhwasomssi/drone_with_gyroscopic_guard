@@ -19,6 +19,9 @@
 uint8_t tx_buffer[6] = {0};
 uint8_t rx_buffer[6] = {0};
 
+// offset variable
+offset_t my_offset = {0, };
+
 
 // cs state
 void cs_high()
@@ -107,7 +110,7 @@ void icm20948_init()
 {
 	// ICM20948 Reset
 	select_user_bank(userbank_0);
-	icm20948_write(B0_PWR_MGMT_1, DEVICE_RESET | 0x41);
+	icm20948_write(B0_PWR_MGMT_1, DEVICE_RESET | 0x41);	// 0x41 is reset value
 
 	// SPI mode only
 	select_user_bank(userbank_0);
@@ -117,13 +120,17 @@ void icm20948_init()
 	select_user_bank(userbank_0);
 	icm20948_write(B0_PWR_MGMT_1, WAKE | CLKSEL);
 
+	// ODR start time alignment
+	select_user_bank(userbank_2);
+	icm20948_write(B2_ODR_ALIGN_EN, ODR_START_TIME_ALIGNMENT_ENABLE);
+
 	// Set Gyroscope ODR and Scale
 	select_user_bank(userbank_2);
-	icm20948_write(B2_GYRO_SMPLRT_DIV, Gyro_ODR_1100Hz);				// Gyro ODR = 1.1kHz
+	icm20948_write(B2_GYRO_SMPLRT_DIV, Gyro_ODR_1125Hz);				// Gyro ODR = 1.125kHz
 	icm20948_write(B2_GYRO_CONFIG_1, GYRO_FS_SEL_250dps | GYRO_FCHOICE);	// Gyro scale ±250dps and Enable DLPF
-
+																			// 자이로 스케일 키우면 잔떨림은 감지x
 	// Set Accelerometer ODR and Scale
-	icm20948_write(B2_ACCEL_SMPLRT_DIV_2, Accel_ODR_1100Hz);			// Accel ODR = 1.1kHz
+	icm20948_write(B2_ACCEL_SMPLRT_DIV_2, Accel_ODR_1125Hz);			// Accel ODR = 1.125kHz
 	icm20948_write(B2_ACCEL_CONFIG, ACCEL_FS_SEL_2g | ACCEL_FCHOICE);	// Accel scale ±2g and Enable DLPF
 }
 
@@ -151,13 +158,25 @@ void ak09916_init()
 
 
 // read gyro
-void read_gyro_lsb(icm20948_t* icm20948)	// 22us
+void read_gyro_lsb(icm20948_t* icm20948)
 {
 	icm20948_read(B0_GYRO_XOUT_H, 6);
 
-	icm20948->gyro_lsb_x = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]);
-	icm20948->gyro_lsb_y = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]);
-	icm20948->gyro_lsb_z = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]);
+	// calibration
+	if(my_offset.offsetting == 1)
+	{
+		icm20948->gyro_lsb_x = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]) - my_offset.gyro_x;
+		icm20948->gyro_lsb_y = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]) - my_offset.gyro_y;
+		icm20948->gyro_lsb_z = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]) - my_offset.gyro_z;
+	}
+
+	// raw data
+	else
+	{
+		icm20948->gyro_lsb_x = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]);
+		icm20948->gyro_lsb_y = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]);
+		icm20948->gyro_lsb_z = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]);
+	}
 }
 
 void read_gyro_dps(icm20948_t* icm20948)	
@@ -176,10 +195,19 @@ void read_gyro_dps(icm20948_t* icm20948)
 void read_accel_lsb(icm20948_t* icm20948)	// 22us
 {
 	icm20948_read(B0_ACCEL_XOUT_H, 6);
-
-	icm20948->accel_lsb_x = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]);
-	icm20948->accel_lsb_y = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]);
-	icm20948->accel_lsb_z = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]);
+	
+	if(my_offset.offsetting == 1)
+	{
+		icm20948->accel_lsb_x = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]) - my_offset.accel_x;
+		icm20948->accel_lsb_y = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]) - my_offset.accel_y;
+		icm20948->accel_lsb_z = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]) - my_offset.accel_z;
+	}
+	else
+	{
+		icm20948->accel_lsb_x = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]);
+		icm20948->accel_lsb_y = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]);
+		icm20948->accel_lsb_z = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]);
+	}
 }
 
 void read_accel_g(icm20948_t* icm20948)
@@ -226,90 +254,34 @@ void read_mag_lsb(ak09916_t* ak09916)
 // calibrate gyro and accel
 void calibrate_icm20948(icm20948_t* icm20948, uint16_t samples)
 {
-	int32_t gyro_bias[3] = {0, 0, 0};
-	uint8_t gyro_offset[6] = {0, 0, 0, 0, 0, 0};
-
-	int32_t accel_bias_reg[3] = {0, 0, 0};
-	int32_t accel_bias[3] = {0, 0, 0};
-	uint8_t accel_offset[6] = {0, 0, 0, 0, 0, 0};
-
 	// for read function
 	select_user_bank(userbank_0);
 
 	// average
 	for(int i = 0; i < samples; i++)
 	{
-		read_accel_lsb(icm20948);
 		read_gyro_lsb(icm20948);
+		read_accel_lsb(icm20948);
 
-		gyro_bias[0] += icm20948->gyro_lsb_x;
-		gyro_bias[1] += icm20948->gyro_lsb_y;
-		gyro_bias[2] += icm20948->gyro_lsb_z;
+		my_offset.gyro_x += icm20948->gyro_lsb_x;
+		my_offset.gyro_y += icm20948->gyro_lsb_y;
+		my_offset.gyro_z += icm20948->gyro_lsb_z;
 
-		accel_bias[0] += icm20948->accel_lsb_x;
-		accel_bias[1] += icm20948->accel_lsb_y;
-		accel_bias[2] += icm20948->accel_lsb_z;
+		my_offset.accel_x += icm20948->accel_lsb_x;
+		my_offset.accel_y += icm20948->accel_lsb_y;
+		my_offset.accel_z += icm20948->accel_lsb_z;
 	}
 
-	gyro_bias[0] /= (int32_t) samples;
-	gyro_bias[1] /= (int32_t) samples;	
-	gyro_bias[2] /= (int32_t) samples;
+	my_offset.gyro_x /= samples;
+	my_offset.gyro_y /= samples;	
+	my_offset.gyro_z /= samples;
 
-	accel_bias[0] /= (int32_t) samples;
-	accel_bias[1] /= (int32_t) samples;	
-	accel_bias[2] /= (int32_t) samples;
+	my_offset.accel_x /= samples;
+	my_offset.accel_y /= samples;	
+	my_offset.accel_z /= samples;
 
-	// gyro offset register
-	gyro_offset[0] = (-gyro_bias[0] / 4  >> 8) & 0xFF; 
-	gyro_offset[1] = (-gyro_bias[0] / 4)       & 0xFF; 
-	gyro_offset[2] = (-gyro_bias[1] / 4  >> 8) & 0xFF;
-	gyro_offset[3] = (-gyro_bias[1] / 4)       & 0xFF;
-	gyro_offset[4] = (-gyro_bias[2] / 4  >> 8) & 0xFF;
-	gyro_offset[5] = (-gyro_bias[2] / 4)       & 0xFF;
-
-	// write
-	select_user_bank(userbank_2);
-	icm20948_write(B2_XG_OFFS_USRH, gyro_offset[0]);
-	icm20948_write(B2_XG_OFFS_USRL, gyro_offset[1]);
-	icm20948_write(B2_YG_OFFS_USRH, gyro_offset[2]);
-	icm20948_write(B2_YG_OFFS_USRL, gyro_offset[3]);
-	icm20948_write(B2_ZG_OFFS_USRH, gyro_offset[4]);
-	icm20948_write(B2_ZG_OFFS_USRL, gyro_offset[5]);
-
-	// read factory accel trim values
-	select_user_bank(userbank_1);
-	icm20948_read(B1_XA_OFFS_H, 2);
-	accel_bias_reg[0] = (int32_t)((int16_t)rx_buffer[0] << 8 | rx_buffer[1]);
-
-	icm20948_read(B1_YA_OFFS_H, 2);
-	accel_bias_reg[1] = (int32_t)((int16_t)rx_buffer[0] << 8 | rx_buffer[1]);
-
-	icm20948_read(B1_ZA_OFFS_H, 2);
-	accel_bias_reg[2] = (int32_t)((int16_t)rx_buffer[0] << 8 | rx_buffer[1]);
-
-	// accel offset register
-	accel_bias_reg[0] -= (accel_bias[0] / 8);
-	accel_bias_reg[1] -= (accel_bias[1] / 8);
-	accel_bias_reg[2] -= (accel_bias[2] / 8);
-
-	// ignore bit 0 (& 0xFE)
-	accel_offset[0] = (accel_bias_reg[0] >> 8) & 0xFF;
-  	accel_offset[1] = (accel_bias_reg[0])      & 0xFE;
-
-	accel_offset[2] = (accel_bias_reg[1] >> 8) & 0xFF;
-  	accel_offset[3] = (accel_bias_reg[1])      & 0xFE;
-
-	accel_offset[4] = (accel_bias_reg[2] >> 8) & 0xFF;
-	accel_offset[5] = (accel_bias_reg[2])      & 0xFE;
-
-	// write
-	select_user_bank(userbank_1);
-	icm20948_write(B1_XA_OFFS_H, accel_offset[0]);
-	icm20948_write(B1_XA_OFFS_L, accel_offset[1]);
-	icm20948_write(B1_YA_OFFS_H, accel_offset[2]);
-	icm20948_write(B1_YA_OFFS_L, accel_offset[3]);
-	icm20948_write(B1_ZA_OFFS_H, accel_offset[4]);
-	icm20948_write(B1_ZA_OFFS_L, accel_offset[5]);
+	// offset flag
+	my_offset.offsetting = 1;
 
 	// for read function
 	select_user_bank(userbank_0);
@@ -322,10 +294,10 @@ void complementary_filter(icm20948_t *icm20948, angle_t *angle)
 	read_accel_g(icm20948);
 
 	// angle from gyro
-	// dt : 1ms
-	angle->gyro_angle_x += icm20948->gyro_dps_x * (0.001);
-	angle->gyro_angle_y += icm20948->gyro_dps_y * (0.001);
-	angle->gyro_angle_z += icm20948->gyro_dps_z * (0.001);
+	// dt : 1.125ms
+	angle->gyro_angle_x += icm20948->gyro_dps_x * dt;
+	angle->gyro_angle_y += icm20948->gyro_dps_y * dt;
+	angle->gyro_angle_z += icm20948->gyro_dps_z * dt;
 
 	// angle from accel
 	angle->accel_angle_x = atan(icm20948->accel_g_y / sqrt( pow(icm20948->accel_g_x, 2) + pow(icm20948->accel_g_z, 2) ) ) * 57.3;
@@ -336,4 +308,5 @@ void complementary_filter(icm20948_t *icm20948, angle_t *angle)
 	angle->angle_x = ALPHA * angle->gyro_angle_x + (1 - ALPHA) * angle->accel_angle_x;
 	angle->angle_y = ALPHA * angle->gyro_angle_y + (1 - ALPHA) * angle->accel_angle_y;
 	angle->angle_z = angle->gyro_angle_z;
+
 }

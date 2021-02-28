@@ -42,6 +42,9 @@
 
 #define NUM_OF_MOTORS          4    // quadcopter
 
+#define DSHOT_THROTTLE_MIN      48
+#define DSHOT_THROTTLE_MAX      2047
+
 typedef uint32_t dshot_frame;
 typedef uint16_t throttle_value;
 
