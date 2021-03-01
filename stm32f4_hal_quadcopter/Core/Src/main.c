@@ -118,13 +118,15 @@ void reset_my_variable()
 /* USER CODE BEGIN 0 */
 
 // 1.125khz period
+// preemption priority : 1
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 
   if (htim == &htim11)
   {
-
-	  if(my_channel[4] == 2000)	// arming
+	  // arming
+	  // fail-safe
+	  if(my_channel[4] == 2000 && my_ibus_state != IBUS_MISSING)
 	  {
 		  // angle
 		  complementary_filter(&my_icm20948, &my_angle);
@@ -136,18 +138,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		  distribute(my_value, my_channel, &my_balancing_force);
 	  }
 
-	  else // disarming
+	  // disarming
+	  else
 	  {
 		  // reset variable
 		  reset_my_variable();
 	  }
 
+
 	  // send throttle
 	  run_dshot600(&my_motors, my_value);
 
-
-
-	  // rc receive
+	  // check uart receive interrupt has occurred
+	  // and receive data is good
 	  if(my_ibus_state == IBUS_DATA_READY && ibus_read_channel(my_channel) == IBUS_DATA_GOOD)
 	  {
 		  my_ibus_state = IBUS_READY;
@@ -174,9 +177,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 
 // ibus protocol receive interrupt
+// preemption priority : 0
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	// receive data every 7ms
+	// receive send data every 7ms
 	if(huart->Instance == IBUS_UART_INSTANCE)
 	{
 		my_ibus_state = IBUS_DATA_READY;

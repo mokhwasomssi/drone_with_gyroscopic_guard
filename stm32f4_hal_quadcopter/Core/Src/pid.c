@@ -27,7 +27,7 @@ void p_control(balancing_force_t *balancing_force, target_angle_t *target_angle,
 // final value
 void distribute(throttle_a *cal_value, rc_channel_a *channel, balancing_force_t *balancing_force)
 {
-    uint16_t defalut_throttle = channel[2];
+    uint16_t defalut_throttle = (channel[2] - 1000) * 2 + 47;
 
     // motor mixing algorithm
     // add control value to defaut value

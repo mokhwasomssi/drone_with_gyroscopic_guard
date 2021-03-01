@@ -42,3 +42,4 @@ ibus_state ibus_init();
 ibus_state ibus_read_channel(rc_channel_a *channel);
 
 #endif /* _FLYSKY_IBUS_H_ */
+
