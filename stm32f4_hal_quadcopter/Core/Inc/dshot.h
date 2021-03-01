@@ -34,19 +34,20 @@
 /* User Configuration */
 
 
-#define MOTOR_BIT_0           7
-#define MOTOR_BIT_1           14
-#define MOTOR_BITLENGTH       20
+#define MOTOR_BIT_0            7
+#define MOTOR_BIT_1            14
+#define MOTOR_BITLENGTH        20
 
-#define DSHOT_FRAME_SIZE      18
+#define DSHOT_FRAME_SIZE       18
 
 #define NUM_OF_MOTORS          4    // quadcopter
 
-#define DSHOT_THROTTLE_MIN      48
-#define DSHOT_THROTTLE_MAX      2047
+#define DSHOT_THROTTLE_STOP    0
+#define DSHOT_THROTTLE_MIN     48
+#define DSHOT_THROTTLE_MAX     2047
 
 typedef uint32_t dshot_frame;
-typedef uint16_t throttle_value;
+typedef uint16_t throttle_a;
 
 typedef struct _motors
 {
@@ -58,8 +59,8 @@ typedef struct _motors
 } motors_s;
 
 void dshot_init();
-void make_dshot600_frame(dshot_frame *motor_x, throttle_value value);
-void run_dshot600(motors_s *motors, throttle_value value[]);
+void make_dshot600_frame(dshot_frame *motor_x, throttle_a value);
+void run_dshot600(motors_s *motors, throttle_a value[]);
 
 
 #endif /* _DSHOT_H_ */

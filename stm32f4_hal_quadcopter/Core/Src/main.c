@@ -28,15 +28,28 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "icm_20948.h"
-#include "dshot.h"
-#include "flysky_ibus.h"
-#include "pid.h"
+// c standard library
+#include "string.h"
+
+// personal library
+#include "icm_20948.h"		// sensor
+#include "dshot.h"			// motor
+#include "flysky_ibus.h"	// rc
+#include "pid.h"			// control
 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+
+typedef enum
+{
+	DISARMING = 0,
+	ARMING = 1,
+
+	INIT_ERROR = 2
+
+} DRONE_STATE;
 
 /* USER CODE END PTD */
 
@@ -53,37 +66,33 @@
 
 /* USER CODE BEGIN PV */
 
+// check  period
+uint32_t			period_us		= 0;
 
 // sensor variable
-extern uint8_t rx_buffer[6];
-
 uint8_t 			id_icm20948 	= 0;	// 0xEA
 uint8_t 			id_ak09916 		= 0;	// 0x09
 
 icm20948_t 			my_icm20948 	= {0, };
 angle_t 			my_angle 		= {0, };
 
-uint8_t 			my_dt			= 0;
-
-uint32_t			period_us		= 0;
-
 
 // motor variable
 motors_s 			my_motors;				// dshot data frame structure
-throttle_value 		my_value[4]		= {0};	// throttle of entire motors
+throttle_a 			my_value[4]		= {0};	// throttle of entire motors
 
 
 // rc controller variable
-channel 			my_channel[IBUS_USER_CHANNELS] = {0};
-uint8_t 			ibus_flag = 0;
-extern uint8_t ibus_buffer[32];
+uint8_t 			my_ibus_state = 0;
+uint8_t				my_ibus_check = 0;
+
+rc_channel_a 		my_channel[IBUS_USER_CHANNELS] = {0};
+extern uint8_t 		ibus_buffer[32];
 
 
 // pid variable
 target_angle_t 		my_target_angle		 = {0, };	// 0
 balancing_force_t 	my_balancing_force	 = {0, };	// output of pid
-
-motor_speed_t		my_motor_speed		 = {0, };	// output of motor mixing algorithm
 
 
 /* USER CODE END PV */
@@ -92,38 +101,85 @@ motor_speed_t		my_motor_speed		 = {0, };	// output of motor mixing algorithm
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
+// reset variable if drone is disarming
+void reset_my_variable()
+{
+	// sensor
+	memset(&my_icm20948, 0, sizeof(icm20948_t));
+	memset(&my_angle, 0, sizeof(angle_t));
+
+	// motor
+	memset(&my_value, 0, sizeof(throttle_a) * 4);
+}
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)	// timer interrupt 1kHz
+// 1.125khz period
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+
   if (htim == &htim11)
   {
 
+	  if(my_channel[4] == 2000)	// arming
+	  {
+		  // angle
+		  complementary_filter(&my_icm20948, &my_angle);
 
-	  complementary_filter(&my_icm20948, &my_angle);
-	  p_control(&my_balancing_force, &my_target_angle, &my_angle);
-	  distribute(&my_motor_speed, &my_balancing_force);
+		  // pid
+		  p_control(&my_balancing_force, &my_target_angle, &my_angle);
 
+		  // distribute
+		  distribute(my_value, my_channel, &my_balancing_force);
+	  }
+
+	  else // disarming
+	  {
+		  // reset variable
+		  reset_my_variable();
+	  }
+
+	  // send throttle
 	  run_dshot600(&my_motors, my_value);
 
 
-	  ibus_read_channel(my_channel);
+
+	  // rc receive
+	  if(my_ibus_state == IBUS_DATA_READY && ibus_read_channel(my_channel) == IBUS_DATA_GOOD)
+	  {
+		  my_ibus_state = IBUS_READY;
+		  my_ibus_check = 0;
+	  }
+	  else
+	  {
+		  my_ibus_check++;
+	  }
+
+	  // fail-safe
+	  if(my_ibus_check > 10)
+	  {
+		  my_ibus_state = IBUS_MISSING;
+	  }
+
+
+	  // running time
 	  period_us = __HAL_TIM_GET_COUNTER(&htim11);
 
-
   }
+
 }
+
 
 // ibus protocol receive interrupt
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	// 7ms period
+	// receive data every 7ms
 	if(huart->Instance == IBUS_UART_INSTANCE)
 	{
+		my_ibus_state = IBUS_DATA_READY;
 		HAL_UART_Receive_IT(IBUS_UART, ibus_buffer, 32);
 	}
 }

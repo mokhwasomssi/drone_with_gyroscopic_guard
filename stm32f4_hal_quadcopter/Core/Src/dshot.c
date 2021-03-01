@@ -15,7 +15,7 @@ void dshot_init()
   // regardless of RC receiver value
 }
 
-void make_dshot600_frame(dshot_frame *motor_x, throttle_value value)
+void make_dshot600_frame(dshot_frame *motor_x, throttle_a value)
 {
   uint16_t packet = value << 1;
 
@@ -43,7 +43,7 @@ void make_dshot600_frame(dshot_frame *motor_x, throttle_value value)
   motor_x[i++] = 0;
 }
 
-void run_dshot600(motors_s *motors, throttle_value value[])
+void run_dshot600(motors_s *motors, throttle_a value[])
 {
   // prepare dshot frame
   make_dshot600_frame(motors->motor_1, value[0]);

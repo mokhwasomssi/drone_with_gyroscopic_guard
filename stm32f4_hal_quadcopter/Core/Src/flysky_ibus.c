@@ -9,22 +9,26 @@
 
 #include "flysky_ibus.h"
 
+// temp
 uint8_t ibus_buffer[32] = {0};
-//uint16_t channel[IBUS_USER_CHANNELS] = {0};
 
+// test for init
+rc_channel_a test_channel[IBUS_USER_CHANNELS] = {0};
 
-void ibus_init()
+// init
+ibus_state ibus_init()
 {
-	//uint8_t ibus_buffer[32] = {0};
 	HAL_UART_Receive_IT(IBUS_UART, ibus_buffer, 32);
+
+	// wait until ibus data good 
+	while( ibus_read_channel(test_channel) != IBUS_DATA_GOOD );
+
+	return IBUS_OK;
 }
 
-
-void ibus_read_channel(channel *channel)
+// read
+ibus_state ibus_read_channel(rc_channel_a *channel)
 {
-	//uint8_t ibus_buffer[32] = {0};
-	//HAL_UART_Receive_IT(IBUS_UART, ibus_buffer, 32);
-
 	uint16_t channel_buffer[IBUS_MAX_CHANNLES] = {0};
 	uint16_t checksum_cal, checksum_ibus;
 
@@ -54,10 +58,20 @@ void ibus_read_channel(channel *channel)
 			{
 				channel[ch_index] = channel_buffer[ch_index];
 			}
-		}
-	}
 
-	// if you use HAL_UART_RxCpltCallback() function
-	//HAL_UART_Receive_IT(IBUS_UART, ibus_buffer, 32);
+			return IBUS_DATA_GOOD;
+		}
+		// lose data
+		else
+		{
+			return IBUS_DATA_NOT_GOOD;
+		}
+		
+	}
+	// it isn't ibus
+	else
+	{
+		return IBUS_NOT_OK;
+	}
 }
 
