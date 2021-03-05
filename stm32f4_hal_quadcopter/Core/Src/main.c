@@ -167,7 +167,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		  my_ibus_state = IBUS_MISSING;
 	  }
 
-
 	  // running time
 	  period_us = __HAL_TIM_GET_COUNTER(&htim11);
 
