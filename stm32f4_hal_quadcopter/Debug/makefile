@@ -54,8 +54,8 @@ all: main-build
 main-build: stm32f4_hal_quadcopter.elf secondary-outputs
 
 # Tool invocations
-stm32f4_hal_quadcopter.elf: $(OBJS) $(USER_OBJS) C:\Users\mokhw\Desktop\GitHub\stm32f4_hal_quadcopter\stm32f4_hal_quadcopter\STM32F411CEUX_FLASH.ld
-	arm-none-eabi-gcc -o "stm32f4_hal_quadcopter.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\mokhw\Desktop\GitHub\stm32f4_hal_quadcopter\stm32f4_hal_quadcopter\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32f4_hal_quadcopter.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+stm32f4_hal_quadcopter.elf: $(OBJS) $(USER_OBJS) C:\Users\mokhw\Desktop\GitHub\gyroscope-drone\stm32f4_hal_quadcopter\STM32F411CEUX_FLASH.ld
+	arm-none-eabi-gcc -o "stm32f4_hal_quadcopter.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\mokhw\Desktop\GitHub\gyroscope-drone\stm32f4_hal_quadcopter\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32f4_hal_quadcopter.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

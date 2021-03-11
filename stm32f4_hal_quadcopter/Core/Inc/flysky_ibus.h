@@ -40,6 +40,7 @@ typedef uint16_t rc_channel_a;
 
 ibus_state ibus_init();
 ibus_state ibus_read_channel(rc_channel_a *channel);
+ibus_state ibus_software_failsafe(uint8_t *ibus_state, uint8_t *ibus_check);
 
 #endif /* _FLYSKY_IBUS_H_ */
 

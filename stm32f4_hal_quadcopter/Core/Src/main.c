@@ -83,6 +83,8 @@ throttle_a 			my_value[4]		= {0};	// throttle of entire motors
 
 
 // rc controller variable
+//uint8_t 			my_ibus_rx_interrupt = 0;
+//uint8_t			my_ibus_data_state = 0;
 uint8_t 			my_ibus_state = 0;
 uint8_t				my_ibus_check = 0;
 
@@ -117,22 +119,25 @@ void reset_my_variable()
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-// 1.125khz period
+
 // preemption priority : 1
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-
+  // 1.125khz loop
   if (htim == &htim11)
   {
-	  // arming
-	  // fail-safe
+	  // RC receiver
+	  my_ibus_state = ibus_read_channel(my_channel);
+	  ibus_software_failsafe(&my_ibus_state, &my_ibus_check);
+
+	  // arming & fail-safe
 	  if(my_channel[4] == 2000 && my_ibus_state != IBUS_MISSING)
 	  {
 		  // angle
 		  complementary_filter(&my_icm20948, &my_angle);
 
 		  // pid
-		  p_control(&my_balancing_force, &my_target_angle, &my_angle);
+		  //p_control(&my_balancing_force, &my_target_angle, &my_angle);
 
 		  // distribute
 		  distribute(my_value, my_channel, &my_balancing_force);
@@ -145,15 +150,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		  reset_my_variable();
 	  }
 
-
 	  // send throttle
 	  run_dshot600(&my_motors, my_value);
 
 	  // check uart receive interrupt has occurred
 	  // and receive data is good
-	  if(my_ibus_state == IBUS_DATA_READY && ibus_read_channel(my_channel) == IBUS_DATA_GOOD)
+	  /*
+	  if(my_ibus_rx_interrupt == IBUS_DATA_READY && ibus_read_channel(my_channel) == IBUS_DATA_GOOD)
 	  {
-		  my_ibus_state = IBUS_READY;
+		  my_ibus_data_state = IBUS_READY;
 		  my_ibus_check = 0;
 	  }
 	  else
@@ -164,8 +169,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  // fail-safe
 	  if(my_ibus_check > 10)
 	  {
-		  my_ibus_state = IBUS_MISSING;
+		  my_ibus_data_state = IBUS_MISSING;
 	  }
+
+	  */
 
 	  // running time
 	  period_us = __HAL_TIM_GET_COUNTER(&htim11);
@@ -180,11 +187,16 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	// receive send data every 7ms
+	/*
 	if(huart->Instance == IBUS_UART_INSTANCE)
 	{
-		my_ibus_state = IBUS_DATA_READY;
+		my_ibus_rx_interrupt = IBUS_DATA_READY;
 		HAL_UART_Receive_IT(IBUS_UART, ibus_buffer, 32);
+
 	}
+	*/
+
+
 }
 
 
@@ -230,8 +242,11 @@ int main(void)
 
 
 
-  // init rc controller
+  // check rc receiver
   ibus_init();
+
+  // init dshot
+  //dshot_init(&my_motors);
 
   // check sensor id
   id_icm20948 = whoami_icm20948();
@@ -242,8 +257,6 @@ int main(void)
   ak09916_init();
 
   // calibrate sensor
-  HAL_Delay(100);
-
   calibrate_icm20948(&my_icm20948, 100);
 
   // 1khz loop
