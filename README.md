@@ -1,21 +1,37 @@
-# stm32f4_hal_quadcopter (now working)
+# gyroscope-drone
 
-My goal is writing all code needed for flight.
+## 0. Intro
 
-![20210219_130214](https://user-images.githubusercontent.com/48342925/109497628-af251d80-7ad5-11eb-8354-0117b9716f45.jpg)
+![다운로드](https://user-images.githubusercontent.com/48342925/111861476-de6ed200-8991-11eb-9798-e63ba10da68a.png)
 
 
-## 0. Development environment
+* Why this project name is gyroscope-drone?  
+    * because, it has sphere-shaped guard with gyroscope structure.
 
-* IDE
-    * STM32Cubeide 1.5.0 (STM32Cube HAL)
+* Why do you put a guard like this on a normal quadcopter?  
+    1. prop gurad
+    2. flight tester
+    3. cushion the impact
+    4. rolling motion on a plane
+
+* What kind of open-source do you use for flight firmware?  
+    * there are drone open-sources like betaflight, ardupilot, px4 and so on.
+    * but I'm trying to write my own code for flight.
+
+---
+
+## 1. Development environment
+
+* Software tools
+    * STM32Cubeide (STM32Cube HAL)
+    * SOLIDWORKS 2020
 
 * Debugging
     * ST-LINK V2
     * Oscilloscope
     * Multimeter
 
-* Part 
+* Drone parts
 
 |No.|Part|Name|
 |:---:|:---:|:---:|
@@ -29,12 +45,19 @@ My goal is writing all code needed for flight.
 |8|Transmitter|FS-i6|
 |9|Receiver|FS-A8S|
 |10|Battery|ZOP Power 14.8V 1800mAh 65C 4S|
-|11|Lipo Alarm|Voltage Buzzer Alarm|
+|11|Lipo Alarm|Voltage Buzzer Alarm|  
+
+---
 
 ## 1. FEATURE
 
-* MCU
-* ICM20948
-* DSHOT600
-* IBUS
-* PID
+* ICM-20948 - https://github.com/mokhwasomssi/icm20948.git
+* DSHOT600 - https://github.com/mokhwasomssi/dshot.git
+* IBUS - https://github.com/mokhwasomssi/flysky_ibus.git
+
+---
+
+## Reference
+
+https://eurekadynamics.com/  
+https://www.flyability.com/
