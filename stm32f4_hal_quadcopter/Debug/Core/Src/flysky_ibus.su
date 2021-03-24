@@ -1,3 +1,2 @@
-flysky_ibus.c:19:12:ibus_init	8	static
+flysky_ibus.c:20:12:ibus_init	8	static
 flysky_ibus.c:30:12:ibus_read_channel	64	static
-flysky_ibus.c:80:12:ibus_software_failsafe	16	static

@@ -3,7 +3,7 @@
 ## 0. Intro
 
 ![다운로드](https://user-images.githubusercontent.com/48342925/111861476-de6ed200-8991-11eb-9798-e63ba10da68a.png)
-
+( drone size = 210mm, sphere diameter = 480mm )
 
 * Why this project name is gyroscope-drone?  
     * because, it has sphere-shaped guard with gyroscope structure.
@@ -54,6 +54,8 @@
 * ICM-20948 - https://github.com/mokhwasomssi/icm20948.git
 * DSHOT600 - https://github.com/mokhwasomssi/dshot.git
 * IBUS - https://github.com/mokhwasomssi/flysky_ibus.git
+
+
 
 ---
 

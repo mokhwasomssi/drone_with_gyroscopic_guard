@@ -25,8 +25,8 @@
 
 
 /* User Configuration */
-#define ALPHA				0.96
-#define dt					0.001125 				// 1.125khz
+#define ALPHA				0.97
+#define dt					0.000889 				// 1.125khz
 
 #define SPI_ICM20948 		(&hspi1)			// SPI Number
 #define CS_PIN_PORT			GPIOA				// CS Pin

@@ -73,6 +73,7 @@ uint32_t			period_us		= 0;
 uint8_t 			id_icm20948 	= 0;	// 0xEA
 uint8_t 			id_ak09916 		= 0;	// 0x09
 
+extern offset_t		my_offset;
 icm20948_t 			my_icm20948 	= {0, };
 angle_t 			my_angle 		= {0, };
 
@@ -83,8 +84,6 @@ throttle_a 			my_value[4]		= {0};	// throttle of entire motors
 
 
 // rc controller variable
-//uint8_t 			my_ibus_rx_interrupt = 0;
-//uint8_t			my_ibus_data_state = 0;
 uint8_t 			my_ibus_state = 0;
 uint8_t				my_ibus_check = 0;
 
@@ -106,6 +105,9 @@ void SystemClock_Config(void);
 // reset variable if drone is disarming
 void reset_my_variable()
 {
+	// receiver
+	//memset(&my_channel, 0, sizeof(rc_channel_a) * IBUS_USER_CHANNELS);
+
 	// sensor
 	memset(&my_icm20948, 0, sizeof(icm20948_t));
 	memset(&my_angle, 0, sizeof(angle_t));
@@ -123,16 +125,34 @@ void reset_my_variable()
 // preemption priority : 1
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+
   // 1.125khz loop
   if (htim == &htim11)
   {
+
 	  // RC receiver
-	  my_ibus_state = ibus_read_channel(my_channel);
-	  ibus_software_failsafe(&my_ibus_state, &my_ibus_check);
+	  if(my_ibus_state == IBUS_DATA_READY && ibus_read_channel(my_channel) == IBUS_DATA_GOOD)
+	  {
+		  my_ibus_state = IBUS_READY;
+		  my_ibus_check = 0;
+	  }
+	  else
+	  {
+		  my_ibus_check++;
+	  }
+
+	  // fail-safe
+	  if(my_ibus_check > 10)
+	  {
+		  my_ibus_state = IBUS_MISSING;
+	  }
+
 
 	  // arming & fail-safe
 	  if(my_channel[4] == 2000 && my_ibus_state != IBUS_MISSING)
 	  {
+		  HAL_GPIO_WritePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin, RESET);
+
 		  // angle
 		  complementary_filter(&my_icm20948, &my_angle);
 
@@ -146,33 +166,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  // disarming
 	  else
 	  {
+		  HAL_GPIO_WritePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin, SET);
+
 		  // reset variable
 		  reset_my_variable();
 	  }
 
 	  // send throttle
 	  run_dshot600(&my_motors, my_value);
-
-	  // check uart receive interrupt has occurred
-	  // and receive data is good
-	  /*
-	  if(my_ibus_rx_interrupt == IBUS_DATA_READY && ibus_read_channel(my_channel) == IBUS_DATA_GOOD)
-	  {
-		  my_ibus_data_state = IBUS_READY;
-		  my_ibus_check = 0;
-	  }
-	  else
-	  {
-		  my_ibus_check++;
-	  }
-
-	  // fail-safe
-	  if(my_ibus_check > 10)
-	  {
-		  my_ibus_data_state = IBUS_MISSING;
-	  }
-
-	  */
 
 	  // running time
 	  period_us = __HAL_TIM_GET_COUNTER(&htim11);
@@ -187,15 +188,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	// receive send data every 7ms
-	/*
+
 	if(huart->Instance == IBUS_UART_INSTANCE)
 	{
-		my_ibus_rx_interrupt = IBUS_DATA_READY;
+		my_ibus_state = IBUS_DATA_READY;
 		HAL_UART_Receive_IT(IBUS_UART, ibus_buffer, 32);
 
 	}
-	*/
-
 
 }
 
@@ -236,34 +235,41 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM2_Init();
   MX_TIM5_Init();
+
   MX_TIM11_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-
-
   // check rc receiver
-  ibus_init();
-
-  // init dshot
-  //dshot_init(&my_motors);
+  HAL_UART_Receive_IT(IBUS_UART, ibus_buffer, 32);
+  while(ibus_init() != IBUS_OK);
 
   // check sensor id
-  id_icm20948 = whoami_icm20948();
-  id_ak09916 = whoami_ak09916();
+  while(whoami_icm20948() != DEVICE_ID_ICM20948);
+  //while(whoami_ak09916() != DEVICE_ID_AK09916);
 
   // init sensor
   icm20948_init();
-  ak09916_init();
+  //ak09916_init();
 
   // calibrate sensor
-  calibrate_icm20948(&my_icm20948, 100);
+  // I think there is a optimized and fixed offset value
+  HAL_Delay(100);
+  calibrate_icm20948(&my_icm20948, 200);
 
-  // 1khz loop
+
+  // finish init
+  for(int i = 0; i < 6; i++)
+  {
+	  HAL_GPIO_TogglePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin);
+	  HAL_Delay(300);
+  }
+
+  // start 1.125khz loop
   HAL_TIM_Base_Start_IT(&htim11);
 
+  // init dshot
 
-  // after init, debug led on
 
   /* USER CODE END 2 */
 
@@ -276,33 +282,6 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 
-
-	  //__HAL_TIM_SET_COUNTER(&htim10, 0);
-	  //complementary_filter(&my_icm20948, &my_angle);
-	  //period_us = __HAL_TIM_GET_COUNTER(&htim11);
-
-	  /*
-	  if(my_channel[4] == 2000) // arming
-	  {
-		  if(my_channel[2] > 1011) // 69
-		  {
-			  for(int i = 0; i < 4; i++)
-				  my_value[i] = (my_channel[2] - 1000) * 2 + 47;
-		  }
-
-		  else
-		  {
-			  for(int i = 0; i < 4; i++)
-				  my_value[i] = 69; // minimum value to spin smoothly
-		  }
-	  }
-
-	  else	// disarming
-	  {
-		  for(int i = 0; i < 4; i++)
-			  my_value[i] = 0;
-	  }
-	  */
 
   }
   /* USER CODE END 3 */

@@ -15,15 +15,15 @@ uint8_t ibus_buffer[32] = {0};
 // test for init
 rc_channel_a test_channel[IBUS_USER_CHANNELS] = {0};
 
+
 // init
 ibus_state ibus_init()
 {
 	//HAL_UART_Receive_IT(IBUS_UART, ibus_buffer, 32);
-
-	// wait until ibus data good 
-	while( ibus_read_channel(test_channel) != IBUS_DATA_GOOD );
-
-	return IBUS_OK;
+	if(ibus_read_channel(test_channel) == IBUS_DATA_GOOD)
+		return IBUS_OK;
+	else
+		return IBUS_NOT_OK;
 }
 
 // read
@@ -32,7 +32,7 @@ ibus_state ibus_read_channel(rc_channel_a *channel)
 	uint16_t channel_buffer[IBUS_MAX_CHANNLES] = {0};
 	uint16_t checksum_cal, checksum_ibus;
 
-	HAL_UART_Receive(IBUS_UART, ibus_buffer, 32, 10);
+	//HAL_UART_Receive(IBUS_UART, ibus_buffer, 32, 10);
 
 	// is it ibus?
 	if(ibus_buffer[0] == IBUS_LENGTH && ibus_buffer[1] == IBUS_COMMAND40)
@@ -77,6 +77,7 @@ ibus_state ibus_read_channel(rc_channel_a *channel)
 	}
 }
 
+/*
 ibus_state ibus_software_failsafe(uint8_t *ibus_state, uint8_t *ibus_check)
 {
 	// check ibus update
@@ -97,3 +98,4 @@ ibus_state ibus_software_failsafe(uint8_t *ibus_state, uint8_t *ibus_check)
 	}
 
 }
+*/

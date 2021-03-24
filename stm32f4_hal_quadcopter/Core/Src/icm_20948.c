@@ -127,7 +127,7 @@ void icm20948_init()
 	// Set Gyroscope ODR and Scale
 	select_user_bank(userbank_2);
 	icm20948_write(B2_GYRO_SMPLRT_DIV, Gyro_ODR_1125Hz);				// Gyro ODR = 1.125kHz
-	icm20948_write(B2_GYRO_CONFIG_1, GYRO_FS_SEL_250dps | GYRO_FCHOICE);	// Gyro scale ±250dps and Enable DLPF
+	icm20948_write(B2_GYRO_CONFIG_1, GYRO_FS_SEL_2000dps | GYRO_FCHOICE);	// Gyro scale ±2000dps and Enable DLPF
 																			// 자이로 스케일 키우면 잔떨림은 감지x
 	// Set Accelerometer ODR and Scale
 	icm20948_write(B2_ACCEL_SMPLRT_DIV_2, Accel_ODR_1125Hz);			// Accel ODR = 1.125kHz
@@ -185,9 +185,9 @@ void read_gyro_dps(icm20948_t* icm20948)
 	read_gyro_lsb(icm20948);
 
 	// divide by 131(lsb/dps)
-	icm20948->gyro_dps_x = icm20948->gyro_lsb_x / 131.0;
-	icm20948->gyro_dps_y = icm20948->gyro_lsb_y / 131.0;
-	icm20948->gyro_dps_z = icm20948->gyro_lsb_z / 131.0;  
+	icm20948->gyro_dps_x = icm20948->gyro_lsb_x / 16.4;
+	icm20948->gyro_dps_y = icm20948->gyro_lsb_y / 16.4;
+	icm20948->gyro_dps_z = icm20948->gyro_lsb_z / 16.4;  
 }
 
 
@@ -279,6 +279,10 @@ void calibrate_icm20948(icm20948_t* icm20948, uint16_t samples)
 	my_offset.accel_x /= samples;
 	my_offset.accel_y /= samples;	
 	my_offset.accel_z /= samples;
+	
+	// 
+	my_offset.gyro_x = 25;
+	my_offset.gyro_y = 15;
 
 	// offset flag
 	my_offset.offsetting = 1;
@@ -294,7 +298,7 @@ void complementary_filter(icm20948_t *icm20948, angle_t *angle)
 	read_accel_g(icm20948);
 
 	// angle from gyro
-	// dt : 1.125ms
+	// dt : 0.89ms
 	angle->gyro_angle_x += icm20948->gyro_dps_x * dt;
 	angle->gyro_angle_y += icm20948->gyro_dps_y * dt;
 	angle->gyro_angle_z += icm20948->gyro_dps_z * dt;

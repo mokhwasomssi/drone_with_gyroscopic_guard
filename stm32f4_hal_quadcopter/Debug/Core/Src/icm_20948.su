@@ -15,4 +15,4 @@ icm_20948.c:195:6:read_accel_lsb	16	static
 icm_20948.c:213:6:read_accel_g	24	static
 icm_20948.c:224:6:read_mag_lsb	24	static
 icm_20948.c:255:6:calibrate_icm20948	24	static
-icm_20948.c:291:6:complementary_filter	32	static
+icm_20948.c:295:6:complementary_filter	32	static

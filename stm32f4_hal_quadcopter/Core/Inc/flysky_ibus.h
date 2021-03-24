@@ -26,10 +26,10 @@
 
 typedef enum
 {   
-    IBUS_READY,
-    IBUS_MISSING, // fail-safe
     IBUS_OK,
     IBUS_NOT_OK,
+    IBUS_READY,
+    IBUS_MISSING, // fail-safe
     IBUS_DATA_READY,
     IBUS_DATA_GOOD,
     IBUS_DATA_NOT_GOOD,
@@ -40,7 +40,7 @@ typedef uint16_t rc_channel_a;
 
 ibus_state ibus_init();
 ibus_state ibus_read_channel(rc_channel_a *channel);
-ibus_state ibus_software_failsafe(uint8_t *ibus_state, uint8_t *ibus_check);
+//ibus_state ibus_software_failsafe(uint8_t *ibus_state, uint8_t *ibus_check);
 
 #endif /* _FLYSKY_IBUS_H_ */
 
