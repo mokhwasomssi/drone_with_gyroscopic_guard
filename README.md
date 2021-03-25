@@ -2,7 +2,7 @@
 
 ## 0. Intro
 
-![다운로드](https://user-images.githubusercontent.com/48342925/111861476-de6ed200-8991-11eb-9798-e63ba10da68a.png)
+![다운로드](https://user-images.githubusercontent.com/48342925/111861476-de6ed200-8991-11eb-9798-e63ba10da68a.png)  
 ( drone size = 210mm, sphere diameter = 480mm )
 
 * Why this project name is gyroscope-drone?  
