@@ -2,8 +2,13 @@
 
 ## 0. Intro
 
+### 3D modeling image
 ![다운로드](https://user-images.githubusercontent.com/48342925/111861476-de6ed200-8991-11eb-9798-e63ba10da68a.png)  
-( drone size = 210mm, sphere diameter = 480mm )
+( drone size = 210mm, sphere diameter = 480mm )  
+
+### Overview
+![드론 개관](https://user-images.githubusercontent.com/48342925/113011908-389f3c80-91b5-11eb-9d83-049acfd645b0.png)
+
 
 * Why this project name is gyroscope-drone?  
     * because, it has sphere-shaped guard with gyroscope structure.
