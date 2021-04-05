@@ -1,0 +1,15 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP HAKRC_35A_ESC
+D BLHeli_32, input voltage 2-5 cell lipo, continuous current 35A
+$ENDCMP
+#
+$CMP sparkrun_icm-20948
+D sparkrun icm20948 breakout board
+$ENDCMP
+#
+$CMP weact_stm32f411ceu6
+D weact_black_pill, stm32f411ceu6 development board
+$ENDCMP
+#
+#End Doc Library
