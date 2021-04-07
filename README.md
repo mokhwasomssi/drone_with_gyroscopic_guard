@@ -9,6 +9,8 @@
 ### Overview
 ![드론 개관](https://user-images.githubusercontent.com/48342925/113011908-389f3c80-91b5-11eb-9d83-049acfd645b0.png)
 
+### Schematic
+![quadcopter](https://user-images.githubusercontent.com/48342925/113841802-1157f900-97cd-11eb-8552-34f727a531c5.jpg)  
 
 * Why this project name is gyroscope-drone?  
     * because, it has sphere-shaped guard with gyroscope structure.
