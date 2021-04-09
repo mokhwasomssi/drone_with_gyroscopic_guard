@@ -1,17 +1,23 @@
-# gyroscope-drone
+# gyroscope-quadcopter
 
-## 0. Intro
+Develop flight firmware and Design gyroscopic guard.
+
+## 0. Overview
 
 ### 3D modeling image
 ![다운로드](https://user-images.githubusercontent.com/48342925/111861476-de6ed200-8991-11eb-9798-e63ba10da68a.png)  
-( drone size = 210mm, sphere diameter = 480mm )  
+( drone size = 210mm, sphere diameter = 480mm )    
 
-### Overview
-![드론 개관](https://user-images.githubusercontent.com/48342925/113011908-389f3c80-91b5-11eb-9d83-049acfd645b0.png)
+---  
 
+### System Structure  
+![overview](https://user-images.githubusercontent.com/48342925/114194621-a8b67b00-998a-11eb-9f10-d65c305e5907.png)
+
+---
 ### Schematic
 ![quadcopter](https://user-images.githubusercontent.com/48342925/113841802-1157f900-97cd-11eb-8552-34f727a531c5.jpg)  
 
+---
 * Why this project name is gyroscope-drone?  
     * because, it has sphere-shaped guard with gyroscope structure.
 
@@ -25,7 +31,6 @@
     * there are drone open-sources like betaflight, ardupilot, px4 and so on.
     * but I'm trying to write my own code for flight.
 
----
 
 ## 1. Development environment
 
@@ -54,7 +59,7 @@
 |10|Battery|ZOP Power 14.8V 1800mAh 65C 4S|
 |11|Lipo Alarm|Voltage Buzzer Alarm|  
 
----
+
 
 ## 1. FEATURE
 
@@ -64,9 +69,8 @@
 
 
 
----
 
-## Reference
+## # Reference
 
 https://eurekadynamics.com/  
 https://www.flyability.com/
