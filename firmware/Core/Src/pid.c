@@ -11,6 +11,7 @@
 // throttle value of motor to be calculated
 throttle_a cal_value[4] = {0};
 
+/*
 // control value
 void p_control(balancing_force_t *balancing_force, target_angle_t *target_angle, angle_t *angle)
 {
@@ -25,7 +26,7 @@ void p_control(balancing_force_t *balancing_force, target_angle_t *target_angle,
 
 
 // final value
-void distribute(throttle_a *cal_value, rc_channel_a *channel, balancing_force_t *balancing_force)
+void distribute(throttle_a *cal_value, rc_channel *channel, balancing_force_t *balancing_force)
 {
     uint16_t defalut_throttle = (channel[2] - 1000) * 2 + 47;
 
@@ -43,3 +44,4 @@ void distribute(throttle_a *cal_value, rc_channel_a *channel, balancing_force_t 
         if(cal_value[i] > DSHOT_THROTTLE_MAX) cal_value[i] = DSHOT_THROTTLE_MAX;
     }
 }
+*/

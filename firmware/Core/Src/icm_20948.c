@@ -19,8 +19,10 @@
 uint8_t tx_buffer[6] = {0};
 uint8_t rx_buffer[6] = {0};
 
-// offset variable
-offset_t my_offset = {0, };
+// constant for changing unit
+float gyro_typ;
+float accel_typ;
+float mag_typ = 0.15;
 
 
 // cs state
@@ -37,11 +39,15 @@ void cs_low()
 // user bank
 void select_user_bank(userbank_e ub)
 {
-	icm20948_write(B0_REG_BANK_SEL, ub);
+	cs_low();
+	tx_buffer[0] = WRITE | B0_REG_BANK_SEL;
+	tx_buffer[1] = ub;
+	HAL_SPI_Transmit(SPI_ICM20948, tx_buffer, 2, 10);
+	cs_high();
 }
 
 // spi
-void icm20948_read(uint8_t regaddr, uint8_t len)
+void read_icm20948(uint8_t regaddr, uint8_t len)
 {
 	cs_low();
 	tx_buffer[0] = READ | regaddr;
@@ -50,7 +56,7 @@ void icm20948_read(uint8_t regaddr, uint8_t len)
 	cs_high();
 }
 
-void icm20948_write(uint8_t regaddr, uint8_t data)
+void write_icm20948(uint8_t regaddr, uint8_t data)
 {
 	cs_low();
 	tx_buffer[0] = WRITE | regaddr;
@@ -63,193 +69,292 @@ void icm20948_write(uint8_t regaddr, uint8_t data)
 }
 
 // auxiliary i2c
-void ak09916_read(uint8_t regaddr, uint8_t len)
+void read_ak09916(uint8_t regaddr, uint8_t len)
 {
 	select_user_bank(userbank_3);
 
-	icm20948_write(B3_I2C_SLV0_ADDR, READ | ADDRESS_AK09916);
-	icm20948_write(B3_I2C_SLV0_REG, regaddr); 
-	icm20948_write(B3_I2C_SLV0_CTRL, I2C_SLV_EN | len);
+	write_icm20948(B3_I2C_SLV0_ADDR, READ | ADDRESS_AK09916);
+	write_icm20948(B3_I2C_SLV0_REG, regaddr); 
+	write_icm20948(B3_I2C_SLV0_CTRL, I2C_SLV_EN | len);
 
 	select_user_bank(userbank_0);
-	icm20948_read(B0_EXT_SLV_SENS_DATA_00, len);
-
-	HAL_Delay(1);
+	read_icm20948(B0_EXT_SLV_SENS_DATA_00, len);
 }
 
-void ak09916_wrtie(uint8_t regaddr, uint8_t data)
+void write_ak09916(uint8_t regaddr, uint8_t data)
 {
 	select_user_bank(userbank_3);
 
-	icm20948_write(B3_I2C_SLV0_ADDR, WRITE | ADDRESS_AK09916);
-	icm20948_write(B3_I2C_SLV0_REG, regaddr);
-	icm20948_write(B3_I2C_SLV0_DO, data);
-	icm20948_write(B3_I2C_SLV0_CTRL, 0x81);
+	write_icm20948(B3_I2C_SLV0_ADDR, WRITE | ADDRESS_AK09916);
+	write_icm20948(B3_I2C_SLV0_REG, regaddr);
+	write_icm20948(B3_I2C_SLV0_DO, data);
+	write_icm20948(B3_I2C_SLV0_CTRL, 0x81);
 
-	HAL_Delay(1);
 }
 
 // check sensor id
 uint8_t whoami_icm20948()
 {
 	select_user_bank(userbank_0);
-	icm20948_read(B0_WHO_AM_I, 1);
+	read_icm20948(B0_WHO_AM_I, 1);
+	while(rx_buffer[0] != DEVICE_ID_ICM20948)
 
 	return rx_buffer[0];
 }
 
 uint8_t whoami_ak09916()
 {
-	ak09916_read(MAG_WIA2, 1);
+	read_ak09916(MAG_WIA2, 1);
+	while(rx_buffer[0] != DEVICE_ID_AK09916);
 
-	return rx_buffer[0];	// 0x09
+	return rx_buffer[0];
 }
 
+
+// set full scale and ODR
+void set_gyro_full_scale(gyro_fs_e gyro_fs)
+{
+	select_user_bank(userbank_2);
+	write_icm20948(B2_GYRO_CONFIG_1, gyro_fs | GYRO_FCHOICE);
+
+	switch(gyro_fs)
+	{
+		case fs_250dps :
+			gyro_typ = 131;
+			break;
+		
+		case fs_500dps :
+			gyro_typ = 65.5;
+			break;
+
+		case fs_1000dps :
+			gyro_typ = 32.8;
+			break;
+		
+		case fs_2000dps :
+			gyro_typ = 16.4;
+			break;
+
+		default : 
+			gyro_typ = 0;
+	}
+}
+
+void set_accel_full_scale(accel_fs_e accel_fs)
+{
+	select_user_bank(userbank_2);
+	write_icm20948(B2_ACCEL_CONFIG, accel_fs | ACCEL_FCHOICE);
+
+	switch(accel_fs)
+	{
+		case fs_2g :
+			accel_typ = 16384;
+			break;
+		
+		case fs_4g :
+			accel_typ = 8192;
+			break;
+
+		case fs_8g :
+			accel_typ = 4096;
+			break;
+		
+		case fs_16g :
+			accel_typ = 2048;
+			break;
+
+		default : 
+			accel_typ = 0;
+	}
+}
+
+void set_gyro_odr(uint16_t odr_hz)
+{
+	select_user_bank(userbank_2);
+
+	uint8_t div = 0;
+	div = (1125 / odr_hz) - 1;
+
+	write_icm20948(B2_GYRO_SMPLRT_DIV, div);
+}
+
+void set_accel_odr(uint16_t odr_hz)
+{
+	select_user_bank(userbank_2);
+
+	uint8_t div = 0;
+	div = (1125 / odr_hz) - 1;
+
+	write_icm20948(B2_ACCEL_SMPLRT_DIV_2, div);
+}
+
+
 // initialize
-void icm20948_init()
+void icm20948_init(gyro_fs_e gyro_fs, uint16_t gyro_odr_hz, accel_fs_e accel_fs, uint16_t accel_ord_hz)
 {
 	// ICM20948 Reset
 	select_user_bank(userbank_0);
-	icm20948_write(B0_PWR_MGMT_1, DEVICE_RESET | 0x41);	// 0x41 is reset value
+	write_icm20948(B0_PWR_MGMT_1, DEVICE_RESET | 0x41);	// 0x41 is reset value
 
 	// SPI mode only
 	select_user_bank(userbank_0);
-	icm20948_write(B0_USER_CTRL, I2C_IF_DIS);
+	write_icm20948(B0_USER_CTRL, I2C_IF_DIS);
 
 	// Wake the chip and Recommended clock selection(CLKSEL = 1)
 	select_user_bank(userbank_0);
-	icm20948_write(B0_PWR_MGMT_1, WAKE | CLKSEL);
+	write_icm20948(B0_PWR_MGMT_1, WAKE | CLKSEL);
 
 	// ODR start time alignment
 	select_user_bank(userbank_2);
-	icm20948_write(B2_ODR_ALIGN_EN, ODR_START_TIME_ALIGNMENT_ENABLE);
+	write_icm20948(B2_ODR_ALIGN_EN, ODR_START_TIME_ALIGNMENT_ENABLE);
 
-	// Set Gyroscope ODR and Scale
-	select_user_bank(userbank_2);
-	icm20948_write(B2_GYRO_SMPLRT_DIV, Gyro_ODR_1125Hz);				// Gyro ODR = 1.125kHz
-	icm20948_write(B2_GYRO_CONFIG_1, GYRO_FS_SEL_2000dps | GYRO_FCHOICE);	// Gyro scale ±2000dps and Enable DLPF
-																			// 자이로 스케일 키우면 잔떨림은 감지x
-	// Set Accelerometer ODR and Scale
-	icm20948_write(B2_ACCEL_SMPLRT_DIV_2, Accel_ODR_1125Hz);			// Accel ODR = 1.125kHz
-	icm20948_write(B2_ACCEL_CONFIG, ACCEL_FS_SEL_2g | ACCEL_FCHOICE);	// Accel scale ±2g and Enable DLPF
+	// set full scale and ODR
+	set_gyro_full_scale(gyro_fs);
+	set_accel_full_scale(accel_fs);
+
+	set_gyro_odr(gyro_odr_hz);
+	set_accel_odr(accel_ord_hz);
 }
 
-void ak09916_init()
+// i2c : master(icm-20948) / slave(ak09916)
+void ak09916_init(op_mode_e op_mode)
 {
 	// I2C Master Reset
 	select_user_bank(userbank_0);
-	icm20948_write(B0_USER_CTRL, I2C_MST_RST);
+	write_icm20948(B0_USER_CTRL, I2C_MST_RST);
 
 	// I2C Master Enable
 	select_user_bank(userbank_0);
-	icm20948_write(B0_USER_CTRL, I2C_MST_EN);
+	write_icm20948(B0_USER_CTRL, I2C_MST_EN);
 
 	// I2C Master Clock Frequency
 	select_user_bank(userbank_3);
-	icm20948_write(B3_I2C_MST_CTRL, I2C_MST_CLK); // 345.6 kHz
+	write_icm20948(B3_I2C_MST_CTRL, I2C_MST_CLK); // 345.6 kHz
 
 	// I2C Slave Reset
-	ak09916_wrtie(MAG_CNTL3, 0x01);
+	write_ak09916(MAG_CNTL3, 0x01);
 	
 	// I2C Slave Operation Mode
-	ak09916_wrtie(MAG_CNTL2, Continuous_measurement_mode_4);
+	write_ak09916(MAG_CNTL2, op_mode);
 }
-
-
 
 // read gyro
-void read_gyro_lsb(icm20948_t* icm20948)
+void read_gyro(gyro_data_t* gyro_data, unit_e unit)
 {
-	icm20948_read(B0_GYRO_XOUT_H, 6);
+	int16_t gyro_data_temp[3];
 
-	// calibration
-	if(my_offset.offsetting == 1)
-	{
-		icm20948->gyro_lsb_x = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]) - my_offset.gyro_x;
-		icm20948->gyro_lsb_y = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]) - my_offset.gyro_y;
-		icm20948->gyro_lsb_z = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]) - my_offset.gyro_z;
-	}
+	select_user_bank(userbank_0);
+	read_icm20948(B0_GYRO_XOUT_H, 6);
 
-	// raw data
-	else
+	gyro_data_temp[0] = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]);
+	gyro_data_temp[1] = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]);
+	gyro_data_temp[2] = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]);
+
+	switch(unit)
 	{
-		icm20948->gyro_lsb_x = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]);
-		icm20948->gyro_lsb_y = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]);
-		icm20948->gyro_lsb_z = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]);
+		case lsb :
+			gyro_data->x = gyro_data_temp[0];
+			gyro_data->y = gyro_data_temp[1];
+			gyro_data->z = gyro_data_temp[2];
+			break;
+		
+		case dps : 
+			gyro_data->x = (float)(gyro_data_temp[0] / gyro_typ);
+			gyro_data->y = (float)(gyro_data_temp[1] / gyro_typ);
+			gyro_data->z = (float)(gyro_data_temp[2] / gyro_typ);
+			break;
+
+		default : 
+			gyro_data->x = 0;
+			gyro_data->y = 0;
+			gyro_data->z = 0;
 	}
 }
 
-void read_gyro_dps(icm20948_t* icm20948)	
+
+void read_accel(accel_data_t* accel_data, unit_e unit)
 {
-	// get lsb data
-	read_gyro_lsb(icm20948);
+	int16_t accel_data_temp[3];
 
-	// divide by 131(lsb/dps)
-	icm20948->gyro_dps_x = icm20948->gyro_lsb_x / 16.4;
-	icm20948->gyro_dps_y = icm20948->gyro_lsb_y / 16.4;
-	icm20948->gyro_dps_z = icm20948->gyro_lsb_z / 16.4;  
-}
-
-
-// read aceel
-void read_accel_lsb(icm20948_t* icm20948)	// 22us
-{
-	icm20948_read(B0_ACCEL_XOUT_H, 6);
+	select_user_bank(userbank_0);
+	read_icm20948(B0_ACCEL_XOUT_H, 6);
 	
-	if(my_offset.offsetting == 1)
-	{
-		icm20948->accel_lsb_x = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]) - my_offset.accel_x;
-		icm20948->accel_lsb_y = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]) - my_offset.accel_y;
-		icm20948->accel_lsb_z = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]) - my_offset.accel_z;
-	}
-	else
-	{
-		icm20948->accel_lsb_x = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]);
-		icm20948->accel_lsb_y = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]);
-		icm20948->accel_lsb_z = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]);
-	}
-}
+	accel_data_temp[0] = (int16_t)(rx_buffer[0] << 8 | rx_buffer[1]);
+	accel_data_temp[1] = (int16_t)(rx_buffer[2] << 8 | rx_buffer[3]);
+	accel_data_temp[2] = (int16_t)(rx_buffer[4] << 8 | rx_buffer[5]);
 
-void read_accel_g(icm20948_t* icm20948)
-{
-	read_accel_lsb(icm20948);
+	switch(unit)
+	{
+		case lsb :
+			accel_data->x = accel_data_temp[0];
+			accel_data->y = accel_data_temp[1];
+			accel_data->z = accel_data_temp[2];
+			break;
+		
+		case g : 
+			accel_data->x = (float)(accel_data_temp[0] / accel_typ);
+			accel_data->y = (float)(accel_data_temp[1] / accel_typ);
+			accel_data->z = (float)(accel_data_temp[2] / accel_typ);
+			break;
 
-	icm20948->accel_g_x = icm20948->accel_lsb_x / 16384.0;
-	icm20948->accel_g_y = icm20948->accel_lsb_y / 16384.0;
-	icm20948->accel_g_z = (icm20948->accel_lsb_z / 16384.0) + 1;
+		default : 
+			accel_data->x = 0;
+			accel_data->y = 0;
+			accel_data->z = 0;
+	}
 }
 
 
 // read mag
-void read_mag_lsb(ak09916_t* ak09916)
+void read_mag(mag_data_t* mag_data, unit_e unit)
 {
-	int16_t data_buffer[3] = {0};
+	int16_t mag_data_temp[3] = {0};
 
 	// Read status1(ST1) register
-	ak09916_read(MAG_ST1,1);
+	read_ak09916(MAG_ST1,1);
 
 	// check data is ready
 	if((rx_buffer[0] & 0x01) == 1)
 	{ 
 		// Read Measurement data register(HXL to HZH)
-		ak09916_read(MAG_HXL, 6);
-
-		data_buffer[0] = (int16_t)(rx_buffer[1] << 8 | rx_buffer[0]);
-		data_buffer[1] = (int16_t)(rx_buffer[3] << 8 | rx_buffer[2]);
-		data_buffer[2] = (int16_t)(rx_buffer[5] << 8 | rx_buffer[4]);
+		read_ak09916(MAG_HXL, 6);
+		mag_data_temp[0] = (int16_t)(rx_buffer[1] << 8 | rx_buffer[0]);
+		mag_data_temp[1] = (int16_t)(rx_buffer[3] << 8 | rx_buffer[2]);
+		mag_data_temp[2] = (int16_t)(rx_buffer[5] << 8 | rx_buffer[4]);
 
 		// Read status2(ST2) register
-		ak09916_read(MAG_ST2, 1);
-
+		read_ak09916(MAG_ST2, 1);
 		if((rx_buffer[0] & 0x08) == 0x00) // not overflow
 		{
-			ak09916->mag_x = data_buffer[0];
-			ak09916->mag_y = data_buffer[1];
-			ak09916->mag_z = data_buffer[2];
+			switch(unit)
+			{
+				case lsb :
+					mag_data->x = mag_data_temp[0];
+					mag_data->y = mag_data_temp[1];
+					mag_data->z = mag_data_temp[2];
+					break;
+				
+				case uT : 
+					mag_data->x = (float)(mag_data_temp[0] / mag_typ);
+					mag_data->y = (float)(mag_data_temp[1] / mag_typ);
+					mag_data->z = (float)(mag_data_temp[2] / mag_typ);
+					break;
+
+				default : 
+					mag_data->x = 0;
+					mag_data->y = 0;
+					mag_data->z = 0;
+			}
+
 		}
+
 	}
+
 }
 
+
+
+/*
 
 // calibrate gyro and accel
 void calibrate_icm20948(icm20948_t* icm20948, uint16_t samples)
@@ -314,3 +419,5 @@ void complementary_filter(icm20948_t *icm20948, angle_t *angle)
 	angle->angle_z = angle->gyro_angle_z;
 
 }
+
+*/

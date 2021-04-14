@@ -42,7 +42,7 @@ typedef struct
 } balancing_force_t;
 
 
-void p_control(balancing_force_t *balancing_force, target_angle_t *target_angle, angle_t *angle);
-void distribute(throttle_a *cal_value, rc_channel_a *channel, balancing_force_t *balancing_force);
+//void p_control(balancing_force_t *balancing_force, target_angle_t *target_angle, angle_t *angle);
+//void distribute(throttle_a *cal_value, rc_channel *channel, balancing_force_t *balancing_force);
 
 #endif /* _PID_H_ */

@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "dma.h"
 #include "spi.h"
 #include "tim.h"
@@ -34,8 +35,8 @@
 // personal library
 #include "icm_20948.h"		// sensor
 #include "dshot.h"			// motor
-#include "flysky_ibus.h"	// rc
-#include "pid.h"			// control
+#include "flysky_ibus.h"	// rc receiver
+//#include "pid.h"			// flight control
 
 /* USER CODE END Includes */
 
@@ -73,10 +74,9 @@ uint32_t			period_us		= 0;
 uint8_t 			id_icm20948 	= 0;	// 0xEA
 uint8_t 			id_ak09916 		= 0;	// 0x09
 
-extern offset_t		my_offset;
-icm20948_t 			my_icm20948 	= {0, };
-angle_t 			my_angle 		= {0, };
-
+gyro_data_t			my_gyro			= {0};
+accel_data_t		my_accel		= {0};
+mag_data_t			my_mag			= {0};
 
 // motor variable
 motors_s 			my_motors;				// dshot data frame structure
@@ -87,20 +87,42 @@ throttle_a 			my_value[4]		= {0};	// throttle of entire motors
 uint8_t 			my_ibus_state = 0;
 uint8_t				my_ibus_check = 0;
 
-rc_channel_a 		my_channel[IBUS_USER_CHANNELS] = {0};
+rc_channel 			my_channel[IBUS_USER_CHANNELS] = {0};
 extern uint8_t 		ibus_buffer[32];
 
 
 // pid variable
-target_angle_t 		my_target_angle		 = {0, };	// 0
-balancing_force_t 	my_balancing_force	 = {0, };	// output of pid
+//target_angle_t 		my_target_angle		 = {0, };	// 0
+//balancing_force_t 	my_balancing_force	 = {0, };	// output of pid
 
+
+// battery adc
+uint16_t adcvalue = 0;
+float battery_votalge = 0;
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+
+// entire loop
+void loop()
+{
+	ibus_read_channel(my_channel);
+	read_gyro(&my_gyro, dps);
+	read_accel(&my_accel, g);
+
+
+
+
+
+	// runtime
+	period_us = __HAL_TIM_GET_COUNTER(&htim11);
+
+}
+
+
 
 // reset variable if drone is disarming
 void reset_my_variable()
@@ -109,8 +131,8 @@ void reset_my_variable()
 	//memset(&my_channel, 0, sizeof(rc_channel_a) * IBUS_USER_CHANNELS);
 
 	// sensor
-	memset(&my_icm20948, 0, sizeof(icm20948_t));
-	memset(&my_angle, 0, sizeof(angle_t));
+	//memset(&my_icm20948, 0, sizeof(icm20948_t));
+	//memset(&my_angle, 0, sizeof(angle_t));
 
 	// motor
 	memset(&my_value, 0, sizeof(throttle_a) * 4);
@@ -122,82 +144,14 @@ void reset_my_variable()
 /* USER CODE BEGIN 0 */
 
 
-// preemption priority : 1
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-
-  // 1.125khz loop
-  if (htim == &htim11)
-  {
-
-	  // RC receiver
-	  if(my_ibus_state == IBUS_DATA_READY && ibus_read_channel(my_channel) == IBUS_DATA_GOOD)
-	  {
-		  my_ibus_state = IBUS_READY;
-		  my_ibus_check = 0;
-	  }
-	  else
-	  {
-		  my_ibus_check++;
-	  }
-
-	  // fail-safe
-	  if(my_ibus_check > 10)
-	  {
-		  my_ibus_state = IBUS_MISSING;
-	  }
-
-
-	  // arming & fail-safe
-	  if(my_channel[4] == 2000 && my_ibus_state != IBUS_MISSING)
-	  {
-		  HAL_GPIO_WritePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin, RESET);
-
-		  // angle
-		  complementary_filter(&my_icm20948, &my_angle);
-
-		  // pid
-		  //p_control(&my_balancing_force, &my_target_angle, &my_angle);
-
-		  // distribute
-		  distribute(my_value, my_channel, &my_balancing_force);
-	  }
-
-	  // disarming
-	  else
-	  {
-		  HAL_GPIO_WritePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin, SET);
-
-		  // reset variable
-		  reset_my_variable();
-	  }
-
-	  // send throttle
-	  run_dshot600(&my_motors, my_value);
-
-	  // running time
-	  period_us = __HAL_TIM_GET_COUNTER(&htim11);
-
-  }
-
-}
-
-
-// ibus protocol receive interrupt
-// preemption priority : 0
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-	// receive send data every 7ms
-
-	if(huart->Instance == IBUS_UART_INSTANCE)
+	// 1.125khz loop
+	if (htim == &htim11)
 	{
-		my_ibus_state = IBUS_DATA_READY;
-		HAL_UART_Receive_IT(IBUS_UART, ibus_buffer, 32);
-
+		loop();
 	}
-
 }
-
 
 
 /* USER CODE END 0 */
@@ -235,40 +189,27 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM2_Init();
   MX_TIM5_Init();
-
   MX_TIM11_Init();
   MX_USART1_UART_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 
-  // check rc receiver
-  HAL_UART_Receive_IT(IBUS_UART, ibus_buffer, 32);
-  while(ibus_init() != IBUS_OK);
 
-  // check sensor id
-  while(whoami_icm20948() != DEVICE_ID_ICM20948);
-  //while(whoami_ak09916() != DEVICE_ID_AK09916);
+  ibus_init();
 
-  // init sensor
-  icm20948_init();
-  //ak09916_init();
+  icm20948_init(fs_2000dps, 1125, fs_2g, 1125);
+  ak09916_init(continuous_measure_100hz);
 
-  // calibrate sensor
-  // I think there is a optimized and fixed offset value
-  HAL_Delay(100);
-  calibrate_icm20948(&my_icm20948, 200);
+  id_icm20948 = whoami_icm20948();
+  id_ak09916 = whoami_ak09916();
 
 
-  // finish init
-  for(int i = 0; i < 6; i++)
-  {
-	  HAL_GPIO_TogglePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin);
-	  HAL_Delay(300);
-  }
 
-  // start 1.125khz loop
-  HAL_TIM_Base_Start_IT(&htim11);
+  // 1.125khz loop
+  //HAL_TIM_Base_Start_IT(&htim11);
 
-  // init dshot
+
+  HAL_GPIO_WritePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin, RESET);
 
 
   /* USER CODE END 2 */
@@ -279,8 +220,10 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
+
     /* USER CODE BEGIN 3 */
 
+	  read_mag(&my_mag, uT);
 
 
   }
