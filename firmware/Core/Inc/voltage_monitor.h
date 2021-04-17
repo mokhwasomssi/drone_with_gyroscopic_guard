@@ -16,18 +16,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef uint32_t element;
-typedef int size;
 
-typedef struct cirqueue
-{
-    int rear;
-    int front;
-    element* data;
-} cirqueue;
-
-
-void init_voltage_monitor(float* battery_voltage, size n);
-float read_battery_voltage(size n);
+void init_voltage_monitor();
+void read_battery_voltage(float* battery_voltage);
 
 #endif /* _VOLTAGE_MONITOR_H_ */

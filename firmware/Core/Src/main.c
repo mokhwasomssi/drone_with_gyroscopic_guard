@@ -114,8 +114,7 @@ void loop()
 	//read_gyro(&my_gyro, dps);
 	//read_accel(&my_accel, g);
 
-	battery_votalge = read_battery_voltage(11);
-
+	read_battery_voltage(&battery_votalge);
 
 
 	// runtime
@@ -210,7 +209,7 @@ int main(void)
   // 1.125khz loop
 */
 
-  init_voltage_monitor(&battery_votalge, 11);
+  init_voltage_monitor();
 
   HAL_GPIO_WritePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin, RESET);
 
