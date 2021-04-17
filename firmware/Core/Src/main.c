@@ -36,6 +36,7 @@
 #include "icm_20948.h"		// sensor
 #include "dshot.h"			// motor
 #include "flysky_ibus.h"	// rc receiver
+#include "voltage_monitor.h"
 //#include "pid.h"			// flight control
 
 /* USER CODE END Includes */
@@ -97,8 +98,8 @@ extern uint8_t 		ibus_buffer[32];
 
 
 // battery adc
-uint16_t adcvalue = 0;
 float battery_votalge = 0;
+int aaaa = 0;
 
 /* USER CODE END PV */
 
@@ -109,11 +110,11 @@ void SystemClock_Config(void);
 // entire loop
 void loop()
 {
-	ibus_read_channel(my_channel);
-	read_gyro(&my_gyro, dps);
-	read_accel(&my_accel, g);
+	//ibus_read_channel(my_channel);
+	//read_gyro(&my_gyro, dps);
+	//read_accel(&my_accel, g);
 
-
+	battery_votalge = read_battery_voltage(11);
 
 
 
@@ -192,13 +193,14 @@ int main(void)
   MX_TIM11_Init();
   MX_USART1_UART_Init();
   MX_ADC1_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
 
-
+/*
   ibus_init();
 
-  icm20948_init(fs_2000dps, 1125, fs_2g, 1125);
-  ak09916_init(continuous_measure_100hz);
+  init_icm20948(fs_2000dps, 1125, fs_2g, 1125);
+  init_ak09916(continuous_measure_100hz);
 
   id_icm20948 = whoami_icm20948();
   id_ak09916 = whoami_ak09916();
@@ -206,11 +208,13 @@ int main(void)
 
 
   // 1.125khz loop
-  //HAL_TIM_Base_Start_IT(&htim11);
+*/
 
+  init_voltage_monitor(&battery_votalge, 11);
 
   HAL_GPIO_WritePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin, RESET);
 
+  HAL_TIM_Base_Start_IT(&htim11);
 
   /* USER CODE END 2 */
 
@@ -220,10 +224,9 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
-
     /* USER CODE BEGIN 3 */
 
-	  read_mag(&my_mag, uT);
+	  //moving_average_filiter_voltage_monitor(100);
 
 
   }

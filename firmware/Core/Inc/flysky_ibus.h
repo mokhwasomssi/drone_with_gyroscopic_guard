@@ -33,7 +33,7 @@ typedef enum
 
 typedef uint16_t rc_channel;
 
-void ibus_init();
+void init_ibus();
 ibus_state ibus_read_channel(rc_channel *channel);
 
 #endif /* _FLYSKY_IBUS_H_ */

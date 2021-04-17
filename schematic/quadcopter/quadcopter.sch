@@ -192,8 +192,6 @@ Wire Wire Line
 	4350 2425 4625 2425
 Wire Wire Line
 	4350 2725 4625 2725
-Wire Notes Line width 12 rgb(0, 0, 0)
-	6975 6550 6975 475 
 Text Notes 7150 2800 0    118  ~ 24
 Motor
 Text Notes 575  5075 0    118  ~ 24
@@ -798,4 +796,6 @@ F 3 "" H 6125 2375 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	6025 2375 6125 2375
+Wire Notes Line width 12 rgb(0, 0, 0)
+	6975 6550 6975 475 
 $EndSCHEMATC

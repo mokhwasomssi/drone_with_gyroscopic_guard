@@ -9,7 +9,7 @@
 
 #include "dshot.h"
 
-void dshot_init(motors_s *motors)
+void init_dshot(motors_s *motors)
 {
   // it have to send 0 value of dshot frame for a while to reset
   // regardless of RC receiver value

@@ -190,7 +190,7 @@ void set_accel_odr(uint16_t odr_hz)
 
 
 // initialize
-void icm20948_init(gyro_fs_e gyro_fs, uint16_t gyro_odr_hz, accel_fs_e accel_fs, uint16_t accel_ord_hz)
+void init_icm20948(gyro_fs_e gyro_fs, uint16_t gyro_odr_hz, accel_fs_e accel_fs, uint16_t accel_ord_hz)
 {
 	// ICM20948 Reset
 	select_user_bank(userbank_0);
@@ -217,7 +217,7 @@ void icm20948_init(gyro_fs_e gyro_fs, uint16_t gyro_odr_hz, accel_fs_e accel_fs,
 }
 
 // i2c : master(icm-20948) / slave(ak09916)
-void ak09916_init(op_mode_e op_mode)
+void init_ak09916(op_mode_e op_mode)
 {
 	// I2C Master Reset
 	select_user_bank(userbank_0);

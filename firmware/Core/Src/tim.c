@@ -35,9 +35,17 @@ DMA_HandleTypeDef hdma_tim5_ch4_trig;
 /* TIM2 init function */
 void MX_TIM2_Init(void)
 {
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_OC_InitTypeDef sConfigOC = {0};
 
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 8-1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -66,15 +74,26 @@ void MX_TIM2_Init(void)
   {
     Error_Handler();
   }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
   HAL_TIM_MspPostInit(&htim2);
 
 }
 /* TIM5 init function */
 void MX_TIM5_Init(void)
 {
+
+  /* USER CODE BEGIN TIM5_Init 0 */
+
+  /* USER CODE END TIM5_Init 0 */
+
   TIM_MasterConfigTypeDef sMasterConfig = {0};
   TIM_OC_InitTypeDef sConfigOC = {0};
 
+  /* USER CODE BEGIN TIM5_Init 1 */
+
+  /* USER CODE END TIM5_Init 1 */
   htim5.Instance = TIM5;
   htim5.Init.Prescaler = 8-1;
   htim5.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -103,6 +122,9 @@ void MX_TIM5_Init(void)
   {
     Error_Handler();
   }
+  /* USER CODE BEGIN TIM5_Init 2 */
+
+  /* USER CODE END TIM5_Init 2 */
   HAL_TIM_MspPostInit(&htim5);
 
 }
@@ -110,6 +132,13 @@ void MX_TIM5_Init(void)
 void MX_TIM11_Init(void)
 {
 
+  /* USER CODE BEGIN TIM11_Init 0 */
+
+  /* USER CODE END TIM11_Init 0 */
+
+  /* USER CODE BEGIN TIM11_Init 1 */
+
+  /* USER CODE END TIM11_Init 1 */
   htim11.Instance = TIM11;
   htim11.Init.Prescaler = 99;
   htim11.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -120,6 +149,9 @@ void MX_TIM11_Init(void)
   {
     Error_Handler();
   }
+  /* USER CODE BEGIN TIM11_Init 2 */
+
+  /* USER CODE END TIM11_Init 2 */
 
 }
 

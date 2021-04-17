@@ -16,7 +16,7 @@ uint8_t ibus_buffer[32] = {0};
 
 
 // init
-void ibus_init()
+void init_ibus()
 {
 	HAL_UART_Receive_DMA(IBUS_UART, ibus_buffer, 32);
 	while (ibus_read_channel(test_channel) != IBUS_OK);

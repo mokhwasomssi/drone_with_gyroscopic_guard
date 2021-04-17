@@ -130,8 +130,8 @@ uint8_t whoami_icm20948();	// return : 0xEA
 uint8_t whoami_ak09916();	// return : 0x09
 
 // initialize
-void icm20948_init(gyro_fs_e gyro_fs, uint16_t gyro_odr_hz, accel_fs_e accel_fs, uint16_t accel_ord_hz);
-void ak09916_init(op_mode_e op_mode);
+void init_icm20948(gyro_fs_e gyro_fs, uint16_t gyro_odr_hz, accel_fs_e accel_fs, uint16_t accel_ord_hz);
+void init_ak09916(op_mode_e op_mode);
 
 // read sensor data
 void read_gyro(gyro_data_t* gyro_data, unit_e unit);

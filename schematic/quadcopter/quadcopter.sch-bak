@@ -690,7 +690,7 @@ Wire Wire Line
 Wire Notes Line width 12 rgb(0, 0, 0)
 	6975 4650 475  4650
 Wire Notes Line width 12 rgb(0, 0, 0)
-	6950 2525 11200 2525
+	6975 2525 11225 2525
 Text Notes 7050 775  0    118  ~ 24
 Voltage level monitor
 $Comp
