@@ -80,6 +80,10 @@ void Error_Handler(void);
 #define IBUS_TX_GPIO_Port GPIOA
 #define IBUS_RX_Pin GPIO_PIN_10
 #define IBUS_RX_GPIO_Port GPIOA
+#define DEBUG_UART_TX_Pin GPIO_PIN_11
+#define DEBUG_UART_TX_GPIO_Port GPIOA
+#define DEBUG_UART_RX_Pin GPIO_PIN_12
+#define DEBUG_UART_RX_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
