@@ -1,76 +1,69 @@
-# gyroscope-quadcopter
+# Drone_with_Gyroscopic_Guard
 
-Develop flight firmware and Design gyroscopic guard.
+### Develop drone firmware and Design gyroscopic guard
 
-## 0. Overview
+This concept is same as [flyability drone](https://www.flyability.com/).  
+I'm a student and making it personally.
 
-### 3D modeling image
-![다운로드](https://user-images.githubusercontent.com/48342925/111861476-de6ed200-8991-11eb-9798-e63ba10da68a.png)  
-( drone size = 210mm, sphere diameter = 480mm )    
-
----  
-
-### System Structure  
-![overview](https://user-images.githubusercontent.com/48342925/114194621-a8b67b00-998a-11eb-9f10-d65c305e5907.png)
+- Drone - STM32F4
+- GCS - Rasberry Pi
+- Gyroscopic guard
 
 ---
-### Schematic
-![quadcopter](https://user-images.githubusercontent.com/48342925/113841802-1157f900-97cd-11eb-8552-34f727a531c5.jpg)  
+
+## Drone
+
+### Hardware Configuration
+
+- STM32F4CEU6   
+- 210mm frame  
+- 2207 2450KV BLDC  
+- 5045 props  
+- PDB  
+- ESC  
+- IMU  
+- RF module - UAV control and Telemetry both   
+- Buzzer  
+- 4S Lipo Battery  
+- Battery Monitor  
+- SWD (st-link)  
+
+### Software Features
+
+- OS x
+- 1Khz control loop  
 
 ---
-* Why this project name is gyroscope-drone?  
-    * because, it has sphere-shaped guard with gyroscope structure.
+## GCS
 
-* Why do you put a guard like this on a normal quadcopter?  
-    1. prop gurad
-    2. flight tester
-    3. cushion the impact
-    4. rolling motion on a plane
+### Hardware Configuration 
 
-* What kind of open-source do you use for flight firmware?  
-    * there are drone open-sources like betaflight, ardupilot, px4 and so on.
-    * but I'm trying to write my own code for flight.
+- Rasberry Pi  
+- LCD  
+- RF module - UAV control and Telemetry both   
+- Joy Stick  
+- Control Button
+- Battery
 
+### Software Features
 
-## 1. Development environment
+- Linux OS
+- Control Drone
+- Monitor Flight Status - ESC, IMU, Battery Voltage
 
-* Software tools
-    * STM32Cubeide (STM32Cube HAL)
-    * SOLIDWORKS 2020
+--- 
 
-* Debugging
-    * ST-LINK V2
-    * Oscilloscope
-    * Multimeter
+## Gyroscopic Guard
 
-* Drone parts
+### Hardwre Configuration
 
-|No.|Part|Name|
-|:---:|:---:|:---:|
-|1|FC|[WeAct Black Pill <br> (STM32F411CEU6)](https://github.com/WeActTC/MiniF4-STM32F4x1)|
-|2|Frame|Mini QAV 210mm|
-|3|PDB|MATEK PDB 3-4S 5V 12V|
-|4|ESC|HAKRC BLHeli_32 Bit 35A 2-5S ESC |
-|5|Motor|iFlight XING E 2207 2450KV|
-|6|Props|5045 3 blades CW, CWW|
-|7|IMU|SparkFun 9DoF IMU Breakout - ICM-20948 (Qwiic)|
-|8|Transmitter|FS-i6|
-|9|Receiver|FS-A8S|
-|10|Battery|ZOP Power 14.8V 1800mAh 65C 4S|
-|11|Lipo Alarm|Voltage Buzzer Alarm|  
+- 3mm Carbon Rod
+- Bearing
+- Shaft
+- 3D Printer Output
 
+### Feature
 
-
-## 1. FEATURE
-
-* ICM-20948 - https://github.com/mokhwasomssi/icm20948.git
-* DSHOT600 - https://github.com/mokhwasomssi/dshot.git
-* IBUS - https://github.com/mokhwasomssi/flysky_ibus.git
-
-
-
-
-## # Reference
-
-https://eurekadynamics.com/  
-https://www.flyability.com/
+- Roll-axis Gyroscope Ring
+- Pitch-axis Gyroscope Ring
+- Yaw-axis 2V Geomesic Sphere
