@@ -1,13 +1,16 @@
 # Drone_with_Gyroscopic_Guard
 
-### Develop drone firmware and Design gyroscopic guard
+### Develop Drone Firmware and Design Gyroscopic Guard
 
-This concept is same as [flyability drone](https://www.flyability.com/).  
+Gyroscopic Guard is similar to [flyability drone](https://www.flyability.com/).  
 I'm a student and making it personally.
+ 
+---
 
-- Drone - STM32F4
-- GCS - Rasberry Pi
-- Gyroscopic guard
+## Size
+- Drone - 5 inches, 210mm
+- GCS - hand-held
+- Gyroscopic guard - Diameter 480mm
 
 ---
 
@@ -22,7 +25,7 @@ I'm a student and making it personally.
 - PDB  
 - ESC  
 - IMU  
-- RF module - UAV control and Telemetry both   
+- RF module - Drone control and Telemetry both   
 - Buzzer  
 - 4S Lipo Battery  
 - Battery Monitor  
@@ -31,7 +34,7 @@ I'm a student and making it personally.
 ### Software Features
 
 - OS x
-- 1Khz control loop  
+- 1Khz Control Loop  
 
 ---
 ## GCS
@@ -40,7 +43,7 @@ I'm a student and making it personally.
 
 - Rasberry Pi  
 - LCD  
-- RF module - UAV control and Telemetry both   
+- RF module - Drone control and Telemetry both   
 - Joy Stick  
 - Control Button
 - Battery
@@ -48,8 +51,8 @@ I'm a student and making it personally.
 ### Software Features
 
 - Linux OS
-- Control Drone
-- Monitor Flight Status - ESC, IMU, Battery Voltage
+- Control Drone - Roll, Pitch, Yaw, Throttle
+- Monitor Flight Status - Data from ESC and IMU, Battery Voltage
 
 --- 
 
@@ -58,6 +61,7 @@ I'm a student and making it personally.
 ### Hardwre Configuration
 
 - 3mm Carbon Rod
+- 3mm Carbon Plate
 - Bearing
 - Shaft
 - 3D Printer Output
@@ -67,3 +71,5 @@ I'm a student and making it personally.
 - Roll-axis Gyroscope Ring
 - Pitch-axis Gyroscope Ring
 - Yaw-axis 2V Geomesic Sphere
+
+---
