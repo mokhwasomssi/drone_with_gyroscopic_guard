@@ -16,6 +16,10 @@ I'm a student and making it personally.
 
 ## Drone
 
+### FMU Block Diagram
+
+![FMU Block Diagram](https://user-images.githubusercontent.com/48342925/117300001-197e8380-aeb4-11eb-9904-a98ef876119a.png)
+
 ### Hardware Configuration
 
 - STM32F4CEU6   
@@ -58,7 +62,11 @@ I'm a student and making it personally.
 
 ## Gyroscopic Guard
 
-### Hardwre Configuration
+### 3D Modeling Image
+![image](https://user-images.githubusercontent.com/48342925/117300397-7843fd00-aeb4-11eb-91a1-5b9b1473b542.png)
+
+
+### Hardware Configuration
 
 - 3mm Carbon Rod
 - 3mm Carbon Plate
@@ -66,7 +74,7 @@ I'm a student and making it personally.
 - Shaft
 - 3D Printer Output
 
-### Feature
+### Features
 
 - Roll-axis Gyroscope Ring
 - Pitch-axis Gyroscope Ring
