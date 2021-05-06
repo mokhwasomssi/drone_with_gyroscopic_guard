@@ -8,12 +8,12 @@ $CMP HAKRC_35A_ESC
 D BLHeli_32, input voltage 2-5 cell lipo, continuous current 35A
 $ENDCMP
 #
-$CMP MATEK_PDB-XT60
-D Input voltage range 9-18V DC, Regulated 5V and 12V outputs, Continuous current 25A*4, Peak current 30A*4
+$CMP ICM_20948_BreakOut
+D sparkrun icm20948 breakout board
 $ENDCMP
 #
-$CMP SPARKRUN_ICM-20948
-D sparkrun icm20948 breakout board
+$CMP MATEK_PDB-XT60
+D Input voltage range 9-18V DC, Regulated 5V and 12V outputs, Continuous current 25A*4, Peak current 30A*4
 $ENDCMP
 #
 $CMP WEACT_STM32F411CEU6
