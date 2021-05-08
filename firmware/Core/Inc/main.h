@@ -58,8 +58,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define DEBUG_LED_Pin GPIO_PIN_13
-#define DEBUG_LED_GPIO_Port GPIOC
+#define LED1_Pin GPIO_PIN_13
+#define LED1_GPIO_Port GPIOC
 #define MOTOR_4_Pin GPIO_PIN_0
 #define MOTOR_4_GPIO_Port GPIOA
 #define MOTOR_3_Pin GPIO_PIN_1
@@ -68,22 +68,20 @@ void Error_Handler(void);
 #define MOTOR_1_GPIO_Port GPIOA
 #define MOTOR_2_Pin GPIO_PIN_3
 #define MOTOR_2_GPIO_Port GPIOA
-#define SPI_ICM20948_CS_Pin GPIO_PIN_4
-#define SPI_ICM20948_CS_GPIO_Port GPIOA
-#define SPI_ICM20948_SCK_Pin GPIO_PIN_5
-#define SPI_ICM20948_SCK_GPIO_Port GPIOA
-#define SPI_ICM20948_MISO_Pin GPIO_PIN_6
-#define SPI_ICM20948_MISO_GPIO_Port GPIOA
-#define SPI_ICM20948_MOSI_Pin GPIO_PIN_7
-#define SPI_ICM20948_MOSI_GPIO_Port GPIOA
-#define IBUS_TX_Pin GPIO_PIN_9
-#define IBUS_TX_GPIO_Port GPIOA
-#define IBUS_RX_Pin GPIO_PIN_10
-#define IBUS_RX_GPIO_Port GPIOA
-#define DEBUG_UART_TX_Pin GPIO_PIN_11
-#define DEBUG_UART_TX_GPIO_Port GPIOA
-#define DEBUG_UART_RX_Pin GPIO_PIN_12
-#define DEBUG_UART_RX_GPIO_Port GPIOA
+#define SPI1_CS_Pin GPIO_PIN_4
+#define SPI1_CS_GPIO_Port GPIOA
+#define BATTERY_ADC_Pin GPIO_PIN_0
+#define BATTERY_ADC_GPIO_Port GPIOB
+#define LED2_Pin GPIO_PIN_1
+#define LED2_GPIO_Port GPIOB
+#define LED3_Pin GPIO_PIN_2
+#define LED3_GPIO_Port GPIOB
+#define SPI2_CE_Pin GPIO_PIN_12
+#define SPI2_CE_GPIO_Port GPIOB
+#define SPI2_CS_Pin GPIO_PIN_13
+#define SPI2_CS_GPIO_Port GPIOB
+#define Buzzer_Pin GPIO_PIN_10
+#define Buzzer_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

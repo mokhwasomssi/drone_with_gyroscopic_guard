@@ -1,6 +1,5 @@
 {
-    "C_Cpp.errorSquiggles": "Disabled",
     "files.associations": {
-        "stdint.h": "c"
+        "battery_monitor.h": "c"
     }
 }

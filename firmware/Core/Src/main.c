@@ -21,38 +21,23 @@
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
-#include "i2c.h"
 #include "spi.h"
 #include "tim.h"
-#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-// c standard library
-#include "string.h"
-
-// personal library
-#include "icm_20948.h"		// sensor
-#include "dshot.h"			// motor
-#include "flysky_ibus.h"	// rc receiver
-#include "voltage_monitor.h"
-//#include "pid.h"			// flight control
+#include "led.h"
+#include "buzzer.h"
+#include "battery_monitor.h"
 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
-typedef enum
-{
-	DISARMING = 0,
-	ARMING = 1,
 
-	INIT_ERROR = 2
-
-} DRONE_STATE;
 
 /* USER CODE END PTD */
 
@@ -69,38 +54,8 @@ typedef enum
 
 /* USER CODE BEGIN PV */
 
-// check  period
-uint32_t			period_us		= 0;
-
-// sensor variable
-uint8_t 			id_icm20948 	= 0;	// 0xEA
-uint8_t 			id_ak09916 		= 0;	// 0x09
-
-gyro_data_t			my_gyro			= {0};
-accel_data_t		my_accel		= {0};
-mag_data_t			my_mag			= {0};
-
-// motor variable
-motors_s 			my_motors;				// dshot data frame structure
-throttle_a 			my_value[4]		= {0};	// throttle of entire motors
 
 
-// rc controller variable
-uint8_t 			my_ibus_state = 0;
-uint8_t				my_ibus_check = 0;
-
-rc_channel 			my_channel[IBUS_USER_CHANNELS] = {0};
-extern uint8_t 		ibus_buffer[32];
-
-
-// pid variable
-//target_angle_t 		my_target_angle		 = {0, };	// 0
-//balancing_force_t 	my_balancing_force	 = {0, };	// output of pid
-
-
-// battery adc
-float battery_votalge = 0;
-int aaaa = 0;
 
 /* USER CODE END PV */
 
@@ -108,36 +63,7 @@ int aaaa = 0;
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-// entire loop
-void loop()
-{
-	//ibus_read_channel(my_channel);
-	//read_gyro(&my_gyro, dps);
-	//read_accel(&my_accel, g);
 
-	read_battery_voltage(&battery_votalge);
-
-
-	// runtime
-	period_us = __HAL_TIM_GET_COUNTER(&htim11);
-
-}
-
-
-
-// reset variable if drone is disarming
-void reset_my_variable()
-{
-	// receiver
-	//memset(&my_channel, 0, sizeof(rc_channel_a) * IBUS_USER_CHANNELS);
-
-	// sensor
-	//memset(&my_icm20948, 0, sizeof(icm20948_t));
-	//memset(&my_angle, 0, sizeof(angle_t));
-
-	// motor
-	memset(&my_value, 0, sizeof(throttle_a) * 4);
-}
 
 /* USER CODE END PFP */
 
@@ -145,14 +71,6 @@ void reset_my_variable()
 /* USER CODE BEGIN 0 */
 
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-	// 1.125khz loop
-	if (htim == &htim11)
-	{
-		loop();
-	}
-}
 
 
 /* USER CODE END 0 */
@@ -191,32 +109,19 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM5_Init();
   MX_TIM11_Init();
-  MX_USART1_UART_Init();
   MX_ADC1_Init();
-  MX_USART6_UART_Init();
   MX_SPI2_Init();
-  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-/*
-  ibus_init();
+  led1_on();
+  led2_on();
+  led3_on();
 
-  init_icm20948(fs_2000dps, 1125, fs_2g, 1125);
-  init_ak09916(continuous_measure_100hz);
+  buzzer_time(100);
 
-  id_icm20948 = whoami_icm20948();
-  id_ak09916 = whoami_ak09916();
-
+  battery_monitor_init();
 
 
-  // 1.125khz loop
-*/
-
-  init_voltage_monitor();
-
-  HAL_GPIO_WritePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin, RESET);
-
-  HAL_TIM_Base_Start_IT(&htim11);
 
   /* USER CODE END 2 */
 
@@ -228,7 +133,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  //moving_average_filiter_voltage_monitor(100);
+	  battery_monitor_read();
 
 
   }

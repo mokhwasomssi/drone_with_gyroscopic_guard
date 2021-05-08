@@ -11,7 +11,7 @@
 *
 */
 
-#include "icm_20948_register.h"
+#include "icm_20948_reg.h"
 #include "icm_20948.h"
 
 

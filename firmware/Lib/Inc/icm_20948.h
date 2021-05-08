@@ -14,12 +14,9 @@
 #ifndef _ICM_20948_H_
 #define	_ICM_20948_H_
 
-#include "icm_20948_register.h"
-#include "stm32f4xx_hal.h"
-#include "main.h"
+#include "icm_20948_reg.h"
 #include "spi.h"
 
-#include "flysky_ibus.h"
 #include <math.h>
 #include <stdbool.h>
 

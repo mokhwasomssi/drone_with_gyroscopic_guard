@@ -11,7 +11,6 @@
 #include "main.h"
 #include "icm_20948.h"
 #include "dshot.h"
-#include "flysky_ibus.h"
 
 /* user configuration */
 
