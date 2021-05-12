@@ -1,5 +1,4 @@
 Lib/Src/icm_20948.o: ../Lib/Src/icm_20948.c \
- C:/Users/mokhw/Desktop/GitHub/Drone_With_Gyroscopic_Guard/firmware/Lib/Inc/icm_20948_reg.h \
  C:/Users/mokhw/Desktop/GitHub/Drone_With_Gyroscopic_Guard/firmware/Lib/Inc/icm_20948.h \
  C:/Users/mokhw/Desktop/GitHub/Drone_With_Gyroscopic_Guard/firmware/Lib/Inc/icm_20948_reg.h \
  ../Core/Inc/spi.h ../Core/Inc/main.h \
@@ -34,8 +33,6 @@ Lib/Src/icm_20948.o: ../Lib/Src/icm_20948.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
-
-C:/Users/mokhw/Desktop/GitHub/Drone_With_Gyroscopic_Guard/firmware/Lib/Inc/icm_20948_reg.h:
 
 C:/Users/mokhw/Desktop/GitHub/Drone_With_Gyroscopic_Guard/firmware/Lib/Inc/icm_20948.h:
 

@@ -14,24 +14,10 @@
 #ifndef _ICM_20948_H_
 #define	_ICM_20948_H_
 
+
 #include "icm_20948_reg.h"
 #include "spi.h"
 
-#include <math.h>
-#include <stdbool.h>
-
-
-/* User Configuration */
-#define ALPHA				0.97
-#define dt					0.000889 				// 1.125khz
-
-#define SPI_ICM20948 		(&hspi1)			// SPI Number
-#define CS_PIN_PORT			GPIOA				// CS Pin
-#define CS_PIN_NUMBER		GPIO_PIN_4
-/* User Configuration */
-
-
-// icm20948 data structure 
 
 typedef enum unit_e
 {
@@ -114,7 +100,7 @@ void cs_low();
 // user bank
 void select_user_bank(userbank_e ub);
 
-// spi
+// read / write
 void read_icm20948(uint8_t regaddr, uint8_t len);
 void write_icm20948(uint8_t regaddr, uint8_t data);
 

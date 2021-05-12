@@ -32,6 +32,8 @@
 #include "buzzer.h"
 #include "battery_monitor.h"
 
+#include "stdio.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -70,7 +72,14 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-
+int _write(int file, char *ptr, int len)
+{
+	for(int i = 0; i < len; i++)
+	{
+		ITM_SendChar(*ptr++);
+	}
+	return len;
+}
 
 
 /* USER CODE END 0 */
@@ -134,6 +143,8 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 	  battery_monitor_read();
+	  printf("Data\n");
+	  HAL_Delay(100);
 
 
   }
@@ -185,6 +196,8 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+
 
 /* USER CODE END 4 */
 

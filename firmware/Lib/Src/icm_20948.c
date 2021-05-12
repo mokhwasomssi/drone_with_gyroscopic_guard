@@ -11,7 +11,7 @@
 *
 */
 
-#include "icm_20948_reg.h"
+
 #include "icm_20948.h"
 
 
@@ -28,12 +28,12 @@ float mag_typ = 0.15;
 // cs state
 void cs_high()
 {
-	HAL_GPIO_WritePin(CS_PIN_PORT, CS_PIN_NUMBER, SET);	
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, SET);	
 }
 
 void cs_low()
 {
-	HAL_GPIO_WritePin(CS_PIN_PORT, CS_PIN_NUMBER, RESET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, RESET);
 }
 
 // user bank
@@ -42,7 +42,7 @@ void select_user_bank(userbank_e ub)
 	cs_low();
 	tx_buffer[0] = WRITE | B0_REG_BANK_SEL;
 	tx_buffer[1] = ub;
-	HAL_SPI_Transmit(SPI_ICM20948, tx_buffer, 2, 10);
+	HAL_SPI_Transmit(&hspi1, tx_buffer, 2, 10);
 	cs_high();
 }
 
@@ -51,8 +51,8 @@ void read_icm20948(uint8_t regaddr, uint8_t len)
 {
 	cs_low();
 	tx_buffer[0] = READ | regaddr;
-	HAL_SPI_Transmit(SPI_ICM20948, tx_buffer, 1, 10);
-	HAL_SPI_Receive(SPI_ICM20948, rx_buffer, len, 10);
+	HAL_SPI_Transmit(&hspi1, tx_buffer, 1, 10);
+	HAL_SPI_Receive(&hspi1, rx_buffer, len, 10);
 	cs_high();
 }
 
@@ -61,7 +61,7 @@ void write_icm20948(uint8_t regaddr, uint8_t data)
 	cs_low();
 	tx_buffer[0] = WRITE | regaddr;
 	tx_buffer[1] = data;
-	HAL_SPI_Transmit(SPI_ICM20948, tx_buffer, 2, 10);
+	HAL_SPI_Transmit(&hspi1, tx_buffer, 2, 10);
 	cs_high();
 
 	// necessary

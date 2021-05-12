@@ -1,5 +1,4 @@
 {
-    "files.associations": {
-        "battery_monitor.h": "c"
-    }
+
+    "C_Cpp.errorSquiggles": "Disabled"
 }
