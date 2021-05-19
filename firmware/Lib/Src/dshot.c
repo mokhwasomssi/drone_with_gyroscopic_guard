@@ -24,7 +24,10 @@ void make_dshot600_frame(dshot_frame *motor_x, throttle_a value)
   int csum_data = packet;
   for (int i = 0; i < 3; i++) {
     csum ^=  csum_data;   // xor data by nibbles
-    csum_data >>= 4;
+    csum_data >>= 4
+    
+    
+    ;
   }
   csum &= 0xf;
 

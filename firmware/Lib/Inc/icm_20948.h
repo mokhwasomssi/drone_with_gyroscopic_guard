@@ -11,6 +11,7 @@
 *
 */
 
+
 #ifndef _ICM_20948_H_
 #define	_ICM_20948_H_
 
@@ -19,18 +20,23 @@
 #include "spi.h"
 
 
+// User Configuration
+#define SPI_ICM20948 		(&hspi1)	  	  	// SPI Number
+#define CS_PIN_PORT         GPIOA			 	// CS Pin
+#define CS_PIN_NUMBER		GPIO_PIN_4
+
+
 typedef enum unit_e
 {
-	lsb,
-	dps,
-	g,
-	deg,
-	uT
+	unit_lsb,
+	unit_dps,
+	unit_g,
+	unit_deg,
+	unit_uT
 
 } unit_e;
 
-// user bank
-typedef enum userbank_e
+typedef enum
 {
 	userbank_0		= 0 << 4,
 	userbank_1		= 1 << 4,
@@ -38,25 +44,35 @@ typedef enum userbank_e
 	userbank_3		= 3 << 4
 } userbank_e;
 
-typedef enum gyro_fs_e
+typedef enum
 {
-	fs_250dps = 0,
-	fs_500dps = 2,
-	fs_1000dps = 4,
-	fs_2000dps = 6
+	gy_fs_250dps = 0,
+	gy_fs_500dps = 2,
+	gy_fs_1000dps = 4,
+	gy_fs_2000dps = 6
 
-} gyro_fs_e;
+} gyro_fs_e;	// full scale
 
-typedef enum accel_fs_e
+typedef enum
 {
-	fs_2g = 1,
-	fs_4g = 3,
-	fs_8g = 5,
-	fs_16g = 7
+	ac_fs_2g = 1,
+	ac_fs_4g = 3,
+	ac_fs_8g = 5,
+	ac_fs_16g = 7
 
 } accel_fs_e;
 
-typedef enum op_mode_e
+typedef enum
+{
+	odr_1125_hz = 0,
+	odr_563_hz = 1,
+	odr_375_hz = 2,
+	odr_225_hz = 4,
+	odr_125_hz = 8
+
+} odr_e; // output data rate
+
+typedef enum
 {
 	power_down 				 = 0,
 	single_measure 			 = 1,
@@ -66,9 +82,9 @@ typedef enum op_mode_e
 	continuous_measure_100hz = 8,
 	self_test 				 = 16
 
-} op_mode_e;
+} mag_opmode_e;	// operation mode
 
-typedef struct gyro_data_t
+typedef struct
 {
 	float x;
 	float y;
@@ -76,7 +92,7 @@ typedef struct gyro_data_t
 
 } gyro_data_t;
 
-typedef struct accel_data_t
+typedef struct
 {
 	float x;
 	float y;
@@ -84,13 +100,19 @@ typedef struct accel_data_t
 
 } accel_data_t;
 
-typedef struct mag_data_t
+typedef struct
 {
 	float x;
 	float y;
 	float z;
 
 } mag_data_t;
+
+
+// sensor data structure
+gyro_data_t gyro_data;
+accel_data_t accel_data;
+mag_data_t mag_data;
 
 
 // cs state
@@ -109,24 +131,17 @@ void read_ak09916(uint8_t regaddr, uint8_t len);
 void write_ak09916(uint8_t regaddr, uint8_t data);
 
 // check sensor id
-uint8_t whoami_icm20948();	// return : 0xEA
-uint8_t whoami_ak09916();	// return : 0x09
+void whoami_icm20948();	// 0xEA
+void whoami_ak09916();	// 0x09
 
 // initialize
-void init_icm20948(gyro_fs_e gyro_fs, uint16_t gyro_odr_hz, accel_fs_e accel_fs, uint16_t accel_ord_hz);
-void init_ak09916(op_mode_e op_mode);
+void icm20948_init(gyro_fs_e gy_fs, odr_e gy_odr, accel_fs_e ac_fs, odr_e ac_odr);
+void ak09916_init(mag_opmode_e op_mode);
 
 // read sensor data
 void read_gyro(gyro_data_t* gyro_data, unit_e unit);
 void read_accel(accel_data_t* accel_data, unit_e unit);
 void read_mag(mag_data_t* mag_data, unit_e unit);
-
-// calibrate gyro and accel
-//void calibrate_icm20948(icm20948_t* icm20948, uint16_t samples);
-
-// complementary filter
-//void complementary_filter(icm20948_t *icm20948, angle_t *angle);
-
 
 
 #endif	/* _ICM_20948_H_ */

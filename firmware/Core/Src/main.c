@@ -23,6 +23,7 @@
 #include "dma.h"
 #include "spi.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -31,8 +32,9 @@
 #include "led.h"
 #include "buzzer.h"
 #include "battery_monitor.h"
+#include "icm_20948.h"
+#include "dshot.h"
 
-#include "stdio.h"
 
 /* USER CODE END Includes */
 
@@ -58,7 +60,6 @@
 
 
 
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -80,7 +81,6 @@ int _write(int file, char *ptr, int len)
 	}
 	return len;
 }
-
 
 /* USER CODE END 0 */
 
@@ -120,15 +120,22 @@ int main(void)
   MX_TIM11_Init();
   MX_ADC1_Init();
   MX_SPI2_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
   led1_on();
-  led2_on();
-  led3_on();
 
   buzzer_time(100);
 
   battery_monitor_init();
+  icm20948_init(gy_fs_2000dps, odr_1125_hz, ac_fs_2g, odr_1125_hz);
+  ak09916_init(continuous_measure_100hz);
+
+  whoami_icm20948();
+  led2_on();
+  whoami_ak09916();
+  led3_on();
+
 
 
 
@@ -142,9 +149,10 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  battery_monitor_read();
-	  printf("Data\n");
-	  HAL_Delay(100);
+	  //battery_monitor_read();
+	  read_gyro(&gyro_data, unit_lsb);
+	  read_accel(&accel_data, unit_lsb);
+	  read_mag(&mag_data, unit_lsb);
 
 
   }
@@ -167,13 +175,12 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 100;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 12;
+  RCC_OscInitStruct.PLL.PLLN = 96;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
