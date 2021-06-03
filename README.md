@@ -1,4 +1,4 @@
-# Drone_with_Gyroscopic_Guard
+# drone_with_gyroscopic_guard
 
 ## 프로젝트 주제
 - 쿼드콥터 비행 펌웨어 개발 및 자이로스코프 형태의 가드 설계  
@@ -12,9 +12,7 @@
 ---
 
 ## 진행 과정
-- 블로그의 Drone With Gyroscopic Guard라는 카테고리에 기록 중.
-- 삽질한거 창피하니까 자세히 안봤으면 좋겠다.
-- https://mokhwasomssi.tistory.com/category/Drone%20With%20Gyroscopic%20Guard
+- 블로그에서 [Drone With Gyroscopic Guard](https://mokhwasomssi.tistory.com/category/Drone%20With%20Gyroscopic%20Guard) 카테고리에 기록 중
 
 ---
 
@@ -25,7 +23,7 @@
 - Kicad
 - VS code
 
-### 디버깅 방법
+### 디버깅
 - ST-LINK (SWD)
 - UART
 - 부저 & LED
@@ -34,65 +32,21 @@
  
 ---
 ## 전체 구성 
+
+<img src = https://user-images.githubusercontent.com/48342925/120675093-bd694800-c4cf-11eb-8fd9-1b790a0e0a16.png width = "80%" height = "80%">
+
+- `자이로스코픽 가드` - 480mm
 - `쿼드콥터` - 5 inches, 210mm
-- `간단한 GCS` (Ground Control System) - 닌텐도 스위치 크기
-- `자이로스코픽 가드` - 최외각 지름 480mm
 
 ---
-## `쿼드콥터`
-
-### 사진 
-![20210508_100119](https://user-images.githubusercontent.com/48342925/118347508-db9df100-b57e-11eb-9086-51e84728b067.jpg)
-
-
-### 블록 다이어그램 (수정 필요)
-
-![FMU Block Diagram](https://user-images.githubusercontent.com/48342925/117300001-197e8380-aeb4-11eb-9904-a98ef876119a.png)
-
-### 하드웨어 구성 
-- STM32F4CEU6   
-- 210mm frame  
-- 2207 2450KV BLDC  
-- 5045 props  
-- PDB  
-- ESC  
-- IMU  
-- RF module - Drone control and Telemetry both   
-- Buzzer  
-- 4S Lipo Battery  
-- Battery Monitor  
-- SWD (st-link)  
-
-### 소프트웨어 특징
-- 운영체제 미탑재
-- Dshot ESC 프로토콜
-- 1Khz 제어 주기  
-
----
-## `간단한 GCS` - 드론 조종 & 비행 상태 모니터
-
-### 하드웨어 구성  
-- Rasberry Pi  
-- LCD  
-- RF module - Drone control and Telemetry both   
-- Joy Stick  
-- Control Button
-- Battery
-
-### 소프트웨어 특징 
-- 리눅스 운영체제 기반
-- 드론 조종 - Roll, Pitch, Yaw, Throttle
-- 비행 상태 모니터 - ESC와 IMU에서 얻은 데이터, 배터리 방전 상태
-
---- 
 
 ## `자이로스코픽 가드`
 
-### 3D 모델링 이미지
-![image](https://user-images.githubusercontent.com/48342925/117300397-7843fd00-aeb4-11eb-91a1-5b9b1473b542.png)
+<img src = https://user-images.githubusercontent.com/48342925/120675984-8a738400-c4d0-11eb-9ec6-cfb9434c2b29.png width = "400" height = "400">
 
+<img src = https://user-images.githubusercontent.com/48342925/120676528-15ed1500-c4d1-11eb-9458-e0ceaea3dd1e.jpg width = "400" height = "400">
 
-### 구성 부품들
+### 구성
 
 - 지름 3mm 카본 로드
 - 두께 3mm 카본 플레이트
@@ -108,5 +62,32 @@
 
 ---
 
-아직 구체적인 부분은 정해지지 않은게 많다.   
-차차 업데이트 할 예정.
+## `쿼드콥터`
+
+<img src = https://user-images.githubusercontent.com/48342925/120677179-c78c4600-c4d1-11eb-9ebb-3a9b6eed6eae.jpg width = "400" height = "400">
+<img src = https://user-images.githubusercontent.com/48342925/120677044-a1ff3c80-c4d1-11eb-8f65-7ed28fb8ffee.jpg width = "400" height = "400">
+
+(rf 모듈은 안쓰는 겁니다...)
+
+### 구성 
+
+- 기체
+    - STM32F4CEU6   
+    - 210mm frame  
+    - 2207 2450KV BLDC  
+    - 5045 props  
+    - PDB  
+    - ESC  
+    - IMU  
+    - Buzzer  
+    - 4S Lipo Battery  
+    - Battery Monitor  
+    - SWD (st-link)  
+- 조종기
+    - 송신기 : FS-i6
+    - 수신기 : FS-A8S
+
+### 특징
+- 1 Khz 제어주기
+- Dshot 프로토콜 사용
+- i-bus 프로토콜 사용
