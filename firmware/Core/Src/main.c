@@ -28,20 +28,17 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "dshot.h"
+#include "loop.h"
 #include "led.h"
 #include "buzzer.h"
-#include "battery_monitor.h"
 #include "icm_20948.h"
-#include "dshot.h"
 
 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
-
 
 /* USER CODE END PTD */
 
@@ -58,28 +55,45 @@
 
 /* USER CODE BEGIN PV */
 
-
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-int _write(int file, char *ptr, int len)
+uint32_t arr[5] = {7, 7, 7, 7, 0};
+uint16_t loop_time[4];
+uint8_t hal_status[4];
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	for(int i = 0; i < len; i++)
-	{
-		ITM_SendChar(*ptr++);
-	}
-	return len;
+  if (htim == &htim11)
+  {
+	  dshot_write(dshot_handle, 11, 0);
+	  dshot_write(dshot_handle, 11, 1);
+
+
+	  //hal_status[0] = HAL_TIM_PWM_Start_DMA(MOTOR_1_TIM, MOTOR_1_TIM_CHANNEL, arr, 5);
+	  //hal_status[1] = HAL_TIM_PWM_Start_DMA(MOTOR_2_TIM, MOTOR_2_TIM_CHANNEL, arr, 5);
+
+	  dshot_dma_start(dshot_handle[0].dshot_timer, dshot_handle[0].channel, dshot_handle[0].dshot_dmabuffer, 18);
+	  dshot_dma_start(dshot_handle[1].dshot_timer, dshot_handle[1].channel, dshot_handle[1].dshot_dmabuffer, 18);
+
+	  //dshot_dma_start_hal(&dshot_handle[0]);
+	  //dshot_dma_start_hal(&dshot_handle[1]);
+
+
+	  //__HAL_TIM_ENABLE_DMA(dshot_handle[0].dshot_timer, TIM_DMA_CC4);
+	  //__HAL_TIM_ENABLE_DMA(dshot_handle[1].dshot_timer, TIM_DMA_CC3);
+
+	  //__HAL_DMA_ENABLE(dshot_handle[0].dshot_timer->hdma[TIM_DMA_ID_CC3]);
+	  //__HAL_DMA_ENABLE(dshot_handle[1].dshot_timer->hdma[TIM_DMA_ID_CC4]);
+  }
 }
 
 /* USER CODE END 0 */
@@ -100,7 +114,6 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
 
   /* USER CODE END Init */
 
@@ -123,18 +136,13 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  led1_on();
-
   buzzer_time(100);
 
-  battery_monitor_init();
-  icm20948_init(gy_fs_2000dps, odr_1125_hz, ac_fs_2g, odr_1125_hz);
-  ak09916_init(continuous_measure_100hz);
+  dshot_init(dshot_handle, DSHOT600);
 
-  whoami_icm20948();
-  led2_on();
-  whoami_ak09916();
-  led3_on();
+  loop_init(1000);
+
+  loop_start();
 
 
 
@@ -148,11 +156,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-	  //battery_monitor_read();
-	  read_gyro(&gyro_data, unit_lsb);
-	  read_accel(&accel_data, unit_lsb);
-	  read_mag(&mag_data, unit_lsb);
 
 
   }
@@ -203,8 +206,6 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-
 
 /* USER CODE END 4 */
 

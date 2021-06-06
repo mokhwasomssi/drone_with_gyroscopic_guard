@@ -46,7 +46,7 @@
 #define MOTOR_BIT_1            14
 #define MOTOR_BITLENGTH        20
 
-#define DSHOT_FRAME_SIZE       18
+#define DSHOT_FRAME_SIZE       16
 #define DSHOT_DMA_BUFFER_SIZE   18 /* resolution + frame reset (2us) */
 
 #define DSHOT_MIN_THROTTLE       48
@@ -70,7 +70,7 @@ typedef struct dshot_handle_s
 	TIM_HandleTypeDef* 	dshot_timer;
 	uint32_t 			channel;			
 	
-	uint16_t 			value;
+	uint16_t 			value;	// motor speed
 	bool 				request_telemetry;
 
 	uint16_t 			packet;
@@ -84,6 +84,8 @@ dshot_handle_t dshot_handle[4];
 
 
 /* functions */
+void dshot_hardware_config(); // hardware configuration is done by cubemx and this function.
+
 uint32_t dshot_choose_type(dshot_type_e dshot_type);
 
 void dshot_set_timer(dshot_handle_t *dshot_handle_array, dshot_type_e dshot_type);
