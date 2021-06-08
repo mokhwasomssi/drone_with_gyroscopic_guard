@@ -9,7 +9,7 @@
 
 
 #include "dshot.h"
-
+#include "led.h"
 
 uint32_t dshot_choose_type(dshot_type_e dshot_type)
 {
@@ -59,8 +59,40 @@ void dshot_set_timer(dshot_handle_t *dshot_handle_array, dshot_type_e dshot_type
 	// motor4
 	__HAL_TIM_SET_PRESCALER(MOTOR_4_TIM, dshot_prescaler);
 	__HAL_TIM_SET_AUTORELOAD(MOTOR_4_TIM, MOTOR_BITLENGTH);
-
 }
+
+extern DMA_HandleTypeDef hdma_tim2_ch1;
+extern DMA_HandleTypeDef hdma_tim2_ch3_up;
+extern DMA_HandleTypeDef hdma_tim5_ch2;
+extern DMA_HandleTypeDef hdma_tim5_ch4_trig;
+
+
+void dshot_dma_tc_callback(DMA_HandleTypeDef *hdma)
+{
+	TIM_HandleTypeDef *htim = (TIM_HandleTypeDef *)((DMA_HandleTypeDef *)hdma)->Parent;
+
+	if (hdma == htim->hdma[TIM_DMA_ID_CC1])
+	{
+		__HAL_TIM_DISABLE_DMA(htim, TIM_DMA_CC1);
+		__HAL_DMA_CLEAR_FLAG(&hdma_tim2_ch1, DMA_FLAG_TCIF1_5);
+	}
+	else if(hdma == htim->hdma[TIM_DMA_ID_CC2])
+	{
+		__HAL_TIM_DISABLE_DMA(htim, TIM_DMA_CC2);
+		__HAL_DMA_CLEAR_FLAG(&hdma_tim5_ch2, DMA_FLAG_TCIF0_4);
+	}
+	else if(hdma == htim->hdma[TIM_DMA_ID_CC3])
+	{
+		__HAL_TIM_DISABLE_DMA(htim, TIM_DMA_CC3);
+		__HAL_DMA_CLEAR_FLAG(&hdma_tim2_ch3_up, DMA_FLAG_TCIF1_5);
+	}
+	else if(hdma == htim->hdma[TIM_DMA_ID_CC4])
+	{
+		__HAL_TIM_DISABLE_DMA(htim, TIM_DMA_CC4);
+		__HAL_DMA_CLEAR_FLAG(&hdma_tim5_ch4_trig, DMA_FLAG_TCIF3_7);
+	}
+}
+
 
 void dshot_init(dshot_handle_t *dshot_handle_array, dshot_type_e dshot_type)
 {
@@ -76,11 +108,20 @@ void dshot_init(dshot_handle_t *dshot_handle_array, dshot_type_e dshot_type)
 
 	dshot_set_timer(dshot_handle_array, dshot_type);
 
+
+	MOTOR_1_TIM->hdma[TIM_DMA_ID_CC4]->XferCpltCallback = dshot_dma_tc_callback;
+	MOTOR_2_TIM->hdma[TIM_DMA_ID_CC3]->XferCpltCallback = dshot_dma_tc_callback;
+	MOTOR_3_TIM->hdma[TIM_DMA_ID_CC1]->XferCpltCallback = dshot_dma_tc_callback;
+	MOTOR_4_TIM->hdma[TIM_DMA_ID_CC2]->XferCpltCallback = dshot_dma_tc_callback;
+
+
     // Start the timer channel now.
     // Enabling/disabling DMA request can restart a new cycle without PWM start/stop.
   	HAL_TIM_PWM_Start(MOTOR_1_TIM, MOTOR_1_TIM_CHANNEL);
   	HAL_TIM_PWM_Start(MOTOR_2_TIM, MOTOR_2_TIM_CHANNEL);
-
+	HAL_TIM_PWM_Start(MOTOR_3_TIM, MOTOR_3_TIM_CHANNEL);
+	HAL_TIM_PWM_Start(MOTOR_4_TIM, MOTOR_4_TIM_CHANNEL);
+	
 
 	printf("dshot initialized\n");
 }
@@ -125,7 +166,7 @@ void dshot_packet_to_pwm(dshot_handle_t *dshot_handle)
 void dshot_dma_start_hal(dshot_handle_t *dshot_handle)
 {
 	HAL_TIM_PWM_Start_DMA(dshot_handle->dshot_timer, dshot_handle->channel, dshot_handle->dshot_dmabuffer, DSHOT_DMA_BUFFER_SIZE);
-
+	
 }
 
 
@@ -136,27 +177,55 @@ void dshot_dma_start(TIM_HandleTypeDef *htim, uint32_t channel, uint32_t *pData,
 	{
 		case TIM_CHANNEL_1:
 			HAL_DMA_Start_IT(htim->hdma[TIM_DMA_ID_CC1], (uint32_t)pData, (uint32_t)&htim->Instance->CCR1, Length);
-			__HAL_TIM_ENABLE_DMA(htim, TIM_DMA_CC1);
+			//__HAL_TIM_ENABLE_DMA(htim, TIM_DMA_CC1);
 			break;
 
 		case TIM_CHANNEL_2:
 			HAL_DMA_Start_IT(htim->hdma[TIM_DMA_ID_CC2], (uint32_t)pData, (uint32_t)&htim->Instance->CCR2, Length);
-			__HAL_TIM_ENABLE_DMA(htim, TIM_DMA_CC2);
+			//__HAL_TIM_ENABLE_DMA(htim, TIM_DMA_CC2);
 			break;
 
 		case TIM_CHANNEL_3:
 			HAL_DMA_Start_IT(htim->hdma[TIM_DMA_ID_CC3], (uint32_t)pData, (uint32_t)&htim->Instance->CCR3,Length);
-			__HAL_TIM_ENABLE_DMA(htim, TIM_DMA_CC3);
+			//__HAL_TIM_ENABLE_DMA(htim, TIM_DMA_CC3);
 			break;
 
 		case TIM_CHANNEL_4:
 			HAL_DMA_Start_IT(htim->hdma[TIM_DMA_ID_CC4], (uint32_t)pData, (uint32_t)&htim->Instance->CCR4, Length);
-			__HAL_TIM_ENABLE_DMA(htim, TIM_DMA_CC4);
+			//__HAL_TIM_ENABLE_DMA(htim, TIM_DMA_CC4);
 			break;
     }
 	
 
 }
+
+
+void dshot_dma_stop(TIM_HandleTypeDef *htim, uint32_t Channel)
+{
+    switch (Channel) 
+	{
+		case TIM_CHANNEL_1:
+			HAL_DMA_Abort(htim->hdma[TIM_DMA_ID_CC1]);
+			__HAL_TIM_DISABLE_DMA(htim, TIM_DMA_CC1);
+			break;
+
+		case TIM_CHANNEL_2:
+			HAL_DMA_Abort(htim->hdma[TIM_DMA_ID_CC2]);
+			__HAL_TIM_DISABLE_DMA(htim, TIM_DMA_CC2);
+			break;
+
+		case TIM_CHANNEL_3:
+			HAL_DMA_Abort(htim->hdma[TIM_DMA_ID_CC3]);
+			__HAL_TIM_DISABLE_DMA(htim, TIM_DMA_CC3);
+			break;
+
+		case TIM_CHANNEL_4:
+			HAL_DMA_Abort(htim->hdma[TIM_DMA_ID_CC4]);
+			__HAL_TIM_DISABLE_DMA(htim, TIM_DMA_CC4);
+			break;
+    }
+}
+
 
 void dshot_write(dshot_handle_t *dshot_handle_array, uint16_t value, uint8_t index)
 {

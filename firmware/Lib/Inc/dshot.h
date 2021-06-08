@@ -17,18 +17,22 @@
 
 /* user pin setting */
 // MOTOR1 : PA3
+// DMA1 Stream 3
 #define MOTOR_1_TIM             (&htim5)
 #define MOTOR_1_TIM_CHANNEL     TIM_CHANNEL_4
 
 // MOTOR2 : PA2
+// DMA1 Stream 1
 #define MOTOR_2_TIM             (&htim2)
 #define MOTOR_2_TIM_CHANNEL     TIM_CHANNEL_3
 
 // MOTOR3 : PA0
+// DMA1 Stream 5
 #define MOTOR_3_TIM             (&htim2)
 #define MOTOR_3_TIM_CHANNEL     TIM_CHANNEL_1
 
 // MOTOR4 : PA1
+// DMA1 Stream 4
 #define MOTOR_4_TIM             (&htim5)
 #define MOTOR_4_TIM_CHANNEL     TIM_CHANNEL_2
 
@@ -99,6 +103,8 @@ void dshot_packet_to_pwm(dshot_handle_t *dshot_handle);
 void dshot_dma_start_hal(dshot_handle_t *dshot_handle);
 
 void dshot_dma_start(TIM_HandleTypeDef* dshot_timer, uint32_t channel, uint32_t *pData, uint16_t length);
+
+void dshot_dma_stop(TIM_HandleTypeDef *htim, uint32_t Channel);
 
 void dshot_write(dshot_handle_t *dshot_handle_array, uint16_t value, uint8_t index);
 
