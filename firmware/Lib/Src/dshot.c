@@ -9,40 +9,35 @@
 
 
 #include "dshot.h"
-#include "led.h"
 
-uint32_t dshot_choose_type(dshot_type_e dshot_type)
+
+extern DMA_HandleTypeDef hdma_tim2_ch1;
+extern DMA_HandleTypeDef hdma_tim2_ch3_up;
+extern DMA_HandleTypeDef hdma_tim5_ch2;
+extern DMA_HandleTypeDef hdma_tim5_ch4_trig;
+
+
+static uint32_t dshot_choose_type(dshot_type_e dshot_type)
 {
 	switch (dshot_type)
 	{
 	case(DSHOT600):
-			printf("dshot type : DSHOT600\n");
 			return DSHOT600_HZ;
 	case(DSHOT300):
-		printf("dshot type : DSHOT300\n");
 			return DSHOT300_HZ;
-
 	default:
 	case(DSHOT150):
-			printf("dshot type : DSHOT150\n");
 			return DSHOT150_HZ;
 	}
 }
 
-void dshot_set_timer(dshot_handle_t *dshot_handle_array, dshot_type_e dshot_type)
+static void dshot_set_timer(dshot_type_e dshot_type)
 {
 	uint16_t dshot_prescaler;
-	uint32_t timer_clock = SystemCoreClock;
+	uint32_t timer_clock = SystemCoreClock; // all timer clock is same as SystemCoreClock in stm32f411ceu6
 
+	// Calculate prescaler that fits dshot type
 	dshot_prescaler = lrintf((float) timer_clock / dshot_choose_type(dshot_type) + 0.01f) - 1;
-
-	/*
-	for(int i = 0; i < 4; i++)
-	{
-		__HAL_TIM_SET_PRESCALER(dshot_handle[i].dshot_timer, dshot_prescaler);
-		__HAL_TIM_SET_AUTORELOAD(dshot_handle[i].dshot_timer, MOTOR_BITLENGTH);
-	}
-	*/
 
 	// motor1
 	__HAL_TIM_SET_PRESCALER(MOTOR_1_TIM, dshot_prescaler);
@@ -61,13 +56,9 @@ void dshot_set_timer(dshot_handle_t *dshot_handle_array, dshot_type_e dshot_type
 	__HAL_TIM_SET_AUTORELOAD(MOTOR_4_TIM, MOTOR_BITLENGTH);
 }
 
-extern DMA_HandleTypeDef hdma_tim2_ch1;
-extern DMA_HandleTypeDef hdma_tim2_ch3_up;
-extern DMA_HandleTypeDef hdma_tim5_ch2;
-extern DMA_HandleTypeDef hdma_tim5_ch4_trig;
 
-
-void dshot_dma_tc_callback(DMA_HandleTypeDef *hdma)
+// 왜 꺼줘야 하는거지?
+static void dshot_dma_tc_callback(DMA_HandleTypeDef *hdma)
 {
 	TIM_HandleTypeDef *htim = (TIM_HandleTypeDef *)((DMA_HandleTypeDef *)hdma)->Parent;
 
@@ -94,39 +85,44 @@ void dshot_dma_tc_callback(DMA_HandleTypeDef *hdma)
 }
 
 
-void dshot_init(dshot_handle_t *dshot_handle_array, dshot_type_e dshot_type)
+static void dshot_put_tc_callback_function()
 {
-	dshot_handle[0].dshot_timer = MOTOR_1_TIM;
-	dshot_handle[1].dshot_timer = MOTOR_2_TIM;
-	dshot_handle[2].dshot_timer = MOTOR_3_TIM;
-	dshot_handle[3].dshot_timer = MOTOR_4_TIM;
-
-	dshot_handle[0].channel = MOTOR_1_TIM_CHANNEL;
-	dshot_handle[1].channel = MOTOR_2_TIM_CHANNEL;
-	dshot_handle[2].channel = MOTOR_3_TIM_CHANNEL;
-	dshot_handle[3].channel = MOTOR_4_TIM_CHANNEL;
-
-	dshot_set_timer(dshot_handle_array, dshot_type);
-
-
+	// TIM_DMA_ID_CCx depends on timer channel
 	MOTOR_1_TIM->hdma[TIM_DMA_ID_CC4]->XferCpltCallback = dshot_dma_tc_callback;
 	MOTOR_2_TIM->hdma[TIM_DMA_ID_CC3]->XferCpltCallback = dshot_dma_tc_callback;
 	MOTOR_3_TIM->hdma[TIM_DMA_ID_CC1]->XferCpltCallback = dshot_dma_tc_callback;
 	MOTOR_4_TIM->hdma[TIM_DMA_ID_CC2]->XferCpltCallback = dshot_dma_tc_callback;
+}
 
 
-    // Start the timer channel now.
+static void dshot_start_pwm()
+{
+	// Start the timer channel now.
     // Enabling/disabling DMA request can restart a new cycle without PWM start/stop.
   	HAL_TIM_PWM_Start(MOTOR_1_TIM, MOTOR_1_TIM_CHANNEL);
   	HAL_TIM_PWM_Start(MOTOR_2_TIM, MOTOR_2_TIM_CHANNEL);
 	HAL_TIM_PWM_Start(MOTOR_3_TIM, MOTOR_3_TIM_CHANNEL);
 	HAL_TIM_PWM_Start(MOTOR_4_TIM, MOTOR_4_TIM_CHANNEL);
-	
-
-	printf("dshot initialized\n");
 }
 
-void dshot_prepare_packet(dshot_handle_t *dshot_handle, uint16_t value)
+
+void dshot_init(dshot_type_e dshot_type)
+{
+	dshot_set_timer(dshot_type);
+
+	dshot_put_tc_callback_function(); // the function that starts at transfer complete interrupt
+
+	dshot_start_pwm();
+
+	// Initialize motor value to 0
+	for(int i = 0; i < 4; i++)
+	{
+		motor_value[i] = 0;
+	}
+
+}
+
+static uint16_t dshot_prepare_packet(uint16_t value)
 {
 	uint16_t packet;
 	bool dshot_telemetry = false;
@@ -139,68 +135,57 @@ void dshot_prepare_packet(dshot_handle_t *dshot_handle, uint16_t value)
 
 	for(int i = 0; i < 3; i++)
 	{
-        csum ^=  csum_data;   // xor data by nibbles
+        csum ^=  csum_data; // xor data by nibbles
         csum_data >>= 4;
 	}
 
 	csum &= 0xf;
-	dshot_handle->packet = (packet << 4) | csum;
+	packet = (packet << 4) | csum;
+
+	return packet;
 }
 
-void dshot_packet_to_pwm(dshot_handle_t *dshot_handle)
+// Convert 16 bits packet to 16 pwm signal sent to dma
+static void dshot_prepare_dmabuffer(uint32_t* motor_dmabuffer, uint16_t value)
 {
-	int i;
-	uint16_t packet = dshot_handle->packet;
+	uint16_t packet;
+	packet = dshot_prepare_packet(value);
 
-	for(i = 0; i < 16; i++)
+	for(int i = 0; i < 16; i++)
 	{
-		dshot_handle->dshot_dmabuffer[i] = (packet & 0x8000) ? MOTOR_BIT_1 : MOTOR_BIT_0;
+		motor_dmabuffer[i] = (packet & 0x8000) ? MOTOR_BIT_1 : MOTOR_BIT_0;
 		packet <<= 1;
 	}
 
-	dshot_handle->dshot_dmabuffer[i++] = 0;
-	dshot_handle->dshot_dmabuffer[i++] = 0;
-
-}
-
-void dshot_dma_start_hal(dshot_handle_t *dshot_handle)
-{
-	HAL_TIM_PWM_Start_DMA(dshot_handle->dshot_timer, dshot_handle->channel, dshot_handle->dshot_dmabuffer, DSHOT_DMA_BUFFER_SIZE);
-	
+	motor_dmabuffer[16] = 0;
+	motor_dmabuffer[17] = 0;
 }
 
 
-void dshot_dma_start(TIM_HandleTypeDef *htim, uint32_t channel, uint32_t *pData, uint16_t Length)
+static void dshot_dma_start(TIM_HandleTypeDef *htim, uint32_t channel, uint32_t *pData, uint16_t Length)
 {
-
     switch (channel) 
 	{
 		case TIM_CHANNEL_1:
 			HAL_DMA_Start_IT(htim->hdma[TIM_DMA_ID_CC1], (uint32_t)pData, (uint32_t)&htim->Instance->CCR1, Length);
-			//__HAL_TIM_ENABLE_DMA(htim, TIM_DMA_CC1);
 			break;
 
 		case TIM_CHANNEL_2:
 			HAL_DMA_Start_IT(htim->hdma[TIM_DMA_ID_CC2], (uint32_t)pData, (uint32_t)&htim->Instance->CCR2, Length);
-			//__HAL_TIM_ENABLE_DMA(htim, TIM_DMA_CC2);
 			break;
 
 		case TIM_CHANNEL_3:
 			HAL_DMA_Start_IT(htim->hdma[TIM_DMA_ID_CC3], (uint32_t)pData, (uint32_t)&htim->Instance->CCR3,Length);
-			//__HAL_TIM_ENABLE_DMA(htim, TIM_DMA_CC3);
 			break;
 
 		case TIM_CHANNEL_4:
 			HAL_DMA_Start_IT(htim->hdma[TIM_DMA_ID_CC4], (uint32_t)pData, (uint32_t)&htim->Instance->CCR4, Length);
-			//__HAL_TIM_ENABLE_DMA(htim, TIM_DMA_CC4);
 			break;
     }
-	
-
 }
 
 
-void dshot_dma_stop(TIM_HandleTypeDef *htim, uint32_t Channel)
+static void dshot_dma_stop(TIM_HandleTypeDef *htim, uint32_t Channel)
 {
     switch (Channel) 
 	{
@@ -227,29 +212,28 @@ void dshot_dma_stop(TIM_HandleTypeDef *htim, uint32_t Channel)
 }
 
 
-void dshot_write(dshot_handle_t *dshot_handle_array, uint16_t value, uint8_t index)
+static void dshot_enable_dma_request()
 {
-	dshot_prepare_packet(&dshot_handle[index], value);
-
-	dshot_packet_to_pwm(&dshot_handle[index]);
-
-	//dshot_dma_start_hal(&dshot_handle[index]);
-
-	//dshot_dma_start(dshot_handle[index].dshot_timer, dshot_handle[index].channel, dshot_handle[index].dshot_dmabuffer, 18);
-}
-
-void dshot_write_all(dshot_handle_t *dshot_handle_array, uint16_t *value)
-{
-	for(int i = 0; i < 4; i++)
-	{
-		dshot_write(&dshot_handle[i], i, value[i]);
-	}
-
+	// TIM_DMA_CCx depends on timer channel
+	__HAL_TIM_ENABLE_DMA(MOTOR_1_TIM, TIM_DMA_CC4);
+	__HAL_TIM_ENABLE_DMA(MOTOR_2_TIM, TIM_DMA_CC3);
+	__HAL_TIM_ENABLE_DMA(MOTOR_3_TIM, TIM_DMA_CC1);
+	__HAL_TIM_ENABLE_DMA(MOTOR_4_TIM, TIM_DMA_CC2);
 }
 
 
+void dshot_write()
+{
+	dshot_prepare_dmabuffer(motor1_dmabuffer, motor_value[0]);
+	dshot_prepare_dmabuffer(motor2_dmabuffer, motor_value[1]);
+	dshot_prepare_dmabuffer(motor3_dmabuffer, motor_value[2]);
+	dshot_prepare_dmabuffer(motor4_dmabuffer, motor_value[3]);
 
+	dshot_dma_start(MOTOR_1_TIM, MOTOR_1_TIM_CHANNEL, motor1_dmabuffer, 18);
+	dshot_dma_start(MOTOR_2_TIM, MOTOR_2_TIM_CHANNEL, motor2_dmabuffer, 18);
+	dshot_dma_start(MOTOR_3_TIM, MOTOR_3_TIM_CHANNEL, motor3_dmabuffer, 18);
+	dshot_dma_start(MOTOR_4_TIM, MOTOR_4_TIM_CHANNEL, motor4_dmabuffer, 18);
 
-
-
+	dshot_enable_dma_request();
+}
 

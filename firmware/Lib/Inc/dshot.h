@@ -16,23 +16,23 @@
 
 
 /* user pin setting */
-// MOTOR1 : PA3
-// DMA1 Stream 3
+// MOTOR1
+// PA3, DMA1 Stream 3
 #define MOTOR_1_TIM             (&htim5)
 #define MOTOR_1_TIM_CHANNEL     TIM_CHANNEL_4
 
-// MOTOR2 : PA2
-// DMA1 Stream 1
+// MOTOR2
+// PA2, DMA1 Stream 1
 #define MOTOR_2_TIM             (&htim2)
 #define MOTOR_2_TIM_CHANNEL     TIM_CHANNEL_3
 
-// MOTOR3 : PA0
-// DMA1 Stream 5
+// MOTOR3
+// PA0, DMA1 Stream 5
 #define MOTOR_3_TIM             (&htim2)
 #define MOTOR_3_TIM_CHANNEL     TIM_CHANNEL_1
 
-// MOTOR4 : PA1
-// DMA1 Stream 4
+// MOTOR4
+// PA1, DMA1 Stream 4
 #define MOTOR_4_TIM             (&htim5)
 #define MOTOR_4_TIM_CHANNEL     TIM_CHANNEL_2
 
@@ -68,47 +68,19 @@ typedef enum
 } dshot_type_e;
 
 
-/* structure */
-typedef struct dshot_handle_s
-{
-	TIM_HandleTypeDef* 	dshot_timer;
-	uint32_t 			channel;			
-	
-	uint16_t 			value;	// motor speed
-	bool 				request_telemetry;
-
-	uint16_t 			packet;
-	uint32_t 			dshot_dmabuffer[DSHOT_DMA_BUFFER_SIZE];
-
-} dshot_handle_t;
-
-
 /* variable */
-dshot_handle_t dshot_handle[4];
+uint32_t motor1_dmabuffer[DSHOT_DMA_BUFFER_SIZE];
+uint32_t motor2_dmabuffer[DSHOT_DMA_BUFFER_SIZE];
+uint32_t motor3_dmabuffer[DSHOT_DMA_BUFFER_SIZE];
+uint32_t motor4_dmabuffer[DSHOT_DMA_BUFFER_SIZE];
+
+uint16_t motor_value[4]; // motor speed value
 
 
 /* functions */
-void dshot_hardware_config(); // hardware configuration is done by cubemx and this function.
+void dshot_init(dshot_type_e dshot_type);
 
-uint32_t dshot_choose_type(dshot_type_e dshot_type);
-
-void dshot_set_timer(dshot_handle_t *dshot_handle_array, dshot_type_e dshot_type);
-
-void dshot_init(dshot_handle_t *dshot_handle_array, dshot_type_e dshot_type);
-
-void dshot_prepare_packet(dshot_handle_t *dshot_handle, uint16_t value);
-
-void dshot_packet_to_pwm(dshot_handle_t *dshot_handle);
-
-void dshot_dma_start_hal(dshot_handle_t *dshot_handle);
-
-void dshot_dma_start(TIM_HandleTypeDef* dshot_timer, uint32_t channel, uint32_t *pData, uint16_t length);
-
-void dshot_dma_stop(TIM_HandleTypeDef *htim, uint32_t Channel);
-
-void dshot_write(dshot_handle_t *dshot_handle_array, uint16_t value, uint8_t index);
-
-void dshot_write_all(dshot_handle_t *dshot_handle_array, uint16_t *value);
+void dshot_write();
 
 
 #endif /* _DSHOT_H_ */

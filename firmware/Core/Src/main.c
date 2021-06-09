@@ -75,32 +75,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if (htim == &htim11)
   {
-	  dshot_write(dshot_handle, 11, 0);
-	  dshot_write(dshot_handle, 11, 1);
-	  dshot_write(dshot_handle, 11, 2);
-	  dshot_write(dshot_handle, 11, 3);
 
-	  dshot_dma_start(MOTOR_1_TIM, MOTOR_1_TIM_CHANNEL, dshot_handle[0].dshot_dmabuffer, 18);
-	  dshot_dma_start(MOTOR_2_TIM, MOTOR_2_TIM_CHANNEL, dshot_handle[0].dshot_dmabuffer, 18);
-	  dshot_dma_start(MOTOR_3_TIM, MOTOR_3_TIM_CHANNEL, dshot_handle[0].dshot_dmabuffer, 18);
-	  dshot_dma_start(MOTOR_4_TIM, MOTOR_4_TIM_CHANNEL, dshot_handle[0].dshot_dmabuffer, 18);
-
-	  //__HAL_TIM_SET_COUNTER(&htim5, 0);
-	  //__HAL_TIM_SET_COUNTER(&htim2, 0);
-
-	  __HAL_TIM_ENABLE_DMA(MOTOR_1_TIM, TIM_DMA_CC4);
-	  __HAL_TIM_ENABLE_DMA(MOTOR_2_TIM, TIM_DMA_CC3);
-	  __HAL_TIM_ENABLE_DMA(MOTOR_3_TIM, TIM_DMA_CC1);
-	  __HAL_TIM_ENABLE_DMA(MOTOR_4_TIM, TIM_DMA_CC2);
+	  dshot_write();
 
 	  loop_time[0] = loop_runtime();
 
-	  /*
-	  dshot_dma_start_hal(&dshot_handle[0]);
-	  dshot_dma_start_hal(&dshot_handle[1]);
-	  dshot_dma_start_hal(&dshot_handle[2]);
-	  dshot_dma_start_hal(&dshot_handle[3]);
-	  */
   }
 }
 
@@ -146,7 +125,7 @@ int main(void)
 
   buzzer_time(100);
 
-  dshot_init(dshot_handle, DSHOT600);
+  dshot_init(DSHOT600);
 
   loop_init(1000);
 
