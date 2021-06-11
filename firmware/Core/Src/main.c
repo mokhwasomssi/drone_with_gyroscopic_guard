@@ -29,12 +29,12 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "dshot.h"
-#include "loop.h"
 #include "led.h"
 #include "buzzer.h"
 #include "icm_20948.h"
-
+#include "dshot.h"
+#include "flysky_ibus.h"
+#include "loop.h"
 
 /* USER CODE END Includes */
 
@@ -67,20 +67,26 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-uint32_t arr[5] = {7, 7, 7, 7, 0};
 uint16_t loop_time[4];
-uint8_t hal_status[4];
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+
   if (htim == &htim11)
   {
-
 	  dshot_write();
-
 	  loop_time[0] = loop_runtime();
-
   }
+
+}
+
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(huart->Instance == IBUS_UART_INSTANCE)
+	{
+		ibus_read_channel();
+	}
 }
 
 /* USER CODE END 0 */
@@ -126,12 +132,10 @@ int main(void)
   buzzer_time(100);
 
   dshot_init(DSHOT600);
-
   loop_init(1000);
-
   loop_start();
 
-
+  ibus_init();
 
 
   /* USER CODE END 2 */
