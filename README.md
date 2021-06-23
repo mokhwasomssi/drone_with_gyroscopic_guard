@@ -1,14 +1,9 @@
 # drone with gyroscopic guard
 
-Develop Drone Firmware and Design Gyroscopic Guard
+Develop drone firmware and Design gyroscopic guard
 
 ![깃헙 소셜 프리뷰 사진](https://user-images.githubusercontent.com/48342925/123043646-90a3b300-d433-11eb-99dd-8545261a8c11.png)
 
-
----
-
-## Dev Diary
-- https://mokhwasomssi.tistory.com/category/Drone%20With%20Gyroscopic%20Guard/%EA%B0%9C%EB%B0%9C%EC%9D%BC%EC%A7%80
 
 ---
 
