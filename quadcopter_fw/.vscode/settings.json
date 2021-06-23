@@ -1,0 +1,8 @@
+{
+
+    "C_Cpp.errorSquiggles": "Disabled",
+    "files.associations": {
+        "dshot.h": "c",
+        "flysky_ibus.h": "c"
+    }
+}
