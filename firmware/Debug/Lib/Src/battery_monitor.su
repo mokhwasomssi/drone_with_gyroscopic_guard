@@ -1,2 +1,0 @@
-battery_monitor.c:19:6:battery_monitor_init	8	static
-battery_monitor.c:25:6:battery_monitor_read	8	static
