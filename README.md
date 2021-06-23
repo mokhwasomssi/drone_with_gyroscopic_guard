@@ -1,93 +1,93 @@
-# drone_with_gyroscopic_guard
+# drone with gyroscopic guard
 
-## 프로젝트 주제
-- 쿼드콥터 비행 펌웨어 개발 및 자이로스코프 형태의 가드 설계  
-(Develop Drone Firmware and Design Gyroscopic Guard)
+Develop Drone Firmware and Design Gyroscopic Guard
 
----
+![깃헙 소셜 프리뷰 사진](https://user-images.githubusercontent.com/48342925/123043646-90a3b300-d433-11eb-99dd-8545261a8c11.png)
 
-## 프로젝트 취지
-- 자체적인 비행 펌웨어 개발
 
 ---
 
-## 진행 과정
-- 블로그에서 [Drone With Gyroscopic Guard](https://mokhwasomssi.tistory.com/category/Drone%20With%20Gyroscopic%20Guard) 카테고리에 기록 중
+## Dev Diary
+- https://mokhwasomssi.tistory.com/category/Drone%20With%20Gyroscopic%20Guard/%EA%B0%9C%EB%B0%9C%EC%9D%BC%EC%A7%80
 
 ---
 
-## 개발 환경
-### 사용 툴
+## Dev Environment
+### Tools
 - STM32CubeIDE
 - Solidworks
 - Kicad
 - VS code
 
-### 디버깅
+### Debug
 - ST-LINK (SWD)
 - UART
-- 부저 & LED
-- 멀티미터
-- 오실로스코프
+- Buzzer & LED
+- Multimeter
+- Oscilloscope
  
 ---
-## 전체 구성 
+## System Architecture
 
-<img src = https://user-images.githubusercontent.com/48342925/120675093-bd694800-c4cf-11eb-8fd9-1b790a0e0a16.png width = "80%" height = "80%">
-
-- `자이로스코픽 가드` - 480mm
-- `쿼드콥터` - 5 inches, 210mm
+![drone with my controller](https://user-images.githubusercontent.com/48342925/123049019-07dc4580-d43a-11eb-8df2-dd53fbee2753.png)
 
 ---
 
-## `자이로스코픽 가드`
+## Parts
 
-<img src = https://user-images.githubusercontent.com/48342925/120675984-8a738400-c4d0-11eb-9ec6-cfb9434c2b29.png width = "400" height = "400">
+### 1. Gyroscopic Guard
 
-<img src = https://user-images.githubusercontent.com/48342925/120676528-15ed1500-c4d1-11eb-9458-e0ceaea3dd1e.jpg width = "400" height = "400">
+<img src = https://user-images.githubusercontent.com/48342925/120675984-8a738400-c4d0-11eb-9ec6-cfb9434c2b29.png width = "400" height = "400"><img src = https://user-images.githubusercontent.com/48342925/120676528-15ed1500-c4d1-11eb-9458-e0ceaea3dd1e.jpg width = "400" height = "400">
 
-### 구성
+- Configuration
+    - 3mm carbon rod
+    - 3mm carbon plate
+    - Small bearing
+    - Shaft
+    - 3d printed parts
 
-- 지름 3mm 카본 로드
-- 두께 3mm 카본 플레이트
-- 소형 베어링
-- 샤프트 (평행핀)
-- 3D 프린터 출력물
+- Feature
+    - Protect drones and Respond flexibly to collisions.
+    - x-axis drone mounter
+    - x-axis gyroscope ring
+    - y-axis gyroscope ring
+    - z-axis 2V geodesic sphere
 
-### 특징
-- 장애물에 충돌시 충격을 완화 시키는 구조
-- x축 회전 자이로스코프 링
-- y축 회전 자이로스코프 링
-- z축 회전 2V 지오데식 구
+### 2. Quadcopter
 
----
+<img src = https://user-images.githubusercontent.com/48342925/120677179-c78c4600-c4d1-11eb-9ebb-3a9b6eed6eae.jpg width = "400" height = "400"><img src = https://user-images.githubusercontent.com/48342925/120677044-a1ff3c80-c4d1-11eb-8f65-7ed28fb8ffee.jpg width = "400" height = "400">
 
-## `쿼드콥터`
-
-<img src = https://user-images.githubusercontent.com/48342925/120677179-c78c4600-c4d1-11eb-9ebb-3a9b6eed6eae.jpg width = "400" height = "400">
-<img src = https://user-images.githubusercontent.com/48342925/120677044-a1ff3c80-c4d1-11eb-8f65-7ed28fb8ffee.jpg width = "400" height = "400">
-
-(rf 모듈은 안쓰는 겁니다...)
-
-### 구성 
-
-- 기체
-    - STM32F4CEU6   
+- Configuration
+    - STM32F4CEU6 core board
     - 210mm frame  
     - 2207 2450KV BLDC  
     - 5045 props  
-    - PDB  
-    - ESC  
-    - IMU  
+    - 3S-4S PDB  
+    - BLHeli_32 35A ESC  
+    - IMU (ICM20948)
+    - RF Transceiver (nrf24l01+pa+lna)
     - Buzzer  
     - 4S Lipo Battery  
-    - Battery Monitor  
+    - Battery Monitor Circuit
     - SWD (st-link)  
-- 조종기
-    - 송신기 : FS-i6
-    - 수신기 : FS-A8S
 
-### 특징
-- 1 Khz 제어주기
-- Dshot 프로토콜 사용
-- i-bus 프로토콜 사용
+- Feature
+    - 1 Khz PID loop
+    - Battery Monitor
+    - [ICM20948 library](https://github.com/mokhwasomssi/stm32_hal_icm20948.git)
+    - [Dshot protocol library](https://github.com/mokhwasomssi/stm32_hal_dshot.git)
+
+### 3. Controller
+
+![image](https://user-images.githubusercontent.com/48342925/123052020-550de680-d43d-11eb-83be-033c09cbf3f6.png)
+
+
+- Configuration
+    - STM32F4CEU6 core board
+    - Joy Stick X 2
+    - OLED LCD
+    - RF Transceiver (nrf24l01+pa+lna)
+    - Switch X 2 (with led)
+    - Buzzer
+    - 18650 battery X 2
+
