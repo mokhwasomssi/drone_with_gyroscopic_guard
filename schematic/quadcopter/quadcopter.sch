@@ -769,4 +769,10 @@ Wire Wire Line
 	1900 4125 3675 4125
 Connection ~ 1900 3675
 Connection ~ 3675 4125
+$Sheet
+S 3400 6700 850  450 
+U 60D5234B
+F0 "Sheet60D5234A" 50
+F1 "file60D5234A.sch" 50
+$EndSheet
 $EndSCHEMATC

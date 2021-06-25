@@ -35,6 +35,7 @@
 #include "dshot.h"
 #include "flysky_ibus.h"
 #include "loop.h"
+#include "battery_monitor.h"
 
 /* USER CODE END Includes */
 
@@ -75,6 +76,8 @@ uint8_t software_fail_safe = 0;
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+
+	battery_monitor_read();
 
   if (htim == LOOP_TIM)
   {
@@ -164,6 +167,7 @@ int main(void)
 
   buzzer_time(100);
 
+  battery_monitor_init();
   dshot_init(DSHOT600);
   ibus_init();
   loop_init(1000);
