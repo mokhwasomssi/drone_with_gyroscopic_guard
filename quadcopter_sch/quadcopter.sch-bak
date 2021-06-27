@@ -24,17 +24,6 @@ F 3 "" H 2100 4750 50  0001 C CNN
 	1    2625 3175
 	1    0    0    -1  
 $EndComp
-$Comp
-L quadcopter-rescue:SparkFun_9Dof_IMU_Breakout-ICM-20948(Qwiic) U5
-U 1 1 60D8BE09
-P 5600 1375
-F 0 "U5" H 5250 1725 50  0000 C CNN
-F 1 "SparkFun_9Dof_IMU_Breakout-ICM-20948(Qwiic)" H 6100 925 50  0000 C CNN
-F 2 "" H 5500 1875 50  0001 C CNN
-F 3 "" H 5500 1875 50  0001 C CNN
-	1    5600 1375
-	1    0    0    -1  
-$EndComp
 Text GLabel 1675 3075 0    50   Input ~ 0
 SPI1_CS
 Text GLabel 1675 3275 0    50   Input ~ 0
@@ -79,33 +68,33 @@ Wire Wire Line
 $Comp
 L power:+3.3V #PWR015
 U 1 1 60D96D22
-P 4775 1125
-F 0 "#PWR015" H 4775 975 50  0001 C CNN
-F 1 "+3.3V" H 4790 1298 50  0000 C CNN
-F 2 "" H 4775 1125 50  0001 C CNN
-F 3 "" H 4775 1125 50  0001 C CNN
-	1    4775 1125
+P 4750 1175
+F 0 "#PWR015" H 4750 1025 50  0001 C CNN
+F 1 "+3.3V" H 4765 1348 50  0000 C CNN
+F 2 "" H 4750 1175 50  0001 C CNN
+F 3 "" H 4750 1175 50  0001 C CNN
+	1    4750 1175
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:GND #PWR016
 U 1 1 60D97925
-P 5000 1900
-F 0 "#PWR016" H 5000 1650 50  0001 C CNN
-F 1 "GND" H 5005 1727 50  0000 C CNN
-F 2 "" H 5000 1900 50  0001 C CNN
-F 3 "" H 5000 1900 50  0001 C CNN
-	1    5000 1900
+P 4975 1950
+F 0 "#PWR016" H 4975 1700 50  0001 C CNN
+F 1 "GND" H 4980 1777 50  0000 C CNN
+F 2 "" H 4975 1950 50  0001 C CNN
+F 3 "" H 4975 1950 50  0001 C CNN
+	1    4975 1950
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	5100 1275 4775 1275
+	5075 1325 4750 1325
 Wire Wire Line
-	4775 1275 4775 1125
+	4750 1325 4750 1175
 Wire Wire Line
-	5100 1175 5000 1175
+	5075 1225 4975 1225
 Wire Wire Line
-	5000 1175 5000 1900
+	4975 1225 4975 1950
 $Comp
 L power:+5V #PWR01
 U 1 1 60D9AA8D
@@ -163,20 +152,20 @@ Wire Wire Line
 Wire Wire Line
 	6200 4225 6200 4275
 Wire Wire Line
-	4900 1675 5100 1675
+	4875 1725 5075 1725
 Wire Wire Line
-	4900 1575 5100 1575
+	4875 1625 5075 1625
 Wire Wire Line
-	4900 1475 5100 1475
+	4875 1525 5075 1525
 Wire Wire Line
-	4900 1375 5100 1375
-Text GLabel 4900 1675 0    50   Input ~ 0
+	4875 1425 5075 1425
+Text GLabel 4875 1725 0    50   Input ~ 0
 SPI1_CS
-Text GLabel 4900 1575 0    50   Input ~ 0
+Text GLabel 4875 1625 0    50   Input ~ 0
 SPI1_MISO
-Text GLabel 4900 1475 0    50   Input ~ 0
+Text GLabel 4875 1525 0    50   Input ~ 0
 SPI1_SCLK
-Text GLabel 4900 1375 0    50   Input ~ 0
+Text GLabel 4875 1425 0    50   Input ~ 0
 SPI1_MOSI
 Text GLabel 5375 3825 0    50   Input ~ 0
 CE
@@ -207,12 +196,6 @@ Text GLabel 3375 3875 2    50   Input ~ 0
 SPI2_MOSI
 Text GLabel 3375 3775 2    50   Input ~ 0
 SPI2_MISO
-NoConn ~ 6075 1325
-NoConn ~ 6075 1425
-NoConn ~ 6075 1525
-NoConn ~ 6075 1625
-NoConn ~ 6075 1725
-NoConn ~ 6075 1825
 Wire Wire Line
 	3225 3775 3375 3775
 Wire Wire Line
@@ -456,7 +439,7 @@ Text Notes 3050 7425 0    98   ~ 20
 PDB
 Text Notes 5050 4700 0    98   ~ 20
 RF transceiver (nrf24l01)
-Text Notes 4875 2325 0    98   ~ 20
+Text Notes 4850 2375 0    98   ~ 20
 IMU (ICM20948)
 Text Notes 1325 4675 0    98   ~ 20
 MCU Module (STM32F411CEU6)
@@ -854,4 +837,21 @@ Text Notes 8500 6250 0    98   ~ 20
 ESC & MOTOR 4
 Text Notes 1200 2025 0    59   ~ 12
 Onboard Led
+NoConn ~ 6075 1325
+NoConn ~ 6075 1425
+NoConn ~ 6075 1525
+NoConn ~ 6075 1625
+NoConn ~ 6075 1725
+$Comp
+L quadcopter-rescue:SparkFun_9Dof_IMU_Breakout-ICM-20948(Qwiic) U5
+U 1 1 60D8BE09
+P 5575 1425
+F 0 "U5" H 5225 1775 50  0000 C CNN
+F 1 "SparkFun_9Dof_IMU_Breakout-ICM-20948(Qwiic)" H 6100 950 50  0000 C CNN
+F 2 "" H 5475 1925 50  0001 C CNN
+F 3 "" H 5475 1925 50  0001 C CNN
+	1    5575 1425
+	1    0    0    -1  
+$EndComp
+NoConn ~ 6075 1225
 $EndSCHEMATC
