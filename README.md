@@ -58,6 +58,10 @@ Develop drone firmware and Design gyroscopic guard
     - Battery Monitor Circuit
     - SWD (st-link)  
 
+- Schematic
+![image](https://user-images.githubusercontent.com/48342925/123547752-f4fca480-d79c-11eb-97d7-01b10829efeb.png)
+
+
 - Feature
     - 1 Khz PID loop
     - Battery Monitor
@@ -77,4 +81,7 @@ Develop drone firmware and Design gyroscopic guard
     - Switch X 2 (with led)
     - Buzzer
     - 18650 battery X 2
+
+- Schematic
+![image](https://user-images.githubusercontent.com/48342925/123547788-12ca0980-d79d-11eb-903d-c53ba52113f3.png)
 
