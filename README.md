@@ -12,14 +12,6 @@ Develop drone firmware and Design gyroscopic guard
 - STM32CubeIDE
 - Solidworks
 - Kicad
-- VS code
-
-### Debug
-- ST-LINK (SWD)
-- UART
-- Buzzer & LED
-- Multimeter
-- Oscilloscope
  
 ---
 ## System Architecture

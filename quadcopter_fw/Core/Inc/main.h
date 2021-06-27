@@ -76,10 +76,6 @@ void Error_Handler(void);
 #define SPI1_CS_GPIO_Port GPIOA
 #define BATTERY_ADC_Pin GPIO_PIN_0
 #define BATTERY_ADC_GPIO_Port GPIOB
-#define LED2_Pin GPIO_PIN_1
-#define LED2_GPIO_Port GPIOB
-#define LED3_Pin GPIO_PIN_2
-#define LED3_GPIO_Port GPIOB
 #define SPI2_CE_Pin GPIO_PIN_12
 #define SPI2_CE_GPIO_Port GPIOB
 #define SPI2_CS_Pin GPIO_PIN_13

@@ -24,6 +24,6 @@ void battery_monitor_init()
 
 void battery_monitor_read()
 {
-    battery_voltage = (3.3/4095) * 5.7 * battery_adc;
+    battery_voltage = (3.3/4095) * 5.7225 * battery_adc;
 }
 
