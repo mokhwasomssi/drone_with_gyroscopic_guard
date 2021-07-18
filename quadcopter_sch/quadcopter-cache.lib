@@ -191,24 +191,6 @@ X VCC ~ 375 -700 100 U 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# quadcopter-rescue_ST-LINK
-#
-DEF quadcopter-rescue_ST-LINK U 0 40 Y Y 1 F N
-F0 "U" -500 -100 50 H V C CNN
-F1 "quadcopter-rescue_ST-LINK" -500 -175 50 H V C CNN
-F2 "" -600 -225 50 H I C CNN
-F3 "" -600 -225 50 H I C CNN
-DRAW
-S -325 0 325 -325 0 1 0 f
-X 5V 1 -250 100 100 D 50 50 1 1 I
-X SWO 2 -150 100 100 D 50 50 1 1 I
-X 3.3V 3 -50 100 100 D 50 50 1 1 I
-X SWDIO 4 50 100 100 D 50 50 1 1 I
-X SWCLK 5 150 100 100 D 50 50 1 1 I
-X GND 6 250 100 100 D 50 50 1 1 I
-ENDDRAW
-ENDDEF
-#
 # quadcopter-rescue_SparkFun_9Dof_IMU_Breakout-ICM-20948(Qwiic)
 #
 DEF quadcopter-rescue_SparkFun_9Dof_IMU_Breakout-ICM-20948(Qwiic) U 0 40 Y Y 1 F N

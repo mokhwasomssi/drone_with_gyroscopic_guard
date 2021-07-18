@@ -145,13 +145,15 @@
                         					
                     </folderInfo>
                     					
+                    <fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1210864389.1684622827" name="flysky_ibus.h" rcbsApplicability="disable" resourcePath="Lib/Inc/flysky_ibus.h" toolsToInvoke=""/>
+                    					
                     <sourceEntries>
-                        						
-                        <entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Lib"/>
                         						
                         <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
                         						
                         <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
+                        						
+                        <entry excluding="Src/led.c|Src/flysky_ibus.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Lib"/>
                         					
                     </sourceEntries>
                     				

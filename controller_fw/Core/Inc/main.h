@@ -58,18 +58,14 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define JoyStick_X1_Pin GPIO_PIN_0
-#define JoyStick_X1_GPIO_Port GPIOA
-#define JoyStick_Y1_Pin GPIO_PIN_1
-#define JoyStick_Y1_GPIO_Port GPIOA
-#define JoyStick_X2_Pin GPIO_PIN_2
-#define JoyStick_X2_GPIO_Port GPIOA
-#define JoyStick_Y2_Pin GPIO_PIN_3
-#define JoyStick_Y2_GPIO_Port GPIOA
-#define JoyStick_SW1_Pin GPIO_PIN_4
-#define JoyStick_SW1_GPIO_Port GPIOA
-#define JoyStick_SW2_Pin GPIO_PIN_5
-#define JoyStick_SW2_GPIO_Port GPIOA
+#define Stick_Roll_Pin GPIO_PIN_0
+#define Stick_Roll_GPIO_Port GPIOA
+#define Stick_Pitch_Pin GPIO_PIN_1
+#define Stick_Pitch_GPIO_Port GPIOA
+#define Stick_Throttle_Pin GPIO_PIN_2
+#define Stick_Throttle_GPIO_Port GPIOA
+#define Stick_Yaw_Pin GPIO_PIN_3
+#define Stick_Yaw_GPIO_Port GPIOA
 #define SW1_Pin GPIO_PIN_6
 #define SW1_GPIO_Port GPIOA
 #define SW2_Pin GPIO_PIN_7

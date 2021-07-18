@@ -32,31 +32,6 @@ Text GLabel 1675 3175 0    50   Input ~ 0
 SPI1_SCLK
 Text GLabel 1675 3375 0    50   Input ~ 0
 SPI1_MOSI
-$Comp
-L quadcopter-rescue:ST-LINK U2
-U 1 1 60D8FF02
-P 2725 1325
-F 0 "U2" H 3050 875 50  0000 R CNN
-F 1 "ST-LINK" H 3050 950 50  0000 R CNN
-F 2 "" H 2125 1100 50  0001 C CNN
-F 3 "" H 2125 1100 50  0001 C CNN
-	1    2725 1325
-	-1   0    0    1   
-$EndComp
-Wire Wire Line
-	2475 1725 2475 1425
-Wire Wire Line
-	2575 1725 2575 1425
-Wire Wire Line
-	2675 1425 2675 1725
-Wire Wire Line
-	2775 1425 2775 1725
-NoConn ~ 2875 1425
-NoConn ~ 2975 1425
-Text Label 2575 1700 1    50   ~ 0
-SWCLK
-Text Label 2675 1700 1    50   ~ 0
-SWDIO
 Wire Wire Line
 	1675 3075 2025 3075
 Wire Wire Line

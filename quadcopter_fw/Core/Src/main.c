@@ -70,16 +70,28 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+void init()
+{
+	  buzzer_time(100);
+
+	  battery_monitor_init();
+	  dshot_init(DSHOT600);
+	  ibus_init();
+	  loop_init(1000);
+
+	  loop_start();
+}
+
+
 uint16_t loop_time[4];
 uint8_t software_fail_safe = 0;
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+void loop()
 {
-
 	battery_monitor_read();
 
-  if (htim == LOOP_TIM)
-  {
+	if (htim == LOOP_TIM)
+	{
 	  if(channel[4] == 2000 && software_fail_safe < 10) // arming
 	  {
 
@@ -110,8 +122,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  }
 
 		  loop_time[0] = loop_runtime();
-  }
+	}
 
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	loop();
 }
 
 
@@ -163,15 +180,8 @@ int main(void)
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
 
-  buzzer_time(100);
 
-  battery_monitor_init();
-  dshot_init(DSHOT600);
-  ibus_init();
-  loop_init(1000);
-
-  loop_start();
-
+  init();
 
 
   /* USER CODE END 2 */
