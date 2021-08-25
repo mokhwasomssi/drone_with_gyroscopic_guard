@@ -44,22 +44,18 @@ X A 2 150 0 100 L 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# Device_R_US
+# Device_R
 #
-DEF Device_R_US R 0 0 N Y 1 F N
-F0 "R" 100 0 50 V V C CNN
-F1 "Device_R_US" -100 0 50 V V C CNN
-F2 "" 40 -10 50 V I C CNN
+DEF Device_R R 0 0 N Y 1 F N
+F0 "R" 80 0 50 V V C CNN
+F1 "Device_R" 0 0 50 V V C CNN
+F2 "" -70 0 50 V I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
  R_*
 $ENDFPLIST
 DRAW
-P 2 0 1 0 0 -90 0 -100 N
-P 2 0 1 0 0 90 0 100 N
-P 5 0 1 0 0 -30 40 -45 0 -60 -40 -75 0 -90 N
-P 5 0 1 0 0 30 40 15 0 0 -40 -15 0 -30 N
-P 5 0 1 0 0 90 40 75 0 60 -40 45 0 30 N
+S -40 -100 40 100 0 1 10 N
 X ~ 1 0 150 50 D 50 50 1 1 P
 X ~ 2 0 -150 50 U 50 50 1 1 P
 ENDDRAW
@@ -124,30 +120,32 @@ X VCC 1 0 0 0 U 50 50 1 1 W N
 ENDDRAW
 ENDDEF
 #
-# quadcopter-rescue_4S_Lipo_Battery
+# quadcopter-rescue_FS-A8S
 #
-DEF quadcopter-rescue_4S_Lipo_Battery U 0 40 Y Y 1 F N
-F0 "U" -325 225 50 H V C CNN
-F1 "quadcopter-rescue_4S_Lipo_Battery" 50 -150 50 H V C CNN
-F2 "" -325 225 50 H I C CNN
-F3 "" -325 225 50 H I C CNN
+DEF quadcopter-rescue_FS-A8S U 0 40 Y Y 1 F N
+F0 "U" -275 375 50 H V C CNN
+F1 "quadcopter-rescue_FS-A8S" -175 300 50 H V C CNN
+F2 "" -275 375 50 H I C CNN
+F3 "" -275 375 50 H I C CNN
 DRAW
-S -20 -90 -10 90 1 1 0 F
-S 3 -62 23 58 1 1 0 F
-P 2 1 1 10 -105 40 -65 40 N
-P 2 1 1 10 -85 20 -85 60 N
-P 2 1 1 0 -20 0 -50 0 N
-P 2 1 1 0 20 0 50 0 N
-X + ~ -150 0 100 R 50 50 1 1 P
-X - ~ 150 0 100 L 50 50 1 1 P
+A 175 25 112 1166 -266 1 1 10 N 125 125 275 -25
+A 175 26 49 900 -11 1 1 10 N 175 75 225 25
+A 175 26 78 1087 -191 1 1 10 N 150 100 250 0
+C 175 25 25 1 1 10 F
+S -325 250 325 -225 0 1 0 f
+P 2 1 1 10 175 0 175 -125 N
+X GND ~ -425 150 100 R 50 50 1 1 W
+X I-BUS ~ -425 -50 100 R 50 50 1 1 I
+X PPM ~ -425 -150 100 R 50 50 1 1 I
+X VCC ~ -425 50 100 R 50 50 1 1 W
 ENDDRAW
 ENDDEF
 #
-# quadcopter-rescue_HAKRC_BLHeli_32Bit_35A_2-5S_ESC
+# quadcopter-rescue_HAKRC_ESC
 #
-DEF quadcopter-rescue_HAKRC_BLHeli_32Bit_35A_2-5S_ESC U 0 40 Y Y 1 F N
+DEF quadcopter-rescue_HAKRC_ESC U 0 40 Y Y 1 F N
 F0 "U" -400 450 50 H V C CNN
-F1 "quadcopter-rescue_HAKRC_BLHeli_32Bit_35A_2-5S_ESC" 225 -325 50 H V C CNN
+F1 "quadcopter-rescue_HAKRC_ESC" 225 -325 50 H V C CNN
 F2 "" -400 450 50 H I C CNN
 F3 "" -400 450 50 H I C CNN
 DRAW
@@ -163,41 +161,13 @@ X VCC ~ -550 300 100 R 50 50 0 1 P
 ENDDRAW
 ENDDEF
 #
-# quadcopter-rescue_Matek_PDB-XT60_3-4S
+# quadcopter-rescue_ICM20948_module
 #
-DEF quadcopter-rescue_Matek_PDB-XT60_3-4S U 0 40 Y Y 1 F N
-F0 "U" -1100 775 50 H V C CNN
-F1 "quadcopter-rescue_Matek_PDB-XT60_3-4S" -1175 600 50 H V C CNN
-F2 "" -800 800 50 H I C CNN
-F3 "" -800 800 50 H I C CNN
-DRAW
-S -600 600 600 -600 0 1 0 f
-X 12V ~ -700 0 100 R 50 50 0 1 P
-X 5V ~ -700 200 100 R 50 50 0 1 P
-X GND ~ -700 -200 100 R 50 50 0 1 P
-X GND ~ -700 100 100 R 50 50 0 1 P
-X GND ~ -700 300 100 R 50 50 0 1 P
-X GND ~ -375 -700 100 U 50 50 0 1 P
-X GND ~ 700 150 100 L 50 50 0 1 P
-X VCC ~ -700 -300 100 R 50 50 0 1 P
-X VCC ~ -175 -700 100 U 50 50 0 1 P
-X VCC ~ 700 -150 100 L 50 50 0 1 P
-X GND ~ -175 700 100 D 50 50 1 1 P
-X GND ~ 175 -700 100 U 50 50 1 1 P
-X GND ~ 375 700 100 D 50 50 1 1 P
-X VCC ~ -375 700 100 D 50 50 1 1 P
-X VCC ~ 175 700 100 D 50 50 1 1 P
-X VCC ~ 375 -700 100 U 50 50 1 1 P
-ENDDRAW
-ENDDEF
-#
-# quadcopter-rescue_SparkFun_9Dof_IMU_Breakout-ICM-20948(Qwiic)
-#
-DEF quadcopter-rescue_SparkFun_9Dof_IMU_Breakout-ICM-20948(Qwiic) U 0 40 Y Y 1 F N
-F0 "U" -100 500 50 H V C CNN
-F1 "quadcopter-rescue_SparkFun_9Dof_IMU_Breakout-ICM-20948(Qwiic)" 500 -450 50 H V C CNN
-F2 "" -100 500 50 H I C CNN
-F3 "" -100 500 50 H I C CNN
+DEF quadcopter-rescue_ICM20948_module U 0 40 Y Y 1 F N
+F0 "U" -375 450 50 H V C CNN
+F1 "quadcopter-rescue_ICM20948_module" -75 350 50 H V C CNN
+F2 "" -375 450 50 H I C CNN
+F3 "" -375 450 50 H I C CNN
 DRAW
 S -400 300 400 -400 0 1 0 f
 X AUX_CL ~ 500 -200 100 L 50 50 0 1 P
@@ -215,11 +185,39 @@ X VIN ~ 500 -300 100 L 50 50 0 1 P
 ENDDRAW
 ENDDEF
 #
-# quadcopter-rescue_WeAct_Black_Pill_V3.0(STM32F411CEU6)
+# quadcopter-rescue_PDB-XT60
 #
-DEF quadcopter-rescue_WeAct_Black_Pill_V3.0(STM32F411CEU6) U 0 40 Y Y 1 F N
+DEF quadcopter-rescue_PDB-XT60 U 0 40 Y Y 1 F N
+F0 "U" -500 525 50 H V C CNN
+F1 "quadcopter-rescue_PDB-XT60" 725 -575 50 H V C CNN
+F2 "" 775 -850 50 H I C CNN
+F3 "" 775 -850 50 H I C CNN
+DRAW
+S 525 -525 -525 475 0 1 0 f
+X 12V ~ 625 -25 100 L 50 50 0 1 P
+X 5V ~ 625 -225 100 L 50 50 0 1 P
+X GND ~ -625 -100 100 R 50 50 0 1 P
+X GND ~ 225 575 100 D 50 50 0 1 P
+X GND ~ 625 -325 100 L 50 50 0 1 P
+X GND ~ 625 -125 100 L 50 50 0 1 P
+X GND ~ 625 150 100 L 50 50 0 1 P
+X VCC ~ -625 0 100 R 50 50 0 1 P
+X VCC ~ 125 575 100 D 50 50 0 1 P
+X VCC ~ 625 250 100 L 50 50 0 1 P
+X GND ~ -250 -625 100 U 50 50 1 1 P
+X GND ~ -150 575 100 D 50 50 1 1 P
+X GND ~ 125 -625 100 U 50 50 1 1 P
+X VCC ~ -250 575 100 D 50 50 1 1 P
+X VCC ~ -150 -625 100 U 50 50 1 1 P
+X VCC ~ 225 -625 100 U 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
+# quadcopter-rescue_STM32F411_module
+#
+DEF quadcopter-rescue_STM32F411_module U 0 40 Y Y 1 F N
 F0 "U" -450 1400 50 H V C CNN
-F1 "quadcopter-rescue_WeAct_Black_Pill_V3.0(STM32F411CEU6)" 250 -1050 50 H V C CNN
+F1 "quadcopter-rescue_STM32F411_module" 250 -1050 50 H V C CNN
 F2 "" -525 1575 50 H I C CNN
 F3 "" -525 1575 50 H I C CNN
 DRAW
@@ -271,11 +269,11 @@ X VB ~ -600 1000 100 R 50 50 0 1 P
 ENDDRAW
 ENDDEF
 #
-# quadcopter-rescue_iFlight_XING-E_2207_2450KV
+# quadcopter-rescue_iFlight_XING-E
 #
-DEF quadcopter-rescue_iFlight_XING-E_2207_2450KV U 0 40 Y Y 1 F N
+DEF quadcopter-rescue_iFlight_XING-E U 0 40 Y Y 1 F N
 F0 "U" 200 100 50 H V C CNN
-F1 "quadcopter-rescue_iFlight_XING-E_2207_2450KV" -25 400 50 H V C CNN
+F1 "quadcopter-rescue_iFlight_XING-E" -25 400 50 H V C CNN
 F2 "" 200 100 50 H I C CNN
 F3 "" 200 100 50 H I C CNN
 DRAW
@@ -296,11 +294,11 @@ X ~ 3 -450 -200 100 R 50 50 1 1 P
 ENDDRAW
 ENDDEF
 #
-# quadcopter-rescue_nrf24l01+pa+lna_rf_transceiver_module
+# quadcopter-rescue_nrf24l01+_module
 #
-DEF quadcopter-rescue_nrf24l01+pa+lna_rf_transceiver_module U 0 40 Y Y 1 F N
-F0 "U" -325 500 50 H V C CNN
-F1 "quadcopter-rescue_nrf24l01+pa+lna_rf_transceiver_module" 800 -500 50 H V C CNN
+DEF quadcopter-rescue_nrf24l01+_module U 0 40 Y Y 1 F N
+F0 "U" -325 575 50 H V C CNN
+F1 "quadcopter-rescue_nrf24l01+_module" 50 500 50 H V C CNN
 F2 "" -50 625 50 H I C CNN
 F3 "" -50 625 50 H I C CNN
 DRAW
@@ -310,14 +308,14 @@ A 175 101 78 1087 -191 1 1 10 N 150 175 250 75
 C 175 100 25 1 1 10 F
 S -350 450 350 -450 1 1 10 f
 P 2 1 1 10 175 75 175 -50 N
-X CE ~ -500 -200 150 R 50 50 1 1 I
-X GND ~ 0 -600 150 U 50 50 1 1 W
-X IRQ ~ -500 -300 150 R 50 50 1 1 O
-X MISO ~ -500 200 150 R 50 50 1 1 O
-X MOSI ~ -500 300 150 R 50 50 1 1 I
-X SCK ~ -500 100 150 R 50 50 1 1 I C
-X VCC ~ 0 600 150 D 50 50 1 1 W
-X ~CSN ~ -500 0 150 R 50 50 1 1 I
+X CE ~ -500 150 150 R 50 50 1 1 I
+X GND ~ -500 350 150 R 50 50 1 1 W
+X IRQ ~ -500 -350 150 R 50 50 1 1 O
+X MISO ~ -500 -250 150 R 50 50 1 1 O
+X MOSI ~ -500 -150 150 R 50 50 1 1 I
+X SCK ~ -500 -50 150 R 50 50 1 1 I C
+X VCC ~ -500 250 150 R 50 50 1 1 W
+X ~CSN ~ -500 50 150 R 50 50 1 1 I
 ENDDRAW
 ENDDEF
 #
