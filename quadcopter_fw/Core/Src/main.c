@@ -29,7 +29,8 @@
 /* USER CODE BEGIN Includes */
 
 #include "led.h"
-#include "buzzer.h"
+#include "nrf24l01p.h"
+
 #include "icm_20948.h"
 #include "dshot.h"
 #include "flysky_ibus.h"
@@ -45,6 +46,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -56,8 +58,10 @@
 
 /* USER CODE BEGIN PV */
 
-extern uint16_t channel[IBUS_USER_CHANNELS];
-extern uint16_t motor_value[4];
+//extern uint16_t channel[IBUS_USER_CHANNELS];
+//extern uint16_t motor_value[4];
+
+uint8_t rf_tx[NRF24L01P_PAYLOAD_LENGTH];
 
 /* USER CODE END PV */
 
@@ -65,14 +69,16 @@ extern uint16_t motor_value[4];
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+/*
 void init()
 {
-	  buzzer_time(100);
 
 	  battery_monitor_init();
 	  dshot_init(DSHOT600);
@@ -140,6 +146,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		software_fail_safe = 0;
 	}
 }
+*/
 
 /* USER CODE END 0 */
 
@@ -181,8 +188,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 
-  init();
+  //init();
 
+  nrf24l01p_tx_init(2500, _1Mbps);
 
   /* USER CODE END 2 */
 
@@ -194,6 +202,14 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
+	  for(int i= 0; i < 8; i++)
+	  {
+		  rf_tx[i]++;
+	  }
+
+	  nrf24l01p_tx_transmit(rf_tx);
+
+	  HAL_Delay(50);
 
   }
   /* USER CODE END 3 */
@@ -243,6 +259,17 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	// nRF24L01+ Interrupt
+	if(GPIO_Pin == NRF24L01P_IRQ_PIN_NUMBER)
+	{
+		nrf24l01p_tx_irq();
+	}
+
+
+}
 
 /* USER CODE END 4 */
 

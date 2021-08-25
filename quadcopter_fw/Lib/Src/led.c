@@ -11,51 +11,17 @@
 
 
 // LED1
-void led1_on()
+void led_on()
 {
-    HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, RESET);
+    HAL_GPIO_WritePin(LED_PIN_PORT, LED_PIN_NUMBER, RESET);
 }
 
-void led1_off()
+void led_off()
 {
-    HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, SET);
+    HAL_GPIO_WritePin(LED_PIN_PORT, LED_PIN_NUMBER, SET);
 }
 
-void led1_toggle()
+void led_toggle()
 {
-    HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
-}
-
-
-// LED2
-void led2_on()
-{
-    HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, SET);
-}
-
-void led2_off()
-{
-    HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, RESET);
-}
-
-void led2_toggle()
-{
-    HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
-}
-
-
-// LED3
-void led3_on()
-{
-    HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, SET);
-}
-
-void led3_off()
-{
-    HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, RESET);
-}
-
-void led3_toggle()
-{
-    HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
+    HAL_GPIO_TogglePin(LED_PIN_PORT, LED_PIN_NUMBER);
 }

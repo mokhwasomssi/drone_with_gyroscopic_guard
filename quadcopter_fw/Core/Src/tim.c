@@ -309,7 +309,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
     PA0-WKUP     ------> TIM2_CH1
     PA2     ------> TIM2_CH3
     */
-    GPIO_InitStruct.Pin = MOTOR_3_Pin|MOTOR_2_Pin;
+    GPIO_InitStruct.Pin = Dshot_4_Pin|Dshot_2_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -331,7 +331,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
     PA1     ------> TIM5_CH2
     PA3     ------> TIM5_CH4
     */
-    GPIO_InitStruct.Pin = MOTOR_4_Pin|MOTOR_1_Pin;
+    GPIO_InitStruct.Pin = Dshot_3_Pin|Dshot_1_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

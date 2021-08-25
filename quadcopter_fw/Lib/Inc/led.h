@@ -7,24 +7,20 @@
  *
  */
 
-#ifndef _LED_H_
-#define _LED_H_
+#ifndef __LED_H__
+#define __LED_H__
 
 
 #include "gpio.h"
 
 
-void led1_on();
-void led1_off();
-void led1_toggle();
-
-void led2_on();
-void led2_off();
-void led2_toggle();
-
-void led3_on();
-void led3_off();
-void led3_toggle();
+#define LED_PIN_PORT	GPIOC
+#define LED_PIN_NUMBER	GPIO_PIN_13
 
 
-#endif /* _LED_H_ */
+void led_on();
+void led_off();
+void led_toggle();
+
+
+#endif /* __LED_H__ */
