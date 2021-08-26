@@ -62,37 +62,43 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define LED_Pin GPIO_PIN_13
-#define LED_GPIO_Port GPIOC
-#define Dshot_4_Pin GPIO_PIN_0
-#define Dshot_4_GPIO_Port GPIOA
-#define Dshot_3_Pin GPIO_PIN_1
-#define Dshot_3_GPIO_Port GPIOA
-#define Dshot_2_Pin GPIO_PIN_2
-#define Dshot_2_GPIO_Port GPIOA
-#define Dshot_1_Pin GPIO_PIN_3
-#define Dshot_1_GPIO_Port GPIOA
-#define ICM20948_CS_Pin GPIO_PIN_4
-#define ICM20948_CS_GPIO_Port GPIOA
-#define ICM20948_SCK_Pin GPIO_PIN_5
-#define ICM20948_SCK_GPIO_Port GPIOA
-#define ICM20948_MISO_Pin GPIO_PIN_6
-#define ICM20948_MISO_GPIO_Port GPIOA
-#define ICM20948_MOSI_Pin GPIO_PIN_7
-#define ICM20948_MOSI_GPIO_Port GPIOA
-#define nRF24L01__IRQ_Pin GPIO_PIN_2
-#define nRF24L01__IRQ_GPIO_Port GPIOB
-#define nRF24L01__IRQ_EXTI_IRQn EXTI2_IRQn
-#define nRF24L01__SCK_Pin GPIO_PIN_10
-#define nRF24L01__SCK_GPIO_Port GPIOB
-#define nRF24L01__CE_Pin GPIO_PIN_12
-#define nRF24L01__CE_GPIO_Port GPIOB
-#define nRF24L01__CSN_Pin GPIO_PIN_13
-#define nRF24L01__CSN_GPIO_Port GPIOB
-#define nRF24L01__MISO_Pin GPIO_PIN_14
-#define nRF24L01__MISO_GPIO_Port GPIOB
-#define nRF24L01__MOSI_Pin GPIO_PIN_15
-#define nRF24L01__MOSI_GPIO_Port GPIOB
+#define LED1_Pin GPIO_PIN_13
+#define LED1_GPIO_Port GPIOC
+#define MOTOR4_Pin GPIO_PIN_0
+#define MOTOR4_GPIO_Port GPIOA
+#define MOTOR3_Pin GPIO_PIN_1
+#define MOTOR3_GPIO_Port GPIOA
+#define MOTOR2_Pin GPIO_PIN_2
+#define MOTOR2_GPIO_Port GPIOA
+#define MOTOR1_Pin GPIO_PIN_3
+#define MOTOR1_GPIO_Port GPIOA
+#define SPI1_CS_Pin GPIO_PIN_4
+#define SPI1_CS_GPIO_Port GPIOA
+#define SPI1_SCK_Pin GPIO_PIN_5
+#define SPI1_SCK_GPIO_Port GPIOA
+#define SPI1_MISO_Pin GPIO_PIN_6
+#define SPI1_MISO_GPIO_Port GPIOA
+#define SPI1_MOSI_Pin GPIO_PIN_7
+#define SPI1_MOSI_GPIO_Port GPIOA
+#define LED2_Pin GPIO_PIN_1
+#define LED2_GPIO_Port GPIOB
+#define LED3_Pin GPIO_PIN_2
+#define LED3_GPIO_Port GPIOB
+#define SPI2_SCK_Pin GPIO_PIN_10
+#define SPI2_SCK_GPIO_Port GPIOB
+#define CE_Pin GPIO_PIN_12
+#define CE_GPIO_Port GPIOB
+#define SPI2_CSN_Pin GPIO_PIN_13
+#define SPI2_CSN_GPIO_Port GPIOB
+#define SPI2_MISO_Pin GPIO_PIN_14
+#define SPI2_MISO_GPIO_Port GPIOB
+#define SPI2_MOSI_Pin GPIO_PIN_15
+#define SPI2_MOSI_GPIO_Port GPIOB
+#define IRQ_Pin GPIO_PIN_8
+#define IRQ_GPIO_Port GPIOA
+#define IRQ_EXTI_IRQn EXTI9_5_IRQn
+#define BUZZER_Pin GPIO_PIN_10
+#define BUZZER_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

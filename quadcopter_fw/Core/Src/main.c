@@ -19,23 +19,21 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "adc.h"
 #include "dma.h"
 #include "spi.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
 #include "led.h"
-#include "nrf24l01p.h"
-
-#include "icm_20948.h"
+#include "buzzer.h"
+#include "icm20948.h"
 #include "dshot.h"
-#include "flysky_ibus.h"
-#include "loop.h"
-#include "battery_monitor.h"
+#include "ibus.h"
+#include "nrf24l01p.h" // transmitter
 
 /* USER CODE END Includes */
 
@@ -58,10 +56,12 @@
 
 /* USER CODE BEGIN PV */
 
-//extern uint16_t channel[IBUS_USER_CHANNELS];
-//extern uint16_t motor_value[4];
-
-uint8_t rf_tx[NRF24L01P_PAYLOAD_LENGTH];
+axises my_gyro;
+axises my_accel;
+axises my_mag;
+uint16_t my_motor_value[4] = {0, 0, 0, 0};
+uint16_t ibus_data[IBUS_USER_CHANNELS];
+uint8_t nrf24_data[NRF24L01P_PAYLOAD_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7};
 
 /* USER CODE END PV */
 
@@ -69,84 +69,14 @@ uint8_t rf_tx[NRF24L01P_PAYLOAD_LENGTH];
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart); // ibus
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin); // nrf24l01p
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-/*
-void init()
-{
-
-	  battery_monitor_init();
-	  dshot_init(DSHOT600);
-	  ibus_init();
-	  loop_init(1000);
-
-	  loop_start();
-}
-
-
-uint16_t loop_time[4];
-uint8_t software_fail_safe = 0;
-
-void loop()
-{
-	battery_monitor_read();
-
-	if (htim == LOOP_TIM)
-	{
-	  if(channel[4] == 2000 && software_fail_safe < 10) // arming
-	  {
-
-		  if(channel[2] > 1011) // 69
-		  {
-			  for(int i = 0; i < 4; i++)
-				  motor_value[i] = (channel[2] - 1000) * 2 + 47;
-		  }
-
-		  else
-		  {
-			  for(int i = 0; i < 4; i++)
-				  motor_value[i] = 69; // minimum value to spin smoothly
-		  }
-
-		  dshot_write();
-		  led1_on();
-
-		  software_fail_safe++;
-	  }
-
-	  else	// disarming
-	  {
-		  for(int i = 0; i < 4; i++)
-			  motor_value[i] = 0;
-		  dshot_write();
-		  led1_off();
-	  }
-
-		  loop_time[0] = loop_runtime();
-	}
-
-}
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-	loop();
-}
-
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-	if(huart->Instance == IBUS_UART_INSTANCE)
-	{
-		ibus_read_channel();
-		software_fail_safe = 0;
-	}
-}
-*/
 
 /* USER CODE END 0 */
 
@@ -183,13 +113,14 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM5_Init();
   MX_TIM11_Init();
-  MX_ADC1_Init();
   MX_SPI2_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-
-  //init();
-
+  icm20948_init();
+  ak09916_init();
+  dshot_init(DSHOT600);
+  ibus_init();
   nrf24l01p_tx_init(2500, _1Mbps);
 
   /* USER CODE END 2 */
@@ -202,15 +133,32 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  for(int i= 0; i < 8; i++)
-	  {
-		  rf_tx[i]++;
-	  }
+	  led1_toggle();
+	  HAL_Delay(100);
 
-	  nrf24l01p_tx_transmit(rf_tx);
+	  led2_toggle();
+	  HAL_Delay(100);
 
-	  HAL_Delay(50);
+	  led3_toggle();
+	  HAL_Delay(100);
 
+	  buzzer_time(100);
+
+      icm20948_gyro_read(&my_gyro);
+      icm20948_accel_read(&my_accel);
+      ak09916_mag_read(&my_mag);
+
+      dshot_write(my_motor_value);
+      HAL_Delay(1);
+
+      ibus_read(ibus_data);
+	  ibus_soft_failsafe(ibus_data, 10); // if ibus is not updated, clear ibus data.
+
+      for(int i= 0; i < 8; i++)
+    	  nrf24_data[i]++;
+      nrf24l01p_tx_transmit(nrf24_data);
+
+      HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }
@@ -260,15 +208,16 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(huart == IBUS_UART)
+		ibus_reset_failsafe();
+}
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	// nRF24L01+ Interrupt
 	if(GPIO_Pin == NRF24L01P_IRQ_PIN_NUMBER)
-	{
-		nrf24l01p_tx_irq();
-	}
-
-
+		nrf24l01p_tx_irq(); // clear interrupt flag
 }
 
 /* USER CODE END 4 */

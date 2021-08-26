@@ -176,7 +176,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* tim_pwmHandle)
     hdma_tim2_ch1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
     hdma_tim2_ch1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
     hdma_tim2_ch1.Init.Mode = DMA_NORMAL;
-    hdma_tim2_ch1.Init.Priority = DMA_PRIORITY_HIGH;
+    hdma_tim2_ch1.Init.Priority = DMA_PRIORITY_VERY_HIGH;
     hdma_tim2_ch1.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
     hdma_tim2_ch1.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_1QUARTERFULL;
     hdma_tim2_ch1.Init.MemBurst = DMA_MBURST_SINGLE;
@@ -197,7 +197,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* tim_pwmHandle)
     hdma_tim2_ch3_up.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
     hdma_tim2_ch3_up.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
     hdma_tim2_ch3_up.Init.Mode = DMA_NORMAL;
-    hdma_tim2_ch3_up.Init.Priority = DMA_PRIORITY_HIGH;
+    hdma_tim2_ch3_up.Init.Priority = DMA_PRIORITY_VERY_HIGH;
     hdma_tim2_ch3_up.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
     hdma_tim2_ch3_up.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_1QUARTERFULL;
     hdma_tim2_ch3_up.Init.MemBurst = DMA_MBURST_SINGLE;
@@ -234,7 +234,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* tim_pwmHandle)
     hdma_tim5_ch2.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
     hdma_tim5_ch2.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
     hdma_tim5_ch2.Init.Mode = DMA_NORMAL;
-    hdma_tim5_ch2.Init.Priority = DMA_PRIORITY_HIGH;
+    hdma_tim5_ch2.Init.Priority = DMA_PRIORITY_VERY_HIGH;
     hdma_tim5_ch2.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
     hdma_tim5_ch2.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_1QUARTERFULL;
     hdma_tim5_ch2.Init.MemBurst = DMA_MBURST_SINGLE;
@@ -255,7 +255,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef* tim_pwmHandle)
     hdma_tim5_ch4_trig.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
     hdma_tim5_ch4_trig.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
     hdma_tim5_ch4_trig.Init.Mode = DMA_NORMAL;
-    hdma_tim5_ch4_trig.Init.Priority = DMA_PRIORITY_HIGH;
+    hdma_tim5_ch4_trig.Init.Priority = DMA_PRIORITY_VERY_HIGH;
     hdma_tim5_ch4_trig.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
     hdma_tim5_ch4_trig.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_1QUARTERFULL;
     hdma_tim5_ch4_trig.Init.MemBurst = DMA_MBURST_SINGLE;
@@ -309,7 +309,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
     PA0-WKUP     ------> TIM2_CH1
     PA2     ------> TIM2_CH3
     */
-    GPIO_InitStruct.Pin = Dshot_4_Pin|Dshot_2_Pin;
+    GPIO_InitStruct.Pin = MOTOR4_Pin|MOTOR2_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -331,7 +331,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
     PA1     ------> TIM5_CH2
     PA3     ------> TIM5_CH4
     */
-    GPIO_InitStruct.Pin = Dshot_3_Pin|Dshot_1_Pin;
+    GPIO_InitStruct.Pin = MOTOR3_Pin|MOTOR1_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
