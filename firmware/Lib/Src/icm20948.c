@@ -67,7 +67,7 @@ void ak09916_init()
 	ak09916_operation_mode_setting(continuous_measurement_100hz);
 }
 
-void icm20948_gyro_read(axises* data)
+void icm20948_gyro_read(gyro_t* data)
 {
 	uint8_t* temp = read_multiple_icm20948_reg(ub_0, B0_GYRO_XOUT_H, 6);
 
@@ -76,7 +76,7 @@ void icm20948_gyro_read(axises* data)
 	data->z = (int16_t)(temp[4] << 8 | temp[5]);
 }
 
-void icm20948_accel_read(axises* data)
+void icm20948_accel_read(accel_t* data)
 {
 	uint8_t* temp = read_multiple_icm20948_reg(ub_0, B0_ACCEL_XOUT_H, 6);
 
@@ -86,7 +86,7 @@ void icm20948_accel_read(axises* data)
 	// Add scale factor because calibraiton function offset gravity acceleration.
 }
 
-bool ak09916_mag_read(axises* data)
+bool ak09916_mag_read(mag_t* data)
 {
 	uint8_t* temp;
 	uint8_t drdy, hofl;	// data ready, overflow
@@ -106,27 +106,29 @@ bool ak09916_mag_read(axises* data)
 	return true;
 }
 
-void icm20948_gyro_read_dps(axises* data)
+void icm20948_gyro_read_dps(gyro_t* data)
 {
-	icm20948_gyro_read(data);
+	gyro_t temp_gyro;
+	icm20948_gyro_read(&temp_gyro);
 
-	data->x /= gyro_scale_factor;
-	data->y /= gyro_scale_factor;
-	data->z /= gyro_scale_factor;
+	data->x = temp_gyro.x / gyro_scale_factor;
+	data->y = temp_gyro.y / gyro_scale_factor;
+	data->z = temp_gyro.z / gyro_scale_factor;
 }
 
-void icm20948_accel_read_g(axises* data)
+void icm20948_accel_read_g(accel_t* data)
 {
-	icm20948_accel_read(data);
+	accel_t temp_accel;
+	icm20948_accel_read(&temp_accel);
 
-	data->x /= accel_scale_factor;
-	data->y /= accel_scale_factor;
-	data->z /= accel_scale_factor;
+	data->x = temp_accel.x / accel_scale_factor;
+	data->y = temp_accel.y / accel_scale_factor;
+	data->z = temp_accel.z / accel_scale_factor;
 }
 
-bool ak09916_mag_read_uT(axises* data)
+bool ak09916_mag_read_uT(mag_t* data)
 {
-	axises temp;
+	mag_t temp;
 	bool new_data = ak09916_mag_read(&temp);
 	if(!new_data)	return false;
 
@@ -273,7 +275,7 @@ void ak09916_operation_mode_setting(operation_mode mode)
 
 void icm20948_gyro_calibration()
 {
-	axises temp;
+	gyro_t temp;
 	int32_t gyro_bias[3] = {0};
 	uint8_t gyro_offset[6] = {0};
 
@@ -305,7 +307,7 @@ void icm20948_gyro_calibration()
 
 void icm20948_accel_calibration()
 {
-	axises temp;
+	accel_t temp;
 	uint8_t* temp2;
 	uint8_t* temp3;
 	uint8_t* temp4;
@@ -496,7 +498,7 @@ static uint8_t read_single_ak09916_reg(uint8_t reg)
 	write_single_icm20948_reg(ub_3, B3_I2C_SLV0_REG, reg);
 	write_single_icm20948_reg(ub_3, B3_I2C_SLV0_CTRL, 0x81);
 
-	HAL_Delay(1);
+	HAL_Delay(1); // 1ms 딜레이가 아니라 us 단위로 바꿔야 될 듯.
 	return read_single_icm20948_reg(ub_0, B0_EXT_SLV_SENS_DATA_00);
 }
 

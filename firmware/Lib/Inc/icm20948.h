@@ -53,10 +53,24 @@ typedef enum
 
 typedef struct
 {
-	float x;
-	float y;
-	float z;
-} axises;
+	double x;
+	double y;
+	double z;
+} gyro_t;
+
+typedef struct
+{
+	double x;
+	double y;
+	double z;
+} accel_t;
+
+typedef struct
+{
+	double x;
+	double y;
+	double z;
+} mag_t;
 
 typedef enum
 {
@@ -77,14 +91,14 @@ void icm20948_init();
 void ak09916_init();
 
 // 16 bits ADC value. raw data.
-void icm20948_gyro_read(axises* data);	
-void icm20948_accel_read(axises* data);
-bool ak09916_mag_read(axises* data); 
+void icm20948_gyro_read(gyro_t* data);	
+void icm20948_accel_read(accel_t* data);
+bool ak09916_mag_read(mag_t* data); 
 
 // Convert 16 bits ADC value to their unit.
-void icm20948_gyro_read_dps(axises* data); 
-void icm20948_accel_read_g(axises* data);
-bool ak09916_mag_read_uT(axises* data);
+void icm20948_gyro_read_dps(gyro_t* data); 
+void icm20948_accel_read_g(accel_t* data);
+bool ak09916_mag_read_uT(mag_t* data);
 
 
 /* Sub Functions */

@@ -34,6 +34,7 @@
 #include "dshot.h"
 #include "ibus.h"
 #include "nrf24l01p.h" // transmitter
+#include "angle.h" // calculate angles from imu sensor datas
 
 /* USER CODE END Includes */
 
@@ -56,12 +57,27 @@
 
 /* USER CODE BEGIN PV */
 
-axises my_gyro;
-axises my_accel;
-axises my_mag;
+// imu sensor data
+gyro_t my_gyro;
+accel_t my_accel;
+mag_t my_mag;
+
+// calculated angle
+angle_t my_accel_angle;
+angle_t my_gyro_angle;
+angle_t my_filtered_angle;
+
+// motor throttle
 uint16_t my_motor_value[4] = {0, 0, 0, 0};
+
+// rc transmitter stick data
 uint16_t ibus_data[IBUS_USER_CHANNELS];
+
+// data to be sent from quadcopter
 uint8_t nrf24_data[NRF24L01P_PAYLOAD_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7};
+
+// period of 1kHz control loop
+float dt = 0.001;
 
 /* USER CODE END PV */
 
@@ -69,8 +85,12 @@ uint8_t nrf24_data[NRF24L01P_PAYLOAD_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7};
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart); // ibus
+// ibus receive complete interrupt
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
+// nrf24l01p transmit complete interrupt
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin); // nrf24l01p
+// quadcopter control loop 1kHz timer interrupt
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
 
 /* USER CODE END PFP */
 
@@ -123,6 +143,10 @@ int main(void)
   ibus_init();
   nrf24l01p_tx_init(2500, _1Mbps);
 
+  // 1kHz control loop
+  HAL_TIM_Base_Start_IT(&htim11);
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -132,6 +156,11 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+	  /*
+      icm20948_gyro_read(&my_gyro);
+      icm20948_accel_read(&my_accel);
+      ak09916_mag_read(&my_mag);
 
 	  led1_toggle();
 	  HAL_Delay(100);
@@ -144,10 +173,6 @@ int main(void)
 
 	  buzzer_time(100);
 
-      icm20948_gyro_read(&my_gyro);
-      icm20948_accel_read(&my_accel);
-      ak09916_mag_read(&my_mag);
-
       dshot_write(my_motor_value);
       HAL_Delay(1);
 
@@ -159,6 +184,7 @@ int main(void)
       nrf24l01p_tx_transmit(nrf24_data);
 
       HAL_Delay(100);
+      */
   }
   /* USER CODE END 3 */
 }
@@ -207,6 +233,21 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if(htim->Instance == TIM11)
+	{
+		led1_toggle();
+		icm20948_gyro_read_dps(&my_gyro);
+		icm20948_accel_read_g(&my_accel);
+
+		get_angle_from_gyro(my_gyro, my_filtered_angle, &my_gyro_angle);
+		get_angle_from_accel(my_accel, &my_accel_angle);
+
+		complementary_filter(my_gyro_angle, my_accel_angle, &my_filtered_angle);
+	}
+}
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
