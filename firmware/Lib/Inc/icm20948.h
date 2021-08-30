@@ -20,6 +20,9 @@
 #define ICM20948_SPI_CS_PIN_PORT		GPIOA
 #define ICM20948_SPI_CS_PIN_NUMBER		GPIO_PIN_4
 
+#define ICM20948_IRQ_PIN_PORT           GPIOB
+#define ICM20948_IRQ_PIN_NUMBER         GPIO_PIN_0
+
 
 /* Defines */
 #define READ							0x80
@@ -102,17 +105,19 @@ bool ak09916_mag_read_uT(mag_t* data);
 
 
 /* Sub Functions */
+// who am i
 bool icm20948_who_am_i();
 bool ak09916_who_am_i();
 
+// reset
 void icm20948_device_reset();
 void ak09916_soft_reset();
 
 void icm20948_wakeup();
 void icm20948_sleep();
 
+// interface
 void icm20948_spi_slave_enable();
-
 void icm20948_i2c_master_reset();
 void icm20948_i2c_master_enable();
 void icm20948_i2c_master_clk_frq(uint8_t config); // 0 - 15
@@ -120,6 +125,14 @@ void icm20948_i2c_master_clk_frq(uint8_t config); // 0 - 15
 void icm20948_clock_source(uint8_t source);
 void icm20948_odr_align_enable();
 
+// interrupt
+void icm20948_int_pin_active_low();
+void icm20948_int_pin_active_high();
+void icm20948_int_latch(); // INT1 pin level held until interrupt status is cleared
+void icm20948_int_pulse(); // interrupt pulse is width 50us
+void icm20948_int_enable_raw_data_rdy();
+
+// LPF config
 void icm20948_gyro_low_pass_filter(uint8_t config); // 0 - 7
 void icm20948_accel_low_pass_filter(uint8_t config); // 0 - 7
 
@@ -132,6 +145,7 @@ void ak09916_operation_mode_setting(operation_mode mode);
 void icm20948_gyro_calibration();
 void icm20948_accel_calibration();
 
+// select full scale.
 void icm20948_gyro_full_scale_select(gyro_full_scale full_scale);
 void icm20948_accel_full_scale_select(accel_full_scale full_scale);
 

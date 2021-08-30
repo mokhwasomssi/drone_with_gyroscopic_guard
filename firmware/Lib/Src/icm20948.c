@@ -41,7 +41,11 @@ void icm20948_init()
 	icm20948_odr_align_enable();
 	
 	icm20948_spi_slave_enable();
-	
+
+	icm20948_int_pin_active_low();
+	icm20948_int_pulse();
+	icm20948_int_enable_raw_data_rdy();
+
 	icm20948_gyro_low_pass_filter(0);
 	icm20948_accel_low_pass_filter(0);
 
@@ -235,6 +239,43 @@ void icm20948_clock_source(uint8_t source)
 void icm20948_odr_align_enable()
 {
 	write_single_icm20948_reg(ub_2, B2_ODR_ALIGN_EN, 0x01);
+}
+
+void icm20948_int_pin_active_low()
+{
+	uint8_t new_val = read_single_icm20948_reg(ub_0, B0_INT_PIN_CFG);
+	new_val |= 0x80;
+
+	write_single_icm20948_reg(ub_0, B0_INT_PIN_CFG, new_val);
+}
+
+void icm20948_int_pin_active_high()
+{
+	uint8_t new_val = read_single_icm20948_reg(ub_0, B0_INT_PIN_CFG);
+	new_val &= 0x7F;
+
+	write_single_icm20948_reg(ub_0, B0_INT_PIN_CFG, new_val);
+}
+
+void icm20948_int_latch()
+{
+	uint8_t new_val = read_single_icm20948_reg(ub_0, B0_INT_PIN_CFG);
+	new_val |= 0x20;
+
+	write_single_icm20948_reg(ub_0, B0_INT_PIN_CFG, new_val);
+}
+
+void icm20948_int_pulse()
+{
+	uint8_t new_val = read_single_icm20948_reg(ub_0, B0_INT_PIN_CFG);
+	new_val &= 0xDF;
+
+	write_single_icm20948_reg(ub_0, B0_INT_PIN_CFG, new_val);
+}
+
+void icm20948_int_enable_raw_data_rdy()
+{
+	write_single_icm20948_reg(ub_0, B0_INT_ENABLE_1, 0x01);
 }
 
 void icm20948_gyro_low_pass_filter(uint8_t config)

@@ -1,8 +1,8 @@
-/*
- * angle.c
- *
- *  Created on: Aug 27, 2021
- *      Author: mokhwasomssi
+/**
+ * @file   angle.c
+ * @date   2021-08-30
+ * @author mokhwasomssi
+ * @brief  
  */
 
 
@@ -25,20 +25,26 @@ void get_angle_from_accel(accel_t accel, angle_t* angle)
     angle->pitch = -temp_angle.pitch;
 }
 
-void get_angle_from_gyro(gyro_t gyro, angle_t prev_angle, angle_t* angle)
+void get_angle_from_gyro(gyro_t gyro, angle_t prev_angle, double dt, angle_t* angle)
 {
     angle_t temp_angle;
 
-    temp_angle.roll = gyro.x * DT;
-    temp_angle.pitch = gyro.y * DT;
-    temp_angle.yaw = gyro.z * DT;
+    temp_angle.roll  = gyro.x * dt;
+    temp_angle.pitch = gyro.y * dt;
+    temp_angle.yaw   = gyro.z * dt;
 
     angle->roll  = prev_angle.roll + temp_angle.roll;
     angle->pitch = prev_angle.pitch + temp_angle.pitch;
 }
 
-void complementary_filter(angle_t gyro_angle, angle_t accel_angle, angle_t* filterd_angle)
+void complementary_filter(gyro_t gyro, accel_t accel, double dt, double alpha, angle_t* filtered_angle)
 {
-    filterd_angle->roll  = (1 - ALPHA)*gyro_angle.roll + ALPHA*accel_angle.roll;
-    filterd_angle->pitch = (1 - ALPHA)*gyro_angle.pitch + ALPHA*accel_angle.pitch;
+    angle_t accel_angle;
+    get_angle_from_accel(accel, &accel_angle);
+
+    angle_t gyro_angle;
+    get_angle_from_gyro(gyro, *filtered_angle, dt, &gyro_angle);
+
+    filtered_angle->roll  = alpha*gyro_angle.roll  + (1-alpha)*accel_angle.roll;
+    filtered_angle->pitch = alpha*gyro_angle.pitch + (1-alpha)*accel_angle.pitch;   
 }

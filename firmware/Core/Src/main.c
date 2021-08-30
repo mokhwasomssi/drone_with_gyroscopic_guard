@@ -62,6 +62,11 @@ gyro_t my_gyro;
 accel_t my_accel;
 mag_t my_mag;
 
+uint16_t dt;
+
+/// imu data ready flag;
+uint8_t imu_ready;
+
 // calculated angle
 angle_t my_accel_angle;
 angle_t my_gyro_angle;
@@ -76,8 +81,6 @@ uint16_t ibus_data[IBUS_USER_CHANNELS];
 // data to be sent from quadcopter
 uint8_t nrf24_data[NRF24L01P_PAYLOAD_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7};
 
-// period of 1kHz control loop
-float dt = 0.001;
 
 /* USER CODE END PV */
 
@@ -143,9 +146,7 @@ int main(void)
   ibus_init();
   nrf24l01p_tx_init(2500, _1Mbps);
 
-  // 1kHz control loop
-  HAL_TIM_Base_Start_IT(&htim11);
-
+  HAL_TIM_Base_Start(&htim11);
 
   /* USER CODE END 2 */
 
@@ -157,34 +158,17 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  /*
-      icm20948_gyro_read(&my_gyro);
-      icm20948_accel_read(&my_accel);
-      ak09916_mag_read(&my_mag);
+	  if(imu_ready)
+	  {
+			led1_toggle();
+			icm20948_gyro_read_dps(&my_gyro);
+			icm20948_accel_read_g(&my_accel);
 
-	  led1_toggle();
-	  HAL_Delay(100);
+			complementary_filter(my_gyro, my_accel, dt*0.000001, 0.99, &my_filtered_angle);
 
-	  led2_toggle();
-	  HAL_Delay(100);
+			imu_ready = 0;
+	  }
 
-	  led3_toggle();
-	  HAL_Delay(100);
-
-	  buzzer_time(100);
-
-      dshot_write(my_motor_value);
-      HAL_Delay(1);
-
-      ibus_read(ibus_data);
-	  ibus_soft_failsafe(ibus_data, 10); // if ibus is not updated, clear ibus data.
-
-      for(int i= 0; i < 8; i++)
-    	  nrf24_data[i]++;
-      nrf24l01p_tx_transmit(nrf24_data);
-
-      HAL_Delay(100);
-      */
   }
   /* USER CODE END 3 */
 }
@@ -234,21 +218,6 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-	if(htim->Instance == TIM11)
-	{
-		led1_toggle();
-		icm20948_gyro_read_dps(&my_gyro);
-		icm20948_accel_read_g(&my_accel);
-
-		get_angle_from_gyro(my_gyro, my_filtered_angle, &my_gyro_angle);
-		get_angle_from_accel(my_accel, &my_accel_angle);
-
-		complementary_filter(my_gyro_angle, my_accel_angle, &my_filtered_angle);
-	}
-}
-
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if(huart == IBUS_UART)
@@ -259,6 +228,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin == NRF24L01P_IRQ_PIN_NUMBER)
 		nrf24l01p_tx_irq(); // clear interrupt flag
+
+	if(GPIO_Pin == ICM20948_IRQ_PIN_NUMBER)
+	{
+		imu_ready = 1;
+		dt = __HAL_TIM_GET_COUNTER(&htim11);
+		__HAL_TIM_SET_COUNTER(&htim11, 0);
+	}
 }
 
 /* USER CODE END 4 */

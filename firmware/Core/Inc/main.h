@@ -80,6 +80,9 @@ void Error_Handler(void);
 #define SPI1_MISO_GPIO_Port GPIOA
 #define SPI1_MOSI_Pin GPIO_PIN_7
 #define SPI1_MOSI_GPIO_Port GPIOA
+#define IMU_IRQ_Pin GPIO_PIN_0
+#define IMU_IRQ_GPIO_Port GPIOB
+#define IMU_IRQ_EXTI_IRQn EXTI0_IRQn
 #define LED2_Pin GPIO_PIN_1
 #define LED2_GPIO_Port GPIOB
 #define LED3_Pin GPIO_PIN_2

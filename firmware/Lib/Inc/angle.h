@@ -1,8 +1,8 @@
-/*
- * angle.h
- *
- *  Created on: Aug 27, 2021
- *      Author: mokhwasomssi
+/**
+ * @file   angle.h
+ * @date   2021-08-30
+ * @author mokhwasomssi
+ * @brief  
  */
 
 
@@ -13,9 +13,6 @@
 #include "icm20948.h"
 #include <math.h>
 
-/* User Configuration */
-#define DT                  0.001 // 1ms
-#define ALPHA               0.01  // complemetary filter coefficient
 
 #define RADIAN_TO_DEGREE    (180 / M_PI);
 
@@ -28,9 +25,10 @@ typedef struct
 } angle_t;
 
 
-void get_angle_from_accel(accel_t accel, angle_t* angle); // integrate anguler velocity
-void get_angle_from_gyro(gyro_t gyro, angle_t prev_angle, angle_t* angle); // use gravity acceleration.
+void get_angle_from_gyro(gyro_t gyro, angle_t prev_angle, double dt, angle_t* angle); // integrate anguler velocity
+void get_angle_from_accel(accel_t accel, angle_t* angle); // use gravity acceleration.
 
-void complementary_filter(angle_t gyro_angle, angle_t accel_angle, angle_t* filterd_angle);
+void complementary_filter(gyro_t gyro, accel_t accel, double dt, double alpha, angle_t* filtered_angle);
+
 
 #endif /* __ANGLE_H__ */
