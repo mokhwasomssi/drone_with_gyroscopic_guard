@@ -1,7 +1,0 @@
-{
-    "C_Cpp.errorSquiggles": "Disabled",
-    "files.associations": {
-        "nrf24l01p.h": "c",
-        "stdbool.h": "c"
-    }
-}

@@ -1,0 +1,7 @@
+/Core/
+/Drivers/
+/Lib/
+/makefile
+/objects.list
+/objects.mk
+/sources.mk
