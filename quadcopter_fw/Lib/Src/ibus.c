@@ -1,8 +1,8 @@
-/*
- * flysky_ibus.h
- *
- *  Created on: Feb 4, 2021
- *      Author: mokhwasomssi
+/**
+ * @file   ibus.c
+ * @brief  ibus is a Flysky RC receiver protocol
+ * @author mokhwasomssi
+ * @date   2021-02-04
  */
 
 
@@ -11,8 +11,7 @@
 
 /* Static variable */
 static uint8_t uart_rx_buffer[IBUS_LENGTH] = {0};
-static uint8_t fail_safe_flag = 0;
-
+static uint8_t ibus_lost_flag = 0;
 
 /* Main Functions */
 void ibus_init()
@@ -20,7 +19,7 @@ void ibus_init()
 	HAL_UART_Receive_DMA(IBUS_UART, uart_rx_buffer, 32);
 }
 
-bool ibus_read(uint16_t* ibus_data)
+bool ibus_read(uint16_t ibus_channel[], uint8_t ch_num)
 {
 	if(!ibus_is_valid()) 
 		return false;
@@ -28,7 +27,7 @@ bool ibus_read(uint16_t* ibus_data)
 	if(!ibus_checksum())
 		return false;
 
-	ibus_update(ibus_data);
+	ibus_update(ibus_channel, ch_num);
 	return true;
 }
 
@@ -46,48 +45,35 @@ bool ibus_checksum()
 	uint16_t checksum_ibus;
 
 	for(int i = 0; i < 30; i++)
-	{
 		checksum_cal -= uart_rx_buffer[i];
-	}
 
 	checksum_ibus = uart_rx_buffer[31] << 8 | uart_rx_buffer[30]; // checksum value from ibus
 	return (checksum_ibus == checksum_cal);
 }
 
-void ibus_update(uint16_t* ibus_data)
+void ibus_update(uint16_t ibus_channel[], uint8_t ch_num)
 {
-	for(int ch_index = 0, bf_index = 2; ch_index < IBUS_USER_CHANNELS; ch_index++, bf_index += 2)
+	for(int i = 0, j = 2; i < ch_num; i++, j += 2)
 	{
-		ibus_data[ch_index] = uart_rx_buffer[bf_index + 1] << 8 | uart_rx_buffer[bf_index];
+		ibus_channel[i] = uart_rx_buffer[j + 1] << 8 | uart_rx_buffer[j];
 	}
 }
 
-/**
- * @note FS-A8S don't have fail safe feature, So make software fail-safe.
- */
-void ibus_soft_failsafe(uint16_t* ibus_data, uint8_t fail_safe_max)
-{	
-	fail_safe_flag++;
+bool is_ibus_lost()
+{
+	uint8_t max_lost_flag = 20;
 
-	if(fail_safe_max > fail_safe_flag)
-		return;
+	if(max_lost_flag > ibus_lost_flag)
+	{
+		ibus_lost_flag++;
+		return false;
+	}
 
-	// Clear ibus data
-	for(int i = 0; i < IBUS_USER_CHANNELS; i++)
-		ibus_data[i] = 0;
-
-	// Clear ibus buffer
-	for(int j = 0; j < IBUS_LENGTH; j++)
-		uart_rx_buffer[j] = 0;
-
-	fail_safe_flag = 0;
-	return;
+	else
+		return true;
 }
 
-/**
- * @note This function is located in HAL_UART_RxCpltCallback.
- */
-void ibus_reset_failsafe()
+void ibus_lost_flag_clear()
 {
-		fail_safe_flag = 0; // flag reset
+	ibus_lost_flag = 0;
 }

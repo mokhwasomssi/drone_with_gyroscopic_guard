@@ -36,6 +36,7 @@
 #include "nrf24l01p.h" // transmitter
 #include "angle.h" // calculate angles from imu sensor datas
 #include "telemetry.h"
+#include "rc_command.h"
 
 /* USER CODE END Includes */
 
@@ -77,7 +78,8 @@ angle_t my_angle;
 uint16_t my_motor_value[4] = {0, 0, 0, 0};
 
 // rc transmitter stick data
-uint16_t ibus_data[IBUS_USER_CHANNELS];
+uint16_t my_ibus_data[6];
+rc_command_t my_rc_command;
 
 
 /* USER CODE END PV */
@@ -143,6 +145,7 @@ int main(void)
   dshot_init(DSHOT600);
   ibus_init();
   nrf24l01p_tx_init(2500, _1Mbps);
+  rc_command_init(20, -20);
 
   HAL_TIM_Base_Start(&htim11);
 
@@ -158,28 +161,28 @@ int main(void)
 
 	  if(imu_ready)
 	  {
-			led2_on();
-			led3_on();
+		led2_on();
+		led3_on();
 
-			// get angle (roll, pitch) from imu sensor
-			icm20948_gyro_read_dps(&my_gyro);
-			icm20948_accel_read_g(&my_accel);
-			complementary_filter(my_gyro, my_accel, dt*0.000001, 0.99, &my_angle);
-
-
-      // get desired angle from rc controller
+		// get angle (roll, pitch) from imu sensor
+		icm20948_gyro_read_dps(&my_gyro);
+		icm20948_accel_read_g(&my_accel);
+		complementary_filter(my_gyro, my_accel, dt*0.000001, 0.99, &my_angle);
 
 
+		// get desired angle from rc controller
+		ibus_read(my_ibus_data, 6);
+		rc_command_update(my_ibus_data, &my_rc_command);
 
-      // calculate motor input using PID
-
-
-
-			// transmit currunt angle to computer
-			transmit_angle(my_angle);
+		// calculate motor input using PID
 
 
-			imu_ready = 0;
+
+		// transmit currunt angle to computer
+		transmit_angle(my_angle);
+
+
+		imu_ready = 0;
 	  }
 
 	  led2_off();
@@ -236,7 +239,7 @@ void SystemClock_Config(void)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if(huart == IBUS_UART)
-		ibus_reset_failsafe();
+		ibus_lost_flag_clear();
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)

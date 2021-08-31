@@ -1,8 +1,8 @@
-/*
- * flysky_ibus.h
- *
- *  Created on: Feb 4, 2021
- *      Author: mokhwasomssi
+/**
+ * @file   ibus.h
+ * @brief  ibus is a Flysky RC receiver protocol
+ * @author mokhwasomssi
+ * @date   2021-02-04
  */
 
 
@@ -16,7 +16,6 @@
 
 /* User configuration */
 #define IBUS_UART				(&huart1)
-#define IBUS_USER_CHANNELS		6		// Use 6 channels
 
 
 /* Defines */
@@ -27,14 +26,14 @@
 
 /* Main Functions */
 void ibus_init();
-bool ibus_read(uint16_t* ibus_data);
+bool ibus_read(uint16_t ibus_channel[], uint8_t ch_num);
 
 
 /* Sub Functions */
 bool ibus_is_valid();
 bool ibus_checksum();
-void ibus_update(uint16_t* ibus_data);
-void ibus_soft_failsafe(uint16_t* ibus_data, uint8_t fail_safe_max);
-void ibus_reset_failsafe();
+void ibus_update(uint16_t ibus_channel[], uint8_t ch_num);
+bool is_ibus_lost();
+void ibus_lost_flag_clear();
 
 #endif /* __IBUS_H__ */
