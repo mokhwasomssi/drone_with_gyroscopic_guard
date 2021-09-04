@@ -24,8 +24,8 @@ typedef struct
 } rc_command_t;
 
 
-void rc_command_init(int8_t max_angle, int8_t min_angle);
-bool rc_command_update(uint16_t ibus_channel[], rc_command_t* rc_command);
+void rc_init(int8_t max_angle, int8_t min_angle);
+bool rc_update(uint16_t ibus_channel[], rc_command_t* rc_command);
 
 
 #endif /* __RC_H__ */

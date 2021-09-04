@@ -29,7 +29,7 @@ static void dshot_start_pwm();
 // dshot write
 static uint16_t dshot_prepare_packet(uint16_t value);
 static void dshot_prepare_dmabuffer(uint32_t* motor_dmabuffer, uint16_t value);
-static void dshot_prepare_dmabuffer_all();
+static void dshot_prepare_dmabuffer_all(uint16_t* motor_value);
 static void dshot_dma_start();
 static void dshot_enable_dma_request();
 
@@ -42,7 +42,7 @@ void dshot_init(dshot_type_e dshot_type)
 	dshot_start_pwm();
 }
 
-void dshot_write(uint16_t* motor_value)
+void dshot_write(uint16_t motor_value[])
 {
 	dshot_prepare_dmabuffer_all(motor_value);
 	dshot_dma_start();

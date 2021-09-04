@@ -37,13 +37,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_macro  000150ac  00000000  00000000  0002a178  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00008670  00000000  00000000  0003f224  2**0
+ 17 .debug_line   00008664  00000000  00000000  0003f224  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    00081857  00000000  00000000  00047894  2**0
+ 18 .debug_str    000818a3  00000000  00000000  00047888  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000053  00000000  00000000  000c90eb  2**0
+ 19 .comment      00000053  00000000  00000000  000c912b  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00001be0  00000000  00000000  000c9140  2**2
+ 20 .debug_frame  00001be0  00000000  00000000  000c9180  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1195,103 +1195,46 @@ void SystemInit(void)
  80008f8:	e000ed00 	.word	0xe000ed00
 
 080008fc <Reset_Handler>:
-
-    .section  .text.Reset_Handler
-  .weak  Reset_Handler
-  .type  Reset_Handler, %function
-Reset_Handler:  
-  ldr   sp, =_estack    		 /* set stack pointer */
  80008fc:	f8df d034 	ldr.w	sp, [pc, #52]	; 8000934 <LoopFillZerobss+0x12>
-
-/* Copy the data segment initializers from flash to SRAM */  
-  ldr r0, =_sdata
  8000900:	480d      	ldr	r0, [pc, #52]	; (8000938 <LoopFillZerobss+0x16>)
-  ldr r1, =_edata
  8000902:	490e      	ldr	r1, [pc, #56]	; (800093c <LoopFillZerobss+0x1a>)
-  ldr r2, =_sidata
  8000904:	4a0e      	ldr	r2, [pc, #56]	; (8000940 <LoopFillZerobss+0x1e>)
-  movs r3, #0
  8000906:	2300      	movs	r3, #0
-  b LoopCopyDataInit
  8000908:	e002      	b.n	8000910 <LoopCopyDataInit>
 
 0800090a <CopyDataInit>:
-
-CopyDataInit:
-  ldr r4, [r2, r3]
  800090a:	58d4      	ldr	r4, [r2, r3]
-  str r4, [r0, r3]
  800090c:	50c4      	str	r4, [r0, r3]
-  adds r3, r3, #4
  800090e:	3304      	adds	r3, #4
 
 08000910 <LoopCopyDataInit>:
-
-LoopCopyDataInit:
-  adds r4, r0, r3
  8000910:	18c4      	adds	r4, r0, r3
-  cmp r4, r1
  8000912:	428c      	cmp	r4, r1
-  bcc CopyDataInit
  8000914:	d3f9      	bcc.n	800090a <CopyDataInit>
-  
-/* Zero fill the bss segment. */
-  ldr r2, =_sbss
  8000916:	4a0b      	ldr	r2, [pc, #44]	; (8000944 <LoopFillZerobss+0x22>)
-  ldr r4, =_ebss
  8000918:	4c0b      	ldr	r4, [pc, #44]	; (8000948 <LoopFillZerobss+0x26>)
-  movs r3, #0
  800091a:	2300      	movs	r3, #0
-  b LoopFillZerobss
  800091c:	e001      	b.n	8000922 <LoopFillZerobss>
 
 0800091e <FillZerobss>:
-
-FillZerobss:
-  str  r3, [r2]
  800091e:	6013      	str	r3, [r2, #0]
-  adds r2, r2, #4
  8000920:	3204      	adds	r2, #4
 
 08000922 <LoopFillZerobss>:
-
-LoopFillZerobss:
-  cmp r2, r4
  8000922:	42a2      	cmp	r2, r4
-  bcc FillZerobss
  8000924:	d3fb      	bcc.n	800091e <FillZerobss>
-
-/* Call the clock system intitialization function.*/
-  bl  SystemInit   
  8000926:	f7ff ffd7 	bl	80008d8 <SystemInit>
-/* Call static constructors */
-    bl __libc_init_array
  800092a:	f001 ffd3 	bl	80028d4 <__libc_init_array>
-/* Call the application's entry point.*/
-  bl  main
  800092e:	f7ff fe65 	bl	80005fc <main>
-  bx  lr    
  8000932:	4770      	bx	lr
-  ldr   sp, =_estack    		 /* set stack pointer */
  8000934:	20020000 	.word	0x20020000
-  ldr r0, =_sdata
  8000938:	20000000 	.word	0x20000000
-  ldr r1, =_edata
  800093c:	2000000c 	.word	0x2000000c
-  ldr r2, =_sidata
  8000940:	08002964 	.word	0x08002964
-  ldr r2, =_sbss
  8000944:	2000000c 	.word	0x2000000c
-  ldr r4, =_ebss
  8000948:	20000088 	.word	0x20000088
 
 0800094c <ADC_IRQHandler>:
- * @retval None       
-*/
-    .section  .text.Default_Handler,"ax",%progbits
-Default_Handler:
-Infinite_Loop:
-  b  Infinite_Loop
  800094c:	e7fe      	b.n	800094c <ADC_IRQHandler>
 	...
 

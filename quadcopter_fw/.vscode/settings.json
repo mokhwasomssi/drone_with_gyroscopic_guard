@@ -4,6 +4,8 @@
         "nrf24l01p.h": "c",
         "stdbool.h": "c",
         "telemetry.h": "c",
-        "ibus.h": "c"
+        "ibus.h": "c",
+        "dshot.h": "c",
+        "tim.h": "c"
     }
 }

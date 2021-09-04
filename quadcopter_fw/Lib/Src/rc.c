@@ -6,18 +6,18 @@
  */
 
 
-#include "rc_command.h"
+#include "rc.h"
 
 
 static int8_t angle_range;
 
 
-void rc_command_init(int8_t max_angle, int8_t min_angle)
+void rc_init(int8_t max_angle, int8_t min_angle)
 {
     angle_range = max_angle - min_angle;
 }
 
-bool rc_command_update(uint16_t ibus_channel[], rc_command_t* rc_command)
+bool rc_update(uint16_t ibus_channel[], rc_command_t* rc_command)
 {
     if(is_ibus_lost())   
     {

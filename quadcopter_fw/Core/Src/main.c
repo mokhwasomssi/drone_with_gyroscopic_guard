@@ -31,12 +31,12 @@
 #include "led.h"
 #include "buzzer.h"
 #include "icm20948.h"
-#include "dshot.h"
 #include "ibus.h"
 #include "nrf24l01p.h" // transmitter
 #include "angle.h" // calculate angles from imu sensor datas
 #include "telemetry.h"
-#include "rc_command.h"
+#include "rc.h"
+#include "motor.h"
 
 /* USER CODE END Includes */
 
@@ -140,14 +140,17 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
+
   icm20948_init();
   ak09916_init();
-  dshot_init(DSHOT600);
   ibus_init();
   nrf24l01p_tx_init(2500, _1Mbps);
-  rc_command_init(20, -20);
+
+  motor_init();
+  rc_init(20, -20);
 
   HAL_TIM_Base_Start(&htim11);
+
 
   /* USER CODE END 2 */
 
@@ -161,8 +164,8 @@ int main(void)
 
 	  if(imu_ready)
 	  {
-		led2_on();
-		led3_on();
+		led1_on(); // telemetry
+		led2_on(); // quadcopter control loop
 
 		// get angle (roll, pitch) from imu sensor
 		icm20948_gyro_read_dps(&my_gyro);
@@ -170,11 +173,14 @@ int main(void)
 		complementary_filter(my_gyro, my_accel, dt*0.000001, 0.99, &my_angle);
 
 
-		// get desired angle from rc controller
+		// get target angle from rc controller
 		ibus_read(my_ibus_data, 6);
-		rc_command_update(my_ibus_data, &my_rc_command);
+		rc_update(my_ibus_data, &my_rc_command);
 
 		// calculate motor input using PID
+		my_motor_value[0] = my_rc_command.trottle;
+
+		motor_update(my_motor_value);
 
 
 
@@ -185,7 +191,7 @@ int main(void)
 		imu_ready = 0;
 	  }
 
-	  led2_off();
+	  led2_off(); // quadcopter control loop
 
   }
   /* USER CODE END 3 */
@@ -247,8 +253,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	// rf transmitter data sent interrupt
 	if(GPIO_Pin == NRF24L01P_IRQ_PIN_NUMBER)
 	{
+		led1_off(); // telemetry
 		nrf24l01p_tx_irq(); // clear interrupt flag
-		led3_off();
 	}
 
 	// imu data ready interrupt
