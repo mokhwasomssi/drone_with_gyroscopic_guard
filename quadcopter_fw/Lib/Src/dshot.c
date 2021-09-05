@@ -34,7 +34,7 @@ static void dshot_dma_start();
 static void dshot_enable_dma_request();
 
 
-/* Functions */
+/* Main Functions */
 void dshot_init(dshot_type_e dshot_type)
 {
 	dshot_set_timer(dshot_type);
@@ -42,9 +42,12 @@ void dshot_init(dshot_type_e dshot_type)
 	dshot_start_pwm();
 }
 
-void dshot_write(uint16_t motor_value[])
+/**
+ * @param dshot_value 0 : disarmed, 48 to 2047 : active trottle control.
+ */
+void dshot_write(uint16_t dshot_value[])
 {
-	dshot_prepare_dmabuffer_all(motor_value);
+	dshot_prepare_dmabuffer_all(dshot_value);
 	dshot_dma_start();
 	dshot_enable_dma_request();
 }

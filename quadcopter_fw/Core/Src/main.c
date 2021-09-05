@@ -30,11 +30,11 @@
 
 #include "led.h"
 #include "buzzer.h"
-#include "icm20948.h"
-#include "ibus.h"
+
 #include "nrf24l01p.h" // transmitter
-#include "angle.h" // calculate angles from imu sensor datas
 #include "telemetry.h"
+
+#include "imu.h"
 #include "rc.h"
 #include "motor.h"
 
@@ -59,28 +59,11 @@
 
 /* USER CODE BEGIN PV */
 
-// imu sensor data
-gyro_t my_gyro;
-accel_t my_accel;
-mag_t my_mag;
-
 uint16_t dt;
-
-/// imu data ready flag;
 uint8_t imu_ready;
-
-// calculated angle
-angle_t my_accel_angle;
-angle_t my_gyro_angle;
 angle_t my_angle;
-
-// motor throttle
 uint16_t my_motor_value[4] = {0, 0, 0, 0};
-
-// rc transmitter stick data
-uint16_t my_ibus_data[6];
 rc_command_t my_rc_command;
-
 
 /* USER CODE END PV */
 
@@ -140,17 +123,13 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-
-  icm20948_init();
-  ak09916_init();
-  ibus_init();
-  nrf24l01p_tx_init(2500, _1Mbps);
-
-  motor_init();
+  imu_init();
   rc_init(20, -20);
+  // pid_init();
+  motor_init();
+  // telemetry_init();
 
   HAL_TIM_Base_Start(&htim11);
-
 
   /* USER CODE END 2 */
 
@@ -164,36 +143,21 @@ int main(void)
 
 	  if(imu_ready)
 	  {
-		led1_on(); // telemetry
-		led2_on(); // quadcopter control loop
+		led1_on(); //telemetry indicator
+		led2_on(); //control loop indicator
 
-		// get angle (roll, pitch) from imu sensor
-		icm20948_gyro_read_dps(&my_gyro);
-		icm20948_accel_read_g(&my_accel);
-		complementary_filter(my_gyro, my_accel, dt*0.000001, 0.99, &my_angle);
-
-
-		// get target angle from rc controller
-		ibus_read(my_ibus_data, 6);
-		rc_update(my_ibus_data, &my_rc_command);
-
-		// calculate motor input using PID
-		my_motor_value[0] = my_rc_command.trottle;
-
+		imu_angle_update(dt*0.000001, &my_angle);
+		rc_update(&my_rc_command);
+		// pid
 		motor_update(my_motor_value);
-
-
-
-		// transmit currunt angle to computer
-		transmit_angle(my_angle);
-
+		// telemetry_tx_angle(my_angle); //monitoring
 
 		imu_ready = 0;
 	  }
 
-	  led2_off(); // quadcopter control loop
-
+	  led2_off(); //control loop indicator
   }
+
   /* USER CODE END 3 */
 }
 
@@ -253,7 +217,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	// rf transmitter data sent interrupt
 	if(GPIO_Pin == NRF24L01P_IRQ_PIN_NUMBER)
 	{
-		led1_off(); // telemetry
+		led1_off(); //telemetry indicator
 		nrf24l01p_tx_irq(); // clear interrupt flag
 	}
 

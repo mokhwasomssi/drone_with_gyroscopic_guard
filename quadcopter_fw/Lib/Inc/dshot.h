@@ -64,9 +64,9 @@ typedef enum
 } dshot_type_e;
 
 
-/* Functions */
+/* Main Functions */
 void dshot_init(dshot_type_e dshot_type);
-void dshot_write(uint16_t motor_value[]);
+void dshot_write(uint16_t dshot_value[]);
 
 
 #endif /* __DSHOT_H__ */

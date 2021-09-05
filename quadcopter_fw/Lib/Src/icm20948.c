@@ -32,7 +32,7 @@ static uint8_t* read_multiple_ak09916_reg(uint8_t reg, uint8_t len);
 /* Main Functions */
 void icm20948_init()
 {
-	while(!icm20948_who_am_i());
+	//while(!icm20948_who_am_i());
 
 	icm20948_device_reset();
 	icm20948_wakeup();
@@ -65,7 +65,7 @@ void ak09916_init()
 	icm20948_i2c_master_enable();
 	icm20948_i2c_master_clk_frq(7);
 
-	while(!ak09916_who_am_i());
+	//while(!ak09916_who_am_i());
 
 	ak09916_soft_reset();
 	ak09916_operation_mode_setting(continuous_measurement_100hz);

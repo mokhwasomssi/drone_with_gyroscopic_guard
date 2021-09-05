@@ -25,7 +25,8 @@ typedef struct
 
 
 void rc_init(int8_t max_angle, int8_t min_angle);
-bool rc_update(uint16_t ibus_channel[], rc_command_t* rc_command);
+bool rc_update(rc_command_t* rc_command);
+bool is_rc_lost();
 
 
 #endif /* __RC_H__ */
