@@ -9,9 +9,10 @@
 #include "ibus.h"
 
 
-/* Static variable */
+/* Static variables */
 static uint8_t uart_rx_buffer[IBUS_LENGTH] = {0};
 static uint8_t ibus_lost_flag = 0;
+
 
 /* Main Functions */
 void ibus_init()
@@ -19,6 +20,9 @@ void ibus_init()
 	HAL_UART_Receive_DMA(IBUS_UART, uart_rx_buffer, 32);
 }
 
+/**
+ * @brief Check ibus is valid and parse ibus data from uart dma buffer
+ */
 bool ibus_read(uint16_t ibus_channel[], uint8_t ch_num)
 {
 	if(!ibus_is_valid()) 

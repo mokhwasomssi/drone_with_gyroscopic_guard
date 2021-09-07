@@ -9,52 +9,74 @@
 #include "rc.h"
 
 
-static int8_t angle_range;
-
-
-void rc_init(int8_t max_angle, int8_t min_angle)
+/* Main Functions */
+void rc_init()
 {
     ibus_init();
-    angle_range = max_angle - min_angle;
 }
 
 bool rc_update(rc_command_t* rc_command)
 {
-    // read ibus channel
     static uint16_t ibus_channel[6] = { 0, 0, 0, 0, 0, 0 };
-    ibus_read(ibus_channel, 6);
+    rc_raw_command_t rc_raw_command = { 0 };
 
-    // check ibus signal lost
-    if(is_rc_lost())   
+    if(!ibus_read(ibus_channel, 6))
+        return false;
+
+    if(is_ibus_lost())   
     {
-        rc_command->arming = false;
-        rc_command->roll = 0;
-        rc_command->pitch = 0;
-        rc_command->yaw = 0;
-        rc_command->trottle = 0;
-
+        rc_command_clear(rc_command);
         return false;
     }
 
-    // check arming
-    if(ibus_channel[4] == 2000)
-        rc_command->arming = true;
-    else
-        rc_command->arming = false;
-
-    // convert ibus data to rc command
-    uint8_t scale_factor = 1000 / angle_range;
-
-    rc_command->roll  = (ibus_channel[0] - 1500) / scale_factor;
-    rc_command->pitch = (ibus_channel[1] - 1500) / scale_factor;
-    rc_command->yaw   = (ibus_channel[3] - 1500) / scale_factor;
-    
-    rc_command->trottle = ibus_channel[2] - 1000;
-
+    rc_channel_mapping(ibus_channel, &rc_raw_command);
+    rc_get_command(rc_raw_command, rc_command);
     return true;
 }
 
-bool is_rc_lost()
+
+/* Sub Functions */
+void rc_command_clear(rc_command_t* rc_command)
 {
-    return is_ibus_lost();
+    rc_command->start = false;
+    rc_command->arming = false;
+    
+    rc_command->throttle = 0;
+
+    rc_command->roll = 0;
+    rc_command->pitch = 0;
+    rc_command->yaw = 0;
+}
+
+void rc_channel_mapping(uint16_t ibus_channel[], rc_raw_command_t* rc_raw_command)
+{
+    rc_raw_command->start = ibus_channel[4];
+    rc_raw_command->arming = ibus_channel[5];
+
+    rc_raw_command->throttle = ibus_channel[2];
+
+    rc_raw_command->roll = ibus_channel[0];
+    rc_raw_command->pitch = ibus_channel[1];
+    rc_raw_command->yaw = ibus_channel[3];
+}
+
+static uint8_t rc_set_angle_range(int8_t max_angle, int8_t min_angle)
+{
+    int8_t angle_range = max_angle - min_angle;
+    uint8_t scale_factor = 1000 / angle_range;
+
+    return scale_factor;
+}
+
+void rc_get_command(rc_raw_command_t rc_raw_command, rc_command_t* rc_command)
+{
+    rc_command->start  = (rc_raw_command.start == 2000) ? true : false;
+    rc_command->arming = (rc_raw_command.arming == 2000) ? true : false;
+
+    rc_command->throttle = rc_raw_command.throttle - 1000;
+
+    uint8_t scale_factor = rc_set_angle_range(20, -20);
+    rc_command->roll  = (int16_t)((rc_raw_command.roll - 1500) / scale_factor);
+    rc_command->pitch = (int16_t)((rc_raw_command.pitch - 1500) / scale_factor);
+    rc_command->yaw   = (int16_t)((rc_raw_command.yaw - 1500) / scale_factor);
 }

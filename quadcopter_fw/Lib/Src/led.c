@@ -1,59 +1,60 @@
-/*
- * led.c
- *
- *  Created on: Aug 26, 2021
- *      Author: mokhwasomssi
+/**
+ * @file   led.c
+ * @brief  led on/off and toggle functions
+ * @author mokhwasomssi
+ * @date   2021-08-26
  */
+
 
 #include "led.h"
 
 
-// LED1
-void led1_on()
+// LED BLUE
+void led_blue_on()
 {
-    HAL_GPIO_WritePin(LED1_PIN_PORT, LED1_PIN_NUMBER, RESET);
+    HAL_GPIO_WritePin(LED_BLUE_PIN_PORT, LED_BLUE_PIN_NUMBER, RESET);
 }
 
-void led1_off()
+void led_blue_off()
 {
-    HAL_GPIO_WritePin(LED1_PIN_PORT, LED1_PIN_NUMBER, SET);
+    HAL_GPIO_WritePin(LED_BLUE_PIN_PORT, LED_BLUE_PIN_NUMBER, SET);
 }
 
-void led1_toggle()
+void led_blue_toggle()
 {
-    HAL_GPIO_TogglePin(LED1_PIN_PORT, LED1_PIN_NUMBER);
-}
-
-
-// LED2
-void led2_on()
-{
-    HAL_GPIO_WritePin(LED2_PIN_PORT, LED2_PIN_NUMBER, SET);
-}
-
-void led2_off()
-{
-    HAL_GPIO_WritePin(LED2_PIN_PORT, LED2_PIN_NUMBER, RESET);
-}
-
-void led2_toggle()
-{
-    HAL_GPIO_TogglePin(LED2_PIN_PORT, LED2_PIN_NUMBER);
+    HAL_GPIO_TogglePin(LED_BLUE_PIN_PORT, LED_BLUE_PIN_NUMBER);
 }
 
 
-// LED3
-void led3_on()
+// LED GREEN
+void led_green_on()
 {
-    HAL_GPIO_WritePin(LED3_PIN_PORT, LED3_PIN_NUMBER, SET);
+    HAL_GPIO_WritePin(LED_GREEN_PIN_PORT, LED_GREEN_PIN_NUMBER, SET);
 }
 
-void led3_off()
+void led_green_off()
 {
-    HAL_GPIO_WritePin(LED3_PIN_PORT, LED3_PIN_NUMBER, RESET);
+    HAL_GPIO_WritePin(LED_GREEN_PIN_PORT, LED_GREEN_PIN_NUMBER, RESET);
 }
 
-void led3_toggle()
+void led_green_toggle()
 {
-    HAL_GPIO_TogglePin(LED3_PIN_PORT, LED3_PIN_NUMBER);
+    HAL_GPIO_TogglePin(LED_GREEN_PIN_PORT, LED_GREEN_PIN_NUMBER);
+}
+
+
+// LED YELLOW
+void led_yellow_on()
+{
+    HAL_GPIO_WritePin(LED_YELLOW_PIN_PORT, LED_YELLOW_PIN_NUMBER, SET);
+}
+
+void led_yellow_off()
+{
+    HAL_GPIO_WritePin(LED_YELLOW_PIN_PORT, LED_YELLOW_PIN_NUMBER, RESET);
+}
+
+void led_yellow_toggle()
+{
+    HAL_GPIO_TogglePin(LED_YELLOW_PIN_PORT, LED_YELLOW_PIN_NUMBER);
 }

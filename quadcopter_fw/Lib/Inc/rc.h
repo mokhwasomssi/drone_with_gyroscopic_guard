@@ -15,18 +15,39 @@
 
 typedef struct 
 {
-    bool arming;
+    bool start;     // if start is true, start init functions and control loop.
+    bool arming;    // start the motors.
 
-    int16_t roll;
+    uint16_t throttle; 
+
+    int16_t roll;   // target angle (unit : degree)
     int16_t pitch;
     int16_t yaw;
-    uint16_t trottle;
 } rc_command_t;
 
+typedef struct 
+{
+    // struct for mapping ibus channel to rc command.
+    // have same data type(uint16_t) as ibus data.
+    uint16_t start;   
+    uint16_t arming; 
 
-void rc_init(int8_t max_angle, int8_t min_angle);
+    uint16_t throttle; 
+
+    uint16_t roll;  
+    uint16_t pitch;
+    uint16_t yaw;
+} rc_raw_command_t;
+
+
+/* Main Functions */
+void rc_init();
 bool rc_update(rc_command_t* rc_command);
-bool is_rc_lost();
+
+/* Sub Functions */
+void rc_command_clear(rc_command_t* rc_command);
+void rc_channel_mapping(uint16_t ibus_channel[], rc_raw_command_t* rc_raw_data);
+void rc_get_command(rc_raw_command_t rc_raw_data, rc_command_t* rc_command);
 
 
 #endif /* __RC_H__ */

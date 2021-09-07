@@ -123,11 +123,11 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  rc_init();
   imu_init();
-  rc_init(20, -20);
   // pid_init();
   motor_init();
-  // telemetry_init();
+  telemetry_init();
 
   HAL_TIM_Base_Start(&htim11);
 
@@ -143,19 +143,19 @@ int main(void)
 
 	  if(imu_ready)
 	  {
-		led1_on(); //telemetry indicator
-		led2_on(); //control loop indicator
+		led_blue_on(); //telemetry indicator
+		led_green_on(); //control loop indicator
 
 		imu_angle_update(dt*0.000001, &my_angle);
 		rc_update(&my_rc_command);
 		// pid
 		motor_update(my_motor_value);
-		// telemetry_tx_angle(my_angle); //monitoring
+		telemetry_tx_angle(my_angle); //monitoring
 
 		imu_ready = 0;
 	  }
 
-	  led2_off(); //control loop indicator
+	  led_green_off(); //control loop indicator
   }
 
   /* USER CODE END 3 */
@@ -217,7 +217,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	// rf transmitter data sent interrupt
 	if(GPIO_Pin == NRF24L01P_IRQ_PIN_NUMBER)
 	{
-		led1_off(); //telemetry indicator
+		led_blue_off(); //telemetry indicator
 		nrf24l01p_tx_irq(); // clear interrupt flag
 	}
 
