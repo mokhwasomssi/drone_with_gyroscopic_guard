@@ -60,6 +60,9 @@ void rc_channel_mapping(uint16_t ibus_channel[], rc_raw_command_t* rc_raw_comman
     rc_raw_command->yaw = ibus_channel[3];
 }
 
+/**
+ * @brief set angle command range
+ */
 static uint8_t rc_set_angle_range(int8_t max_angle, int8_t min_angle)
 {
     int8_t angle_range = max_angle - min_angle;
@@ -75,7 +78,7 @@ void rc_get_command(rc_raw_command_t rc_raw_command, rc_command_t* rc_command)
 
     rc_command->throttle = rc_raw_command.throttle - 1000;
 
-    uint8_t scale_factor = rc_set_angle_range(20, -20);
+    uint8_t scale_factor = rc_set_angle_range(20, -20); // send angle command upto ±20 degree
     rc_command->roll  = (int16_t)((rc_raw_command.roll - 1500) / scale_factor);
     rc_command->pitch = (int16_t)((rc_raw_command.pitch - 1500) / scale_factor);
     rc_command->yaw   = (int16_t)((rc_raw_command.yaw - 1500) / scale_factor);

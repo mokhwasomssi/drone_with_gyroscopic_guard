@@ -28,15 +28,20 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+/* standard library */
+#include <stdio.h>
+#include <math.h>
+#include <stdbool.h>
+
+/* private library */
 #include "led.h"
-#include "buzzer.h"
+#include "timer.h"
+#include "interrupt.h"
 
-#include "nrf24l01p.h" // transmitter
-#include "telemetry.h"
-
-#include "imu.h"
 #include "rc.h"
+#include "imu.h"
 #include "motor.h"
+#include "telemetry.h"
 
 /* USER CODE END Includes */
 
@@ -59,11 +64,11 @@
 
 /* USER CODE BEGIN PV */
 
-uint16_t dt;
-uint8_t imu_ready;
-angle_t my_angle;
-uint16_t my_motor_value[4] = {0, 0, 0, 0};
+angle_t 	 my_angle;
+uint16_t 	 my_motor_value[4] = {0, 0, 0, 0};
 rc_command_t my_rc_command;
+
+us dt;
 
 /* USER CODE END PV */
 
@@ -71,18 +76,19 @@ rc_command_t my_rc_command;
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-// ibus receive complete interrupt
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
-// nrf24l01p transmit complete interrupt
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin); // nrf24l01p
-// quadcopter control loop 1kHz timer interrupt
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+bool is_quadcopter_ready()
+{
+	rc_update(&my_rc_command);
+	HAL_Delay(10);
+
+	return my_rc_command.start;
+}
 
 /* USER CODE END 0 */
 
@@ -121,15 +127,19 @@ int main(void)
   MX_TIM11_Init();
   MX_SPI2_Init();
   MX_USART1_UART_Init();
+  MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
 
+
+  timer_init();
   rc_init();
+
+  while(!is_quadcopter_ready());
+
   imu_init();
-  // pid_init();
   motor_init();
   telemetry_init();
 
-  HAL_TIM_Base_Start(&htim11);
 
   /* USER CODE END 2 */
 
@@ -141,18 +151,22 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  if(imu_ready)
-	  {
-		led_blue_on(); //telemetry indicator
+	  if(imu_ready) // run control loop depending on imu sampling time
+	  {				// ex) imu sampling time = 1.125khz, control loop cycle = 1.125khz
+
 		led_green_on(); //control loop indicator
 
-		imu_angle_update(dt*0.000001, &my_angle);
 		rc_update(&my_rc_command);
-		// pid
+		imu_update(imu_sampling_time*0.000001, &my_angle);
 		motor_update(my_motor_value);
-		telemetry_tx_angle(my_angle); //monitoring
+		//telemetry_update();
 
-		imu_ready = 0;
+		set_timer_2_counter_zero();
+		led_blue_on(); //telemetry indicator
+		telemetry_tx_angle(my_angle); //monitoring
+		telemetry_time = get_timer_2_counter();
+
+		imu_ready = false;
 	  }
 
 	  led_green_off(); //control loop indicator
@@ -205,30 +219,6 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-	if(huart == IBUS_UART)
-		ibus_lost_flag_clear();
-}
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	// rf transmitter data sent interrupt
-	if(GPIO_Pin == NRF24L01P_IRQ_PIN_NUMBER)
-	{
-		led_blue_off(); //telemetry indicator
-		nrf24l01p_tx_irq(); // clear interrupt flag
-	}
-
-	// imu data ready interrupt
-	if(GPIO_Pin == ICM20948_IRQ_PIN_NUMBER)
-	{
-		imu_ready = 1;
-		dt = __HAL_TIM_GET_COUNTER(&htim11);
-		__HAL_TIM_SET_COUNTER(&htim11, 0);
-	}
-}
 
 /* USER CODE END 4 */
 

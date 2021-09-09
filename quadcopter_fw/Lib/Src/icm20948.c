@@ -49,8 +49,8 @@ void icm20948_init()
 	icm20948_gyro_low_pass_filter(0);
 	icm20948_accel_low_pass_filter(0);
 
-	icm20948_gyro_sample_rate_divider(0);
-	icm20948_accel_sample_rate_divider(0);
+	icm20948_gyro_sample_rate_divider(1);
+	icm20948_accel_sample_rate_divider(1);
 
 	icm20948_gyro_calibration();
 	icm20948_accel_calibration();

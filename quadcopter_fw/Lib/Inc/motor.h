@@ -1,6 +1,6 @@
 /**
  * @file   motor.h
- * @brief  
+ * @brief  calculate and send motor value
  * @author mokhwasomssi
  * @date   2021-09-04
  */
@@ -10,7 +10,8 @@
 #define __MOTOR_H__
 
 
-#include "dshot.h"
+//#include "pid.h" // calculate motor value
+#include "dshot.h" // send motor value
 
 
 void motor_init();

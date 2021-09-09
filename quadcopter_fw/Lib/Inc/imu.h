@@ -15,7 +15,7 @@
 
 
 void imu_init();
-void imu_angle_update(double dt, angle_t* angle);
+void imu_update(double dt, angle_t* angle);
 
 
 #endif /* __IMU_H__ */

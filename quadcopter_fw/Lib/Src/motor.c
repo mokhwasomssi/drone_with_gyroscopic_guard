@@ -1,6 +1,6 @@
 /**
  * @file   motor.c
- * @brief  
+ * @brief  calculate and send motor value
  * @author mokhwasomssi
  * @date   2021-09-04
  */
@@ -15,7 +15,7 @@ void motor_init()
 }
 
 
-void motor_update(uint16_t motor_value[])
+void motor_update(uint16_t motor_value[]) // 매개변수에 각도 추가
 {
     uint16_t dshot_value[4] = { 0, 0, 0, 0 };
 

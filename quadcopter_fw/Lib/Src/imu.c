@@ -15,7 +15,10 @@ void imu_init()
     ak09916_init();
 }
 
-void imu_angle_update(double dt, angle_t* angle)
+/**
+ * @brief calculate and update current angle
+ */
+void imu_update(double dt, angle_t* angle)
 {
     gyro_t temp_gyro;
     accel_t temp_accel;

@@ -15,6 +15,8 @@
 
 
 void telemetry_init();
+void telemetry_update();
+
 void telemetry_tx_angle(angle_t current_angle);
 void telemetry_tx_rc_command();
 void telemetry_rx_pid_gain();
