@@ -9,13 +9,16 @@
 #include "rc.h"
 
 
+rc_command_t my_rc_command;
+
+
 /* Main Functions */
 void rc_init()
 {
     ibus_init();
 }
 
-bool rc_update(rc_command_t* rc_command)
+bool rc_update()
 {
     static uint16_t ibus_channel[6] = { 0, 0, 0, 0, 0, 0 };
     rc_raw_command_t rc_raw_command = { 0 };
@@ -25,12 +28,12 @@ bool rc_update(rc_command_t* rc_command)
 
     if(is_ibus_lost())   
     {
-        rc_command_clear(rc_command);
+        rc_command_clear(&my_rc_command);
         return false;
     }
 
     rc_channel_mapping(ibus_channel, &rc_raw_command);
-    rc_get_command(rc_raw_command, rc_command);
+    rc_get_command(rc_raw_command, &my_rc_command);
     return true;
 }
 
@@ -79,7 +82,7 @@ void rc_get_command(rc_raw_command_t rc_raw_command, rc_command_t* rc_command)
     rc_command->throttle = rc_raw_command.throttle - 1000;
 
     uint8_t scale_factor = rc_set_angle_range(20, -20); // send angle command upto ±20 degree
-    rc_command->roll  = (int16_t)((rc_raw_command.roll - 1500) / scale_factor);
+    rc_command->roll  = (int16_t)((rc_raw_command.roll  - 1500) / scale_factor);
     rc_command->pitch = (int16_t)((rc_raw_command.pitch - 1500) / scale_factor);
-    rc_command->yaw   = (int16_t)((rc_raw_command.yaw - 1500) / scale_factor);
+    rc_command->yaw   = (int16_t)((rc_raw_command.yaw   - 1500) / scale_factor);
 }

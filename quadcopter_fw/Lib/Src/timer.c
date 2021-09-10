@@ -11,26 +11,27 @@
 
 void timer_init()
 {   
-    HAL_TIM_Base_Start(TIMER_1);
-    HAL_TIM_Base_Start(TIMER_2);
+    HAL_TIM_Base_Start(TIMER1);
+    HAL_TIM_Base_Start(TIMER2);
 }
 
-uint16_t get_timer_1_counter()
+void timer1_start()
 {
-    return __HAL_TIM_GET_COUNTER(TIMER_1);
+    __HAL_TIM_SET_COUNTER(TIMER1, 0);
 }
 
-void set_timer_1_counter_zero()
+uint16_t timer1_end()
 {
-    __HAL_TIM_SET_COUNTER(TIMER_1, 0);
+    return __HAL_TIM_GET_COUNTER(TIMER1);
 }
 
-uint16_t get_timer_2_counter()
+void tiemr2_start()
 {
-    return __HAL_TIM_GET_COUNTER(TIMER_2);
+    __HAL_TIM_SET_COUNTER(TIMER2, 0);
 }
 
-void set_timer_2_counter_zero()
+uint16_t timer2_end()
 {
-    __HAL_TIM_SET_COUNTER(TIMER_2, 0);
+    return __HAL_TIM_GET_COUNTER(TIMER2);
 }
+

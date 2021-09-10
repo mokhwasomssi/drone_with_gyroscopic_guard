@@ -64,11 +64,9 @@
 
 /* USER CODE BEGIN PV */
 
-angle_t 	 my_angle;
 uint16_t 	 my_motor_value[4] = {0, 0, 0, 0};
-rc_command_t my_rc_command;
 
-us dt;
+
 
 /* USER CODE END PV */
 
@@ -130,12 +128,11 @@ int main(void)
   MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
 
+  //while(!is_quadcopter_ready());
 
   timer_init();
+
   rc_init();
-
-  while(!is_quadcopter_ready());
-
   imu_init();
   motor_init();
   telemetry_init();
@@ -156,15 +153,11 @@ int main(void)
 
 		led_green_on(); //control loop indicator
 
-		rc_update(&my_rc_command);
-		imu_update(imu_sampling_time*0.000001, &my_angle);
+		rc_update();
+		imu_update();
 		motor_update(my_motor_value);
-		//telemetry_update();
+		telemetry_update();
 
-		set_timer_2_counter_zero();
-		led_blue_on(); //telemetry indicator
-		telemetry_tx_angle(my_angle); //monitoring
-		telemetry_time = get_timer_2_counter();
 
 		imu_ready = false;
 	  }

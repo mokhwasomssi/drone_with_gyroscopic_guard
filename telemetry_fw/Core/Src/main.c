@@ -20,10 +20,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "spi.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
+#include <stdio.h>
 
 #include "led.h"
 #include "nrf24l01p.h"
@@ -48,7 +51,7 @@
 
 /* USER CODE BEGIN PV */
 
-int8_t angle[3];
+int telemetry_rx_buffer[8] = {1,2,3,4,5,6,7,8};
 
 /* USER CODE END PV */
 
@@ -62,6 +65,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+int _write(int file, char *ptr, int len)
+{
+	HAL_UART_Transmit(&huart2, (uint8_t*)ptr, len, 500);
+	return len;
+}
 
 /* USER CODE END 0 */
 
@@ -94,9 +103,12 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI2_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  nrf24l01p_rx_init(2500, _1Mbps, 3);
+  //nrf24l01p_rx_init(2500, _1Mbps, 8);
+
+  uint8_t a = 102;
 
   /* USER CODE END 2 */
 
@@ -107,6 +119,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+	  printf("%d \n", a);
+
   }
   /* USER CODE END 3 */
 }
@@ -160,7 +175,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin == NRF24L01P_IRQ_PIN_NUMBER)
 	{
-		nrf24l01p_rx_receive(angle, 3); // read data when data ready flag is set
+		nrf24l01p_rx_receive(telemetry_rx_buffer, 8); // read data when data ready flag is set
 		led1_toggle();
 	}
 }

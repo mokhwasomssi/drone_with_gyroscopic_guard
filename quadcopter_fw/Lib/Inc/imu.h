@@ -12,10 +12,14 @@
 
 #include "icm20948.h"
 #include "angle.h"
+#include "interrupt.h"
+
+
+extern angle_t my_angle;
 
 
 void imu_init();
-void imu_update(double dt, angle_t* angle);
+void imu_update();
 
 
 #endif /* __IMU_H__ */

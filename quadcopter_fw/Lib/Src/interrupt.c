@@ -33,13 +33,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	{
 		led_blue_off(); //telemetry indicator
 		nrf24l01p_tx_irq(); // clear interrupt flag
-		//telemetry_time = get_timer_2_counter();
 	}
 
 	if(GPIO_Pin == ICM20948_IRQ_PIN_NUMBER)
 	{
 		imu_ready = true;
-		imu_sampling_time = get_timer_1_counter();
-		set_timer_1_counter_zero();
+		imu_sampling_time = timer2_end();
+		tiemr2_start();
 	}
 }

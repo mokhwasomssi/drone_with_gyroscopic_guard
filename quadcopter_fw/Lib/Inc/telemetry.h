@@ -12,14 +12,17 @@
 
 #include "nrf24l01p.h"
 #include "angle.h"
+#include "imu.h"
+#include "rc.h"
 
 
+/* Main Functions */
 void telemetry_init();
 void telemetry_update();
 
-void telemetry_tx_angle(angle_t current_angle);
+/* Sub Functions */
+void telemetry_tx_angle();
 void telemetry_tx_rc_command();
-void telemetry_rx_pid_gain();
 
 
 #endif /* __TELEMETRY_H__ */

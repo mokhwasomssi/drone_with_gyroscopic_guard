@@ -40,9 +40,12 @@ typedef struct
 } rc_raw_command_t;
 
 
+extern rc_command_t my_rc_command;
+
+
 /* Main Functions */
 void rc_init();
-bool rc_update(rc_command_t* rc_command);
+bool rc_update();
 
 /* Sub Functions */
 void rc_command_clear(rc_command_t* rc_command);

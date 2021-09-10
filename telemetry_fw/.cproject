@@ -89,7 +89,7 @@
                                     									
                                     <listOptionValue builtIn="false" value="../Drivers/CMSIS/Include"/>
                                     									
-                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/receiver_fw/Lib/Inc}&quot;"/>
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/telemetry_fw/Lib/Inc}&quot;"/>
                                     								
                                 </option>
                                 								
