@@ -29,7 +29,8 @@
 #include <stdio.h>
 
 #include "led.h"
-#include "nrf24l01p.h"
+#include "telemetry.h"
+#include "interrupt.h"
 
 /* USER CODE END Includes */
 
@@ -51,7 +52,7 @@
 
 /* USER CODE BEGIN PV */
 
-int telemetry_rx_buffer[8] = {1,2,3,4,5,6,7,8};
+
 
 /* USER CODE END PV */
 
@@ -59,18 +60,18 @@ int telemetry_rx_buffer[8] = {1,2,3,4,5,6,7,8};
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+/*
 int _write(int file, char *ptr, int len)
 {
 	HAL_UART_Transmit(&huart2, (uint8_t*)ptr, len, 500);
 	return len;
 }
+*/
 
 /* USER CODE END 0 */
 
@@ -106,9 +107,7 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  //nrf24l01p_rx_init(2500, _1Mbps, 8);
-
-  uint8_t a = 102;
+  telemetry_init();
 
   /* USER CODE END 2 */
 
@@ -120,7 +119,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  printf("%d \n", a);
+	  led_blue_off(); //telemetry indicator
 
   }
   /* USER CODE END 3 */
@@ -170,15 +169,6 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	if(GPIO_Pin == NRF24L01P_IRQ_PIN_NUMBER)
-	{
-		nrf24l01p_rx_receive(telemetry_rx_buffer, 8); // read data when data ready flag is set
-		led1_toggle();
-	}
-}
 
 /* USER CODE END 4 */
 

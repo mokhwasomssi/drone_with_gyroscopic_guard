@@ -12,13 +12,14 @@
 #include "gpio.h"
 
 
-#define LED1_PIN_PORT	GPIOC
-#define LED1_PIN_NUMBER	GPIO_PIN_13
+#define LED_BLUE_PIN_PORT	    GPIOC
+#define LED_BLUE_PIN_NUMBER	    GPIO_PIN_13
 
 
-void led1_on();
-void led1_off();
-void led1_toggle();
+// LED BLUE
+void led_blue_on();
+void led_blue_off();
+void led_blue_toggle();
 
 
 #endif /* __LED_H__ */

@@ -20,9 +20,5 @@
 void telemetry_init();
 void telemetry_update();
 
-/* Sub Functions */
-void telemetry_tx_angle();
-void telemetry_tx_rc_command();
-
 
 #endif /* __TELEMETRY_H__ */

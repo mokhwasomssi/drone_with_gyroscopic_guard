@@ -64,9 +64,7 @@
 
 /* USER CODE BEGIN PV */
 
-uint16_t 	 my_motor_value[4] = {0, 0, 0, 0};
-
-
+uint16_t my_motor_value[4] = {0, 0, 0, 0};
 
 /* USER CODE END PV */
 
@@ -150,7 +148,6 @@ int main(void)
 
 	  if(imu_ready) // run control loop depending on imu sampling time
 	  {				// ex) imu sampling time = 1.125khz, control loop cycle = 1.125khz
-
 		led_green_on(); //control loop indicator
 
 		rc_update();
@@ -158,11 +155,10 @@ int main(void)
 		motor_update(my_motor_value);
 		telemetry_update();
 
-
 		imu_ready = false;
+		led_green_off(); //control loop indicator
 	  }
 
-	  led_green_off(); //control loop indicator
   }
 
   /* USER CODE END 3 */

@@ -8,18 +8,18 @@
 #include "led.h"
 
 
-// LED1
-void led1_on()
+// LED BLUE
+void led_blue_on()
 {
-    HAL_GPIO_WritePin(LED1_PIN_PORT, LED1_PIN_NUMBER, RESET);
+    HAL_GPIO_WritePin(LED_BLUE_PIN_PORT, LED_BLUE_PIN_NUMBER, RESET);
 }
 
-void led1_off()
+void led_blue_off()
 {
-    HAL_GPIO_WritePin(LED1_PIN_PORT, LED1_PIN_NUMBER, SET);
+    HAL_GPIO_WritePin(LED_BLUE_PIN_PORT, LED_BLUE_PIN_NUMBER, SET);
 }
 
-void led1_toggle()
+void led_blue_toggle()
 {
-    HAL_GPIO_TogglePin(LED1_PIN_PORT, LED1_PIN_NUMBER);
+    HAL_GPIO_TogglePin(LED_BLUE_PIN_PORT, LED_BLUE_PIN_NUMBER);
 }

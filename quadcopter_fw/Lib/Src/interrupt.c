@@ -1,6 +1,6 @@
 /**
- * @file   interrupt.h
- * @brief  
+ * @file   interrupt.c
+ * @brief  define interrupt callback functions.
  * @author mokhwasomssi
  * @date   2021-09-10
  */
@@ -31,7 +31,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin == NRF24L01P_IRQ_PIN_NUMBER)
 	{
-		led_blue_off(); //telemetry indicator
+		led_blue_on(); //telemetry indicator
 		nrf24l01p_tx_irq(); // clear interrupt flag
 	}
 

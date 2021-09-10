@@ -19,14 +19,14 @@ static uint8_t write_register(uint8_t reg, uint8_t value);
 
 
 /* Main Functions */
-void nrf24l01p_rx_init(channel MHz, air_data_rate bps, payload_length length)
+void nrf24l01p_rx_init(channel MHz, air_data_rate bps)
 {
     nrf24l01p_reset();
 
     nrf24l01p_prx_mode();
     nrf24l01p_power_up();
 
-    nrf24l01p_rx_set_payload_widths(length);
+    nrf24l01p_rx_set_payload_widths(NRF24L01P_PAYLOAD_LENGTH);
 
     nrf24l01p_set_rf_channel(MHz);
     nrf24l01p_set_rf_air_data_rate(bps);
@@ -61,15 +61,15 @@ void nrf24l01p_tx_init(channel MHz, air_data_rate bps)
     ce_high();
 }
 
-void nrf24l01p_rx_receive(uint8_t* rx_payload, payload_length length)
+void nrf24l01p_rx_receive(uint8_t* rx_payload)
 {
-    nrf24l01p_read_rx_fifo(rx_payload, length);
+    nrf24l01p_read_rx_fifo(rx_payload, NRF24L01P_PAYLOAD_LENGTH);
     nrf24l01p_clear_rx_dr();
 }
 
-void nrf24l01p_tx_transmit(uint8_t* tx_payload, payload_length length)
+void nrf24l01p_tx_transmit(uint8_t* tx_payload)
 {
-    nrf24l01p_write_tx_fifo(tx_payload, length);
+    nrf24l01p_write_tx_fifo(tx_payload, NRF24L01P_PAYLOAD_LENGTH);
 }
 
 void nrf24l01p_tx_irq()

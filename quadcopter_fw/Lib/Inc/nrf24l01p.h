@@ -1,6 +1,6 @@
 /**
  * @file   nrf24l01p.h
- * @brief 
+ * @brief   
  * @author mokhwasomssi
  * @date   2021-07-20
  */
@@ -25,6 +25,8 @@
 
 #define NRF24L01P_IRQ_PIN_PORT            GPIOA
 #define NRF24L01P_IRQ_PIN_NUMBER          GPIO_PIN_8
+
+#define NRF24L01P_PAYLOAD_LENGTH          6
 
 
 /* nRF24L01+ typedefs */
@@ -52,11 +54,11 @@ typedef enum
 
 
 /* Main Functions */
-void nrf24l01p_rx_init(channel MHz, air_data_rate bps, payload_length length);
+void nrf24l01p_rx_init(channel MHz, air_data_rate bps);
 void nrf24l01p_tx_init(channel MHz, air_data_rate bps);
 
-void nrf24l01p_rx_receive (uint8_t* rx_payload, payload_length length);
-void nrf24l01p_tx_transmit(uint8_t* tx_payload, payload_length length);
+void nrf24l01p_rx_receive (uint8_t* rx_payload);
+void nrf24l01p_tx_transmit(uint8_t* tx_payload);
 
 void nrf24l01p_tx_irq(); // Check tx_ds or max_rt
 
