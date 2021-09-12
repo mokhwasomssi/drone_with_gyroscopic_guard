@@ -6,6 +6,7 @@
         "telemetry.h": "c",
         "ibus.h": "c",
         "dshot.h": "c",
-        "tim.h": "c"
+        "tim.h": "c",
+        "rc.h": "c"
     }
 }

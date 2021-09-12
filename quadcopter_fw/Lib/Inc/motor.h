@@ -10,12 +10,19 @@
 #define __MOTOR_H__
 
 
-//#include "pid.h" // calculate motor value
+#include "pid.h" // calculate motor value
 #include "dshot.h" // send motor value
+#include "rc.h"
+#include "interrupt.h"
 
 
+extern angle_t pid_value;
+extern double my_motor_value[4];
+
+
+/* Main Functions */
 void motor_init();
-void motor_update(uint16_t motor_value[]);
+void motor_update();
 
 
 #endif /* __MOTOR_H__ */

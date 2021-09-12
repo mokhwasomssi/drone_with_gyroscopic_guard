@@ -16,6 +16,8 @@
 
 
 extern angle_t my_angle;
+extern gyro_t my_gyro;
+extern accel_t my_accel;
 
 
 void imu_init();

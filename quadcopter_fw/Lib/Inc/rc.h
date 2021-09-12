@@ -11,6 +11,7 @@
 
 
 #include "ibus.h"
+#include "imu.h"
 
 
 typedef struct 
@@ -41,16 +42,12 @@ typedef struct
 
 
 extern rc_command_t my_rc_command;
+extern angle_t my_target_angle;
 
 
 /* Main Functions */
 void rc_init();
 bool rc_update();
-
-/* Sub Functions */
-void rc_command_clear(rc_command_t* rc_command);
-void rc_channel_mapping(uint16_t ibus_channel[], rc_raw_command_t* rc_raw_data);
-void rc_get_command(rc_raw_command_t rc_raw_data, rc_command_t* rc_command);
 
 
 #endif /* __RC_H__ */

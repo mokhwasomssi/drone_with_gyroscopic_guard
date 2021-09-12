@@ -64,8 +64,6 @@
 
 /* USER CODE BEGIN PV */
 
-uint16_t my_motor_value[4] = {0, 0, 0, 0};
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -85,6 +83,8 @@ bool is_quadcopter_ready()
 
 	return my_rc_command.start;
 }
+
+uint16_t loop_time;
 
 /* USER CODE END 0 */
 
@@ -126,14 +126,13 @@ int main(void)
   MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
 
-  //while(!is_quadcopter_ready());
 
-  timer_init();
-
+  timer_init(); // timer for measuring operating time.
   rc_init();
+  while(!is_quadcopter_ready());
   imu_init();
   motor_init();
-  telemetry_init();
+  //telemetry_init();
 
 
   /* USER CODE END 2 */
@@ -148,15 +147,19 @@ int main(void)
 
 	  if(imu_ready) // run control loop depending on imu sampling time
 	  {				// ex) imu sampling time = 1.125khz, control loop cycle = 1.125khz
-		led_green_on(); //control loop indicator
+		timer1_start();
+
+		led_green_on(); //control loop start
 
 		rc_update();
 		imu_update();
-		motor_update(my_motor_value);
-		telemetry_update();
+		motor_update();
+		//telemetry_update();
 
 		imu_ready = false;
-		led_green_off(); //control loop indicator
+		led_green_off(); //control loop end
+
+		loop_time = timer2_end();
 	  }
 
   }

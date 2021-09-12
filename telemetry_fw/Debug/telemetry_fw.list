@@ -7461,7 +7461,7 @@ static uint8_t write_register(uint8_t reg, uint8_t value)
  8002e1c:	20000028 	.word	0x20000028
 
 08002e20 <telemetry_init>:
-angle_t target_angle;
+//static void telemetry_printf();
 
 
 /* Main Functions */
@@ -7480,18 +7480,21 @@ void telemetry_init()
 
 08002e34 <telemetry_update>:
 
+/**
+ * @brief receive data from quadcopter
+ */
 void telemetry_update()
 {
  8002e34:	b580      	push	{r7, lr}
  8002e36:	af00      	add	r7, sp, #0
-    nrf24l01p_rx_receive(telemetry_rx_buffer); // receive data from quadcopter
+    nrf24l01p_rx_receive(telemetry_rx_buffer);
  8002e38:	4804      	ldr	r0, [pc, #16]	; (8002e4c <telemetry_update+0x18>)
  8002e3a:	f7ff fd7d 	bl	8002938 <nrf24l01p_rx_receive>
     get_quadcopter_angle();
  8002e3e:	f000 f807 	bl	8002e50 <get_quadcopter_angle>
     get_target_angle();
  8002e42:	f000 f81f 	bl	8002e84 <get_target_angle>
-    //telemetry_printf();  // print received data
+    //telemetry_printf();
 }
  8002e46:	bf00      	nop
  8002e48:	bd80      	pop	{r7, pc}
@@ -7556,6 +7559,7 @@ static void get_target_angle()
  8002ea0:	b25a      	sxtb	r2, r3
  8002ea2:	4b04      	ldr	r3, [pc, #16]	; (8002eb4 <get_target_angle+0x30>)
  8002ea4:	709a      	strb	r2, [r3, #2]
+}
  8002ea6:	bf00      	nop
  8002ea8:	46bd      	mov	sp, r7
  8002eaa:	f85d 7b04 	ldr.w	r7, [sp], #4

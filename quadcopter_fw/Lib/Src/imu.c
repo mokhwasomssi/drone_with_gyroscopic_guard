@@ -10,6 +10,8 @@
 
 
 angle_t my_angle;
+gyro_t my_gyro;
+accel_t my_accel;
 
 
 void imu_init()
@@ -23,10 +25,7 @@ void imu_init()
  */
 void imu_update()
 {
-    gyro_t temp_gyro;
-    accel_t temp_accel;
-
-    icm20948_gyro_read_dps(&temp_gyro);
-    icm20948_accel_read_g(&temp_accel);
-    complementary_filter(temp_gyro, temp_accel, imu_sampling_time*0.000001, 0.99, &my_angle);
+    icm20948_gyro_read_dps(&my_gyro);
+    icm20948_accel_read_g(&my_accel);
+    complementary_filter(my_gyro, my_accel, imu_sampling_time*0.000001, 0.99, &my_angle);
 }

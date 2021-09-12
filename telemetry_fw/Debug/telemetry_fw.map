@@ -4054,34 +4054,34 @@ LOAD c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
  .debug_macro   0x0000000000013a5e      0x126 Core/Src/gpio.o
  .debug_macro   0x0000000000013b84       0x3a Core/Src/gpio.o
  .debug_macro   0x0000000000013bbe      0x391 Core/Src/main.o
- .debug_macro   0x0000000000013f4f       0x52 Core/Src/main.o
- .debug_macro   0x0000000000013fa1       0x18 Core/Src/main.o
- .debug_macro   0x0000000000013fb9       0x3c Core/Src/main.o
- .debug_macro   0x0000000000013ff5       0x34 Core/Src/main.o
- .debug_macro   0x0000000000014029       0x16 Core/Src/main.o
- .debug_macro   0x000000000001403f       0x35 Core/Src/main.o
- .debug_macro   0x0000000000014074      0x333 Core/Src/main.o
- .debug_macro   0x00000000000143a7       0x10 Core/Src/main.o
- .debug_macro   0x00000000000143b7       0x16 Core/Src/main.o
- .debug_macro   0x00000000000143cd       0x43 Core/Src/main.o
- .debug_macro   0x0000000000014410       0x34 Core/Src/main.o
- .debug_macro   0x0000000000014444       0x10 Core/Src/main.o
- .debug_macro   0x0000000000014454       0x58 Core/Src/main.o
- .debug_macro   0x00000000000144ac       0x71 Core/Src/main.o
- .debug_macro   0x000000000001451d       0x1c Core/Src/main.o
- .debug_macro   0x0000000000014539      0x12a Core/Src/main.o
- .debug_macro   0x0000000000014663       0x10 Core/Src/main.o
- .debug_macro   0x0000000000014673       0x1c Core/Src/main.o
- .debug_macro   0x000000000001468f       0x52 Core/Src/main.o
- .debug_macro   0x00000000000146e1       0x22 Core/Src/main.o
- .debug_macro   0x0000000000014703       0x10 Core/Src/main.o
- .debug_macro   0x0000000000014713       0x40 Core/Src/main.o
- .debug_macro   0x0000000000014753       0xd5 Core/Src/main.o
- .debug_macro   0x0000000000014828       0x1c Core/Src/main.o
- .debug_macro   0x0000000000014844       0x3d Core/Src/main.o
- .debug_macro   0x0000000000014881       0x16 Core/Src/main.o
- .debug_macro   0x0000000000014897      0x145 Core/Src/main.o
- .debug_macro   0x00000000000149dc       0x16 Core/Src/main.o
+ .debug_macro   0x0000000000013f4f       0x16 Core/Src/main.o
+ .debug_macro   0x0000000000013f65       0x52 Core/Src/main.o
+ .debug_macro   0x0000000000013fb7       0x18 Core/Src/main.o
+ .debug_macro   0x0000000000013fcf       0x3c Core/Src/main.o
+ .debug_macro   0x000000000001400b       0x34 Core/Src/main.o
+ .debug_macro   0x000000000001403f       0x16 Core/Src/main.o
+ .debug_macro   0x0000000000014055       0x35 Core/Src/main.o
+ .debug_macro   0x000000000001408a      0x333 Core/Src/main.o
+ .debug_macro   0x00000000000143bd       0x10 Core/Src/main.o
+ .debug_macro   0x00000000000143cd       0x16 Core/Src/main.o
+ .debug_macro   0x00000000000143e3       0x43 Core/Src/main.o
+ .debug_macro   0x0000000000014426       0x34 Core/Src/main.o
+ .debug_macro   0x000000000001445a       0x10 Core/Src/main.o
+ .debug_macro   0x000000000001446a       0x58 Core/Src/main.o
+ .debug_macro   0x00000000000144c2       0x71 Core/Src/main.o
+ .debug_macro   0x0000000000014533       0x1c Core/Src/main.o
+ .debug_macro   0x000000000001454f      0x12a Core/Src/main.o
+ .debug_macro   0x0000000000014679       0x10 Core/Src/main.o
+ .debug_macro   0x0000000000014689       0x1c Core/Src/main.o
+ .debug_macro   0x00000000000146a5       0x52 Core/Src/main.o
+ .debug_macro   0x00000000000146f7       0x22 Core/Src/main.o
+ .debug_macro   0x0000000000014719       0x10 Core/Src/main.o
+ .debug_macro   0x0000000000014729       0x40 Core/Src/main.o
+ .debug_macro   0x0000000000014769       0xd5 Core/Src/main.o
+ .debug_macro   0x000000000001483e       0x1c Core/Src/main.o
+ .debug_macro   0x000000000001485a       0x3d Core/Src/main.o
+ .debug_macro   0x0000000000014897       0x16 Core/Src/main.o
+ .debug_macro   0x00000000000148ad      0x145 Core/Src/main.o
  .debug_macro   0x00000000000149f2       0x22 Core/Src/main.o
  .debug_macro   0x0000000000014a14      0x120 Core/Src/main.o
  .debug_macro   0x0000000000014b34      0x1dd Core/Src/spi.o
