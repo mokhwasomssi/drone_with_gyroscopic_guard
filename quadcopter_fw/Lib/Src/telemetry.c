@@ -37,9 +37,9 @@ void telemetry_update()
 /* Static Functions */
 static void put_angle()
 {
-    telemetry_tx_buffer[0] = (int8_t)(my_angle.roll);
-    telemetry_tx_buffer[1] = (int8_t)(my_angle.pitch);
-    telemetry_tx_buffer[2] = (int8_t)(my_angle.yaw);
+    telemetry_tx_buffer[0] = (int8_t)(my_current_angle.roll);
+    telemetry_tx_buffer[1] = (int8_t)(my_current_angle.pitch);
+    telemetry_tx_buffer[2] = (int8_t)(my_current_angle.yaw);
 }
 
 static void put_rc_command()

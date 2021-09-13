@@ -15,9 +15,9 @@
 #include "interrupt.h"
 
 
-extern angle_t my_angle;
-extern gyro_t my_gyro;
-extern accel_t my_accel;
+extern angle_t my_current_angle;
+extern gyro_t  my_current_gyro;
+extern accel_t my_current_accel;
 
 
 void imu_init();

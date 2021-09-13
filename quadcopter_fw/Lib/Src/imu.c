@@ -9,9 +9,9 @@
 #include "imu.h"
 
 
-angle_t my_angle;
-gyro_t my_gyro;
-accel_t my_accel;
+angle_t my_current_angle;
+gyro_t  my_current_gyro;
+accel_t my_current_accel;
 
 
 void imu_init()
@@ -25,7 +25,7 @@ void imu_init()
  */
 void imu_update()
 {
-    icm20948_gyro_read_dps(&my_gyro);
-    icm20948_accel_read_g(&my_accel);
-    complementary_filter(my_gyro, my_accel, imu_sampling_time*0.000001, 0.99, &my_angle);
+    icm20948_gyro_read_dps(&my_current_gyro);
+    icm20948_accel_read_g(&my_current_accel);
+    complementary_filter(my_current_gyro, my_current_accel, imu_sampling_time*0.000001, 0.99, &my_current_angle);
 }

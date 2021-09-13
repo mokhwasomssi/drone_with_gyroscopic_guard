@@ -11,10 +11,14 @@
 
 
 #include "imu.h"
+#include "rc.h"
 
 
+extern angle_t my_pid_value;
+
+
+/* Main Functions */
 void pid_init();
-void pid_calculate(angle_t current_angle, gyro_t current_gyro, double dt, angle_t target_angle, angle_t* pid_value);
-
+void pid_angle();
 
 #endif /* __PID_H__ */

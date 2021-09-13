@@ -9,47 +9,76 @@
 #include "pid.h"
 
 
-double kp = 1;
-double ki = 0.5;
-double kd = 0.1;
+double roll_kp = 1.0;
+double roll_ki = 0.7;
+double roll_kd = 0.3;
+
+double pitch_kp = 1.5;
+double pitch_ki = 1.1;
+double pitch_kd = 0.5;
+
+double yaw_kp;
+double yaw_ki;
+double yaw_kd;
 
 
+angle_t my_pid_value;
 
+
+/* Static Functions */
+static void pid_roll_angle();
+static void pid_pitch_angle();
+
+
+/* Main Functions */
 void pid_init()
 {
 
 }
 
-/**
- * @brief pid calculation to get new motor value using current angle
- * @param[in] current_angle put current angle
- * @param[in] target_angle 
- * @param[out] pid_value 
- */
-void pid_calculate(angle_t current_angle, gyro_t current_gyro, double dt, angle_t target_angle, angle_t* pid_value)
+void pid_angle()
 {
-    double roll_error;
+    pid_roll_angle();
+    pid_pitch_angle();
+}
+
+
+/* Static Functions */
+static void pid_roll_angle()
+{
+    double        roll_error;
     static double roll_integral, roll_integral_prior;
-    double roll_derivative;
+    double        roll_derivative;
 
-    roll_error = target_angle.roll - current_angle.roll;
-    roll_derivative = -current_gyro.x;
-    roll_integral = roll_integral_prior + roll_error*dt;
+    double dt = imu_sampling_time*0.000001;
 
-    pid_value->roll = (kp*roll_error) + (ki*roll_integral) + (kd*roll_derivative);
+    roll_error      = my_target_angle.roll - my_current_angle.roll;
+    roll_derivative = -my_current_gyro.x;
+    roll_integral   = roll_integral_prior + roll_error*dt;
+
+    // calculate pid
+    my_pid_value.roll = (roll_kp*roll_error) + (roll_ki*roll_integral) + (roll_kd*roll_derivative);
 
     roll_integral_prior = roll_integral;
 }
 
-/*
-void pid_angle()
+static void pid_pitch_angle()
 {
-    pid_roll_angle(double kp, double ki, double kd);
-    pid_pitch_angle(double kp, double ki, double kd);
-    pid_yaw_angle(double kp, double ki, double kd);
-}
-*/
+    double        pitch_error;
+    static double pitch_integral, pitch_integral_prior;
+    double        pitch_derivative;
 
-// void pid_roll_angle(double kp, double ki, double kd);
-// void pid_pitch_angle(double kp, double ki, double kd);
+    double dt = imu_sampling_time*0.000001;
+
+    pitch_error      = my_target_angle.pitch - my_current_angle.pitch;
+    pitch_derivative = -my_current_gyro.y;
+    pitch_integral   = pitch_integral_prior + pitch_error*dt;
+
+    // calculate pid
+    my_pid_value.pitch = (pitch_kp*pitch_error) + (pitch_ki*pitch_integral) + (pitch_kd*pitch_derivative);
+
+    pitch_integral_prior = pitch_integral;
+}
+
+
 // void pid_yaw_angle(double kp, double ki, doble kd);
