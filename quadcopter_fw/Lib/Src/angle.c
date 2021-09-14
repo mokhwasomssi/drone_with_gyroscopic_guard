@@ -35,6 +35,7 @@ void get_angle_from_gyro(gyro_t gyro, angle_t prev_angle, double dt, angle_t* an
 
     angle->roll  = prev_angle.roll + temp_angle.roll;
     angle->pitch = prev_angle.pitch + temp_angle.pitch;
+    angle->yaw   = prev_angle.yaw + temp_angle.pitch;
 }
 
 void complementary_filter(gyro_t gyro, accel_t accel, sec dt, double alpha, angle_t* filtered_angle)
@@ -46,5 +47,29 @@ void complementary_filter(gyro_t gyro, accel_t accel, sec dt, double alpha, angl
     get_angle_from_gyro(gyro, *filtered_angle, dt, &gyro_angle);
 
     filtered_angle->roll  = alpha*gyro_angle.roll  + (1-alpha)*accel_angle.roll;
-    filtered_angle->pitch = alpha*gyro_angle.pitch + (1-alpha)*accel_angle.pitch;   
+    filtered_angle->pitch = alpha*gyro_angle.pitch + (1-alpha)*accel_angle.pitch;
+
+}
+
+void get_roll_angle(gyro_t gyro, accel_t accel, sec dt, double alpha, angle_t* angle)
+{
+    double accel_roll_angle;
+    accel_roll_angle = atan(accel.y / accel.z) * RADIAN_TO_DEGREE;
+
+    // complementary_filter
+    angle->roll = alpha*(gyro.x*dt + angle->roll) + (1-alpha)*accel_roll_angle; 
+}
+
+void get_pitch_angle(gyro_t gyro, accel_t accel, sec dt, double alpha, angle_t* angle)
+{
+    double accel_pitch_angle;
+    accel_pitch_angle = -atan(accel.x / sqrt(accel.y*accel.y + accel.z*accel.z)) * RADIAN_TO_DEGREE;
+
+    // complementary_filter
+    angle->pitch = alpha*(gyro.y*dt + angle->pitch) + (1-alpha)*accel_pitch_angle; 
+}
+
+void get_yaw_angle(gyro_t gyro, sec dt, angle_t* angle)
+{
+    angle->yaw += gyro.z*dt;
 }

@@ -17,9 +17,9 @@ double pitch_kp = 1.5;
 double pitch_ki = 1.1;
 double pitch_kd = 0.5;
 
-double yaw_kp;
+double yaw_kp = 1.0;
 double yaw_ki;
-double yaw_kd;
+double yaw_kd = 0.6;
 
 
 angle_t my_pid_value;
@@ -28,6 +28,7 @@ angle_t my_pid_value;
 /* Static Functions */
 static void pid_roll_angle();
 static void pid_pitch_angle();
+static void pid_yaw_angle();
 
 
 /* Main Functions */
@@ -40,6 +41,7 @@ void pid_angle()
 {
     pid_roll_angle();
     pid_pitch_angle();
+    pid_yaw_angle();
 }
 
 
@@ -80,5 +82,20 @@ static void pid_pitch_angle()
     pitch_integral_prior = pitch_integral;
 }
 
+static void pid_yaw_angle()
+{
+    double        yaw_error;
+    static double yaw_integral, yaw_integral_prior;
+    double        yaw_derivative;
 
-// void pid_yaw_angle(double kp, double ki, doble kd);
+    double dt = imu_sampling_time*0.000001;
+
+    yaw_error      = my_target_angle.yaw - my_current_angle.yaw;
+    yaw_derivative = -my_current_gyro.z;
+    yaw_integral   = yaw_integral_prior + yaw_error*dt;
+
+    // calculate pid
+    my_pid_value.yaw = (yaw_kp*yaw_error) + (yaw_ki*yaw_integral) + (yaw_kd*yaw_derivative);
+
+    yaw_integral_prior = yaw_integral;
+}

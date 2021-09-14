@@ -31,4 +31,8 @@ void get_angle_from_accel(accel_t accel, angle_t* angle); // use gravity acceler
 void complementary_filter(gyro_t gyro, accel_t accel, sec dt, double alpha, angle_t* filtered_angle);
 
 
+void get_roll_angle(gyro_t gyro, accel_t accel, sec dt, double alpha, angle_t* angle);
+void get_pitch_angle(gyro_t gyro, accel_t accel, sec dt, double alpha, angle_t* angle);
+void get_yaw_angle(gyro_t gyro, sec dt, angle_t* angle);
+
 #endif /* __ANGLE_H__ */

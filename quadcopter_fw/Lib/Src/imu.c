@@ -27,5 +27,10 @@ void imu_update()
 {
     icm20948_gyro_read_dps(&my_current_gyro);
     icm20948_accel_read_g(&my_current_accel);
-    complementary_filter(my_current_gyro, my_current_accel, imu_sampling_time*0.000001, 0.99, &my_current_angle);
+
+    //complementary_filter(my_current_gyro, my_current_accel, imu_sampling_time*0.000001, 0.99, &my_current_angle);
+
+    get_roll_angle(my_current_gyro, my_current_accel, imu_sampling_time*0.000001, 0.99, &my_current_angle);
+    get_pitch_angle(my_current_gyro, my_current_accel, imu_sampling_time*0.000001, 0.99, &my_current_angle);
+    get_yaw_angle(my_current_gyro, imu_sampling_time*0.000001, &my_current_angle);
 }

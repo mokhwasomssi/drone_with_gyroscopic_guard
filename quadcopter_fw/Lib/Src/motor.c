@@ -32,16 +32,15 @@ void motor_update()
 {
     if(my_rc_command.arming)
     {
+        led_blue_on(); // arming indicator
         pid_angle();
         mixer();
-        limit_motor_value();
-        led_blue_on(); // arming indicator
     }
 
     else
     {
-        clear_motor_value();
         led_blue_off(); // disarming indicator
+        clear_motor_value();
     }
 
     ready_dshot_value();
@@ -68,6 +67,8 @@ static void mixer()
     my_motor_value[1] = throttle - roll - pitch - yaw;
     my_motor_value[2] = throttle + roll + pitch - yaw;
     my_motor_value[3] = throttle - roll + pitch + yaw;
+
+    limit_motor_value();
 }
 
 /**
