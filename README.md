@@ -2,7 +2,7 @@
 
 **Develop drone firmware and Design gyroscopic guard**
 
-![깃헙 소셜 프리뷰 사진](https://user-images.githubusercontent.com/48342925/123043646-90a3b300-d433-11eb-99dd-8545261a8c11.png)
+![20220227_153951](https://user-images.githubusercontent.com/48342925/155873725-4337d101-3516-4256-a67a-2224b7e8d388.jpg)
 
 
 ---
